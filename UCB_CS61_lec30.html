@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 21:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十课 排序(一), 插/选/希/合</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十课 排序(一), 插/选/希/合</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org85af049">1. Insertion Sort :S and I:</a>
+<ul>
+<li><a href="#org91cb1c9">1.1. Running time is O(n^2), in both array and linkedList</a></li>
+<li><a href="#org525c70c">1.2. in-place sort when using array</a></li>
+<li><a href="#org6a872a6">1.3. features for speeding up insertion-sort</a></li>
+</ul>
+</li>
+<li><a href="#org89596d5">2. Selection Sort :S and I:</a>
+<ul>
+<li><a href="#org3f6fac3">2.1. Running time is always O(n^2)</a></li>
+<li><a href="#org94f05ce">2.2. In-place by array</a></li>
+</ul>
+</li>
+<li><a href="#org6eb751f">3. Heap Sort(a selection sort whose 'I' is a Heap) :S and I:</a>
+<ul>
+<li><a href="#org413ec91">3.1. Running time</a></li>
+<li><a href="#org48b82e7">3.2. In-place by array</a></li>
+<li><a href="#orga8d6b55">3.3. Disadvantage</a></li>
+</ul>
+</li>
+<li><a href="#org292a7ff">4. Merge Sort(a selection sort whose 'S' and 'I' are sorted list)</a>
+<ul>
+<li><a href="#orge853b04">4.1. Divide and conquer and Recursive</a></li>
+<li><a href="#orgcfef65b">4.2. Running time</a></li>
+<li><a href="#org6230be6">4.3. NO in-place and Inefficient for Array</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+The need to sort numbers, strings, and other records arises frequently.  The
+entries in any modern phone book were sorted by a computer.  Databases have
+features that sort the records returned by a query, ordered according to any
+field the user desires.  Google sorts your query results by their "relevance".
+We've seen that Kruskal's algorithm uses sorting.  So do hundreds of other
+algorithms.
+</p>
+
+<p>
+Sorting is perhaps the simplest fundamental problem that offers a huge variety
+of algorithms, each with its own inherent advantages and disadvantages.  We'll
+study and compare eight sorting algorithms.
+</p>
+
+<div id="org85af049" class="outline-2">
+<h2 id="org85af049"><span class="section-number-2">1</span> Insertion Sort :S and I:&#xa0;&#xa0;&#xa0;<span class="tag"><span class="InPlace">InPlace</span>&#xa0;<span class="Stable">Stable</span></span></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Insertion sort is very simple and runs in <span class="underline">O(n^2)</span> time.  We employ a list S, and
+<span class="underline">maintain the invariant that S is sorted</span>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">Start with an empty list _S_ and the unsorted list _I_ of <span style="color: #ce537a; font-weight: bold;">n</span> <span style="color: #bc6ec5; font-weight: bold;">input</span> items.
+<span style="color: #4f97d7; font-weight: bold;">for</span> (each item x <span style="color: #ce537a; font-weight: bold;">in</span> <span style="color: #7590db;">I</span>) {
+  insert x into the <span style="color: #ce537a; font-weight: bold;">list</span> <span style="color: #7590db;">S</span>, <span style="color: #7590db;">positioned</span> so that S remains in sorted order.
+}
+</pre>
+</div>
+
+<p>
+S may be an array or a linked list.
+</p>
+</div>
+
+<div id="org91cb1c9" class="outline-3">
+<h3 id="org91cb1c9"><span class="section-number-3">1.1</span> Running time is O(n^2), in both array and linkedList</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+If S is a linked list, then it takes Theta(n) worst-case time to find the right
+position to insert each item. If S is an array, we can find the right position
+in O(log n) time by binary search, but it takes Theta(n) worst-case time to
+shift the larger items over to make room for the new item.
+</p>
+
+<p>
+In either case, insertion sort runs in Theta(n^2) worst-case time&#x2013;but for a
+different reason in each case.
+</p>
+</div>
+</div>
+
+<div id="org525c70c" class="outline-3">
+<h3 id="org525c70c"><span class="section-number-3">1.2</span> in-place sort when using array</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+If S is an array, one of the nice things about insertion sort is that it's an
+in-place sort.  An <span class="underline">in-place_sort</span> is a sorting algorithm that keeps the sorted
+items in the same array that initially held the input items.  Besides the input
+array, it uses only O(1) or perhaps O(log n) additional memory.
+</p>
+
+<p>
+To do an in-place insertion sort, we partition the array into two pieces:  the
+left portion (initially empty) holds S, and the right portion holds I.  With
+each iteration, the dividing line between S and I moves one step to the right.
+</p>
+
+<pre class="example">
+----------    ----------    ----------    ----------    ----------
+][7|3|9|5| =&gt; |7][3|9|5| =&gt; |3|7][9|5| =&gt; |3|7|9][5| =&gt; |3|5|7|9][
+----------    ----------    ----------    ----------    ----------
+  \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+     I              I         S    I         S              S
+</pre>
+</div>
+</div>
+<div id="org6a872a6" class="outline-3">
+<h3 id="org6a872a6"><span class="section-number-3">1.3</span> features for speeding up insertion-sort</h3>
+<div class="outline-text-3" id="text-1-3">
+<ol class="org-ol">
+<li>If the input list I is "almost" sorted, insertion sort can be as fast as
+Theta(n)&#x2013;if the algorithm starts its search from the <span class="underline">end</span> of S. In this
+case, the running time is proportional to n plus the number of <span class="underline">inversions</span>.
+An inversion is a pair of keys j &lt; k such that j appears after k in I. I
+could have anywhere from zero to n (n - 1) / 2 inversions.</li>
+
+<li>If S is a <span class="underline">balanced search tree</span> (like a 2-3-4 tree or splay tree),which
+means S is a linked List then the running time is in O(n log n); but that's
+not what computer scientists mean when they discuss "insertion sort." This is
+our first <span class="underline">O(n logn)</span> sorting algorithm, but we'll pass it by for others that
+use less memory and have smaller constants hidden in the asymptotic running
+time bounds.</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="org89596d5" class="outline-2">
+<h2 id="org89596d5"><span class="section-number-2">2</span> Selection Sort :S and I:&#xa0;&#xa0;&#xa0;<span class="tag"><span class="InPlace">InPlace</span>&#xa0;<span class="Stable">Stable</span></span></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Selection sort is equally simple, and also runs in quadratic time. Again we
+employ a list S, and <span class="underline">maintain the invariant that S is sorted</span>. Now, however, we
+walk through I and pick out the <span class="underline">smallest</span> item, which we append to the <span class="underline">end</span> of
+S.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">Start with an empty list S and the unsorted list I of <span style="color: #ce537a; font-weight: bold;">n</span> <span style="color: #bc6ec5; font-weight: bold;">input</span> items.
+<span style="color: #4f97d7; font-weight: bold;">for</span> (i = <span style="color: #a45bad;">0</span>; i &lt; <span style="color: #ce537a; font-weight: bold;">n</span>; i++) {
+  Let x be the item in I having smallest <span style="color: #a45bad;">key</span>.
+  Remove x from <span style="color: #a45bad;">I</span>.
+  Append x to the end <span style="color: #ce537a; font-weight: bold;">of</span> <span style="color: #7590db;">S</span>.
+}
+
+</pre>
+</div>
+</div>
+
+<div id="org3f6fac3" class="outline-3">
+<h3 id="org3f6fac3"><span class="section-number-3">2.1</span> Running time is always O(n^2)</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Whether S is an array or linked list, finding the smallest item takes Theta(n)
+time, so selection sort takes Theta(n^2) time, even in the best case! Hence,
+it's even worse than insertion sort.
+</p>
+</div>
+</div>
+<div id="org94f05ce" class="outline-3">
+<h3 id="org94f05ce"><span class="section-number-3">2.2</span> In-place by array</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+If S is an array, we can do an in-place selection sort.  After finding the
+item in I having smallest key, swap it with the first item in I, as shown here.
+</p>
+
+<pre class="example">
+----------    ----------    ----------    ----------    ----------
+][7|3|9|5| =&gt; |3][7|9|5| =&gt; |3|5][9|7| =&gt; |3|5|7][9| =&gt; |3|5|7|9][
+----------    ----------    ----------    ----------    ----------
+  \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+     I              I         S    I         S              S
+</pre>
+
+<p>
+If I is a data structure faster than an array, we call it
+</p>
+</div>
+</div>
+</div>
+<div id="org6eb751f" class="outline-2">
+<h2 id="org6eb751f"><span class="section-number-2">3</span> Heap Sort(a selection sort whose 'I' is a Heap) :S and I:&#xa0;&#xa0;&#xa0;<span class="tag"><span class="InPlace">InPlace</span></span></h2>
+<div class="outline-text-2" id="text-3">
+<p>
+回忆 binary heap 的特色:
+</p>
+<ol class="org-ol">
+<li>Binary Heaps 是对 priority queue 的最佳实现方式;</li>
+<li>priority queue 一个很好的应用是：event queue</li>
+<li>所以 Binary Heaps 能以最快速度找到最小值（事件时间最小，则事件发生）</li>
+</ol>
+
+<p>
+Heapsort is a selection sort in which I is a heap.
+</p>
+
+<p>
+Start with an empty list S and an unsorted list I of n input items. toss all the
+items in I onto a heap h (ignoring the heap-order property).
+</p>
+<div class="org-src-container">
+<pre class="src src-java">h.bottomUpHeap();                         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">O(n), Enforces the heap-order property</span>
+<span style="color: #4f97d7; font-weight: bold;">for</span> (i = <span style="color: #a45bad;">0</span>; i &lt; <span style="color: #ce537a; font-weight: bold;">n</span>; i++) {
+  x = h.removeMin();
+  Append x to the end <span style="color: #ce537a; font-weight: bold;">of</span> <span style="color: #7590db;">S</span>.
+}
+</pre>
+</div>
+</div>
+<div id="org413ec91" class="outline-3">
+<h3 id="org413ec91"><span class="section-number-3">3.1</span> Running time</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+bottomUpHeap() runs in linear time, and each removeMin() takes O(log n)
+</p>
+
+<blockquote>
+<p>
+（由树的深度决定的 running-time，一般都是 O(logn)）time.
+</p>
+</blockquote>
+
+<p>
+Hence, heapsort is an O(n log n)-time sorting algorithm.
+</p>
+</div>
+</div>
+
+<div id="org48b82e7" class="outline-3">
+<h3 id="org48b82e7"><span class="section-number-3">3.2</span> In-place by array</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+There are several ways to do heapsort in place; I'll describe just one.
+Maintain the heap <span class="underline">backward</span> at the <span class="underline">end</span> of the array.
+</p>
+
+<p>
+从数组末尾开始，往数组头的方向生成 heap. root 在数组末尾.
+</p>
+
+<p>
+This makes the indexing a little more complicated, but not substantially so. As
+items are removed from the heap, the heap <span class="underline">shrinks toward the end of the array</span>,
+making room to add items to the end of S.
+</p>
+
+<pre class="example">
+     bottomUpHeap() removeMin()   removeMin()   removeMin()   removeMin()
+    5             3             5             7             9
+   / \           / \           / \           /
+  9   3   =&gt;    7   5   =&gt;    7   9   =&gt;    9       =&gt;            =&gt;   empty
+ /             /
+7             9
+---------    ----------    ----------    ----------    ----------    ----------
+|7|3|9|5| =&gt; ][9|5|7|3| =&gt; |3][9|7|5| =&gt; |3|5][9|7| =&gt; |3|5|7][9| =&gt; |3|5|7|9][
+---------    ----------    ----------    ----------    ----------    ----------
+ \_____/       \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+    I             I              I         S    I         S              S
+</pre>
+</div>
+</div>
+
+<div id="orga8d6b55" class="outline-3">
+<h3 id="orga8d6b55"><span class="section-number-3">3.3</span> Disadvantage</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+Heapsort is excellent for sorting arrays, but it is an <span class="underline">awkward</span> choice for
+<span class="underline">linked lists</span>. The easiest way to heapsort a linked list is to create a new
+array of n references to the listnodes. Sort the array of references (using the
+keys in the listnodes for comparisons). When the array is sorted, link all the
+listnodes together into a sorted list.
+</p>
+
+<p>
+The array of references uses extra memory. There is another O(n log n) algorithm
+that can sort linked lists using very little additional memory.
+</p>
+</div>
+</div>
+</div>
+
+<div id="org292a7ff" class="outline-2">
+<h2 id="org292a7ff"><span class="section-number-2">4</span> Merge Sort(a selection sort whose 'S' and 'I' are sorted list)&#xa0;&#xa0;&#xa0;<span class="tag"><span class="NoInPlace">NoInPlace</span>&#xa0;<span class="DivideAndConquer">DivideAndConquer</span>&#xa0;<span class="IandI">IandI</span>&#xa0;<span class="Stable">Stable</span></span></h2>
+<div class="outline-text-2" id="text-4">
+<p>
+opposite to heap sort who is excelent for array, awkward for linkedList Merge
+sort is excelent for linkedList and awkward for array.
+</p>
+
+<p>
+Mergesort is based on the observation that it's possible to merge two sorted
+lists into one sorted list in linear time. In fact, we can do it with queues:
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-java">Let Q1 and Q2 be two sorted <span style="color: #a45bad;">queues</span>.  Let Q be <span style="color: #ce537a; font-weight: bold;">an</span> <span style="color: #bc6ec5; font-weight: bold;">empty</span> queue.
+
+<span style="color: #4f97d7; font-weight: bold;">while</span> (neither Q1 nor Q2 <span style="color: #ce537a; font-weight: bold;">is</span> <span style="color: #7590db;">empty</span>) {
+  item1 = Q1.front();
+  item2 = Q2.front();
+  move the smaller of item1 and item2 from its present queue to end <span style="color: #ce537a; font-weight: bold;">of</span> <span style="color: #7590db;">Q</span>.
+}
+
+concatenate the <span style="color: #ce537a; font-weight: bold;">remaining</span> <span style="color: #bc6ec5; font-weight: bold;">non</span>-empty queue (Q1 <span style="color: #ce537a; font-weight: bold;">or</span> <span style="color: #7590db;">Q2</span>) to the end of Q.
+</pre>
+</div>
+
+<p>
+The merge routine is a kind of selection sort. At each iteration, it chooses the
+item having smallest key from the two input lists, and appends it to the output
+list. Since the two input lists are sorted, there are only two items to test, so
+each iteration takes constant time. Hence, merging takes O(n) time.
+</p>
+</div>
+<div id="orge853b04" class="outline-3">
+<h3 id="orge853b04"><span class="section-number-3">4.1</span> Divide and conquer and Recursive</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Mergesort is a <span class="underline">recursive</span> <span class="underline">divide-and-conquer</span> algorithm, in which the merge
+routine is what allows us to reunite what we divided:
+</p>
+
+<pre class="example">
+Start with the unsorted list I of n input items.
+Break I into two halves I1 and I2, having ceiling(n/2) and floor(n/2) items.
+Sort I1 recursively, yielding the sorted list S1.
+Sort I2 recursively, yielding the sorted list S2.
+Merge S1 and S2 into a sorted list S.
+</pre>
+</div>
+</div>
+
+<div id="orgcfef65b" class="outline-3">
+<h3 id="orgcfef65b"><span class="section-number-3">4.2</span> Running time</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+The recursion bottoms out at one-item lists.
+</p>
+
+<p>
+How long does mergesort take?
+</p>
+
+<p>
+The answer is made apparent by examining its recursion tree.
+</p>
+
+<p>
+这里仅仅展示了 bottom2up 的 conquer 的过程，这里的树型结构是递归的 分割合并 产生的，
+</p>
+<ul class="org-ul">
+<li>向下 divede 时 ：每次都在 2/n 处分割，耗时 O(1)*(1+ceiling(log_2 n)), 可以忽略不计。总共产生了深度为 1+ ceiling(log_2 n) 的递归调用栈;</li>
+<li>向上 conquer 时：排序就是在这个阶段执行的，每一层都需要处理 O(n)个数据的合并排序, 耗时 O(n)*(1+ceiling(log_2 n))= O(nlogn)</li>
+</ul>
+
+<p>
+这样看，merge-sort 取名很贴切，就是在 divide and conquer 的 merge 阶段执行 sort
+</p>
+
+<pre class="example">
+conquer                                                                            |
+  ^       -------------------------------  --\                                     |
+  |       |0 | 1 | 3 | 4 | 5 | 7 | 8 | 9|    |                                     |
+  |       -------------------------------    |                                     |
+  |              /               \           |                                     |
+  |       --------------- ---------------    |                                     |
+  |       |3 | 5 | 7 | 9| |0 | 1 | 4 | 8|    |                                     |
+  |       --------------- ---------------    \                                     |
+  |          /       \       /       \        &gt;  1 + ceiling(log_2  n) levels      |
+  |       ------- ------- ------- -------    /                     |               |
+  |       |3 | 7| |5 | 9| |4 | 8| |0 | 1|    |                     |               |
+  |       ------- ------- ------- -------    |                     |               |
+  |        /   \   /   \   /   \   /   \     |                     |               |
+  |       --- --- --- --- --- --- --- ---    |                     |               |
+  |       |7| |3| |9| |5| |4| |8| |0| |1|    |                     |               v
+  |       --- --- --- --- --- --- --- ---  --/                     |             divide
+          \_____________________________/                          |
+                        v                                          v
+                   O(n) time per level -----------------------&gt;  O(nlogn)time
+
+</pre>
+
+<p>
+(Note that this tree is not a data structure. It's the structure of a sequence
+of recursive calls, like a game tree.)
+</p>
+
+<p>
+Each level of the tree involves O(n) operations, and there are O(log n) levels.
+Hence, mergesort runs in O(n log n) time.
+</p>
+</div>
+</div>
+
+<div id="org6230be6" class="outline-3">
+<h3 id="org6230be6"><span class="section-number-3">4.3</span> NO in-place and Inefficient for Array</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+What makes mergesort a memory-efficient algorithm for sorting linked lists
+makes it a memory-inefficient algorithm for sorting arrays?
+</p>
+
+<p>
+Unlike the other sorting algorithms we've considered, mergesort is not an
+in-place algorithm. There is no reasonably efficient way to merge two arrays in
+place. Instead, use an <span class="underline">extra array of O(n) size</span> to temporarily hold the result
+of a merge.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

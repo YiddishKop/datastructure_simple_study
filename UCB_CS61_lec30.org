@@ -1,0 +1,258 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第三十课 排序(一), 插/选/希/合
+#+PROPERTY: header-args:ipython :session 第三十课 排序(一), 插/选/希/合
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第三十课 排序(一), 插/选/希/合
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+The need to sort numbers, strings, and other records arises frequently.  The
+entries in any modern phone book were sorted by a computer.  Databases have
+features that sort the records returned by a query, ordered according to any
+field the user desires.  Google sorts your query results by their "relevance".
+We've seen that Kruskal's algorithm uses sorting.  So do hundreds of other
+algorithms.
+
+Sorting is perhaps the simplest fundamental problem that offers a huge variety
+of algorithms, each with its own inherent advantages and disadvantages.  We'll
+study and compare eight sorting algorithms.
+
+* Insertion Sort :S and I:                                   :InPlace:Stable:
+Insertion sort is very simple and runs in _O(n^2)_ time.  We employ a list S, and
+_maintain the invariant that S is sorted_.
+
+#+BEGIN_SRC java
+  Start with an empty list _S_ and the unsorted list _I_ of n input items.
+  for (each item x in I) {
+    insert x into the list S, positioned so that S remains in sorted order.
+  }
+#+END_SRC
+
+S may be an array or a linked list.
+
+** Running time is O(n^2), in both array and linkedList
+If S is a linked list, then it takes Theta(n) worst-case time to find the right
+position to insert each item. If S is an array, we can find the right position
+in O(log n) time by binary search, but it takes Theta(n) worst-case time to
+shift the larger items over to make room for the new item.
+
+In either case, insertion sort runs in Theta(n^2) worst-case time--but for a
+different reason in each case.
+
+** in-place sort when using array
+If S is an array, one of the nice things about insertion sort is that it's an
+in-place sort.  An _in-place_sort_ is a sorting algorithm that keeps the sorted
+items in the same array that initially held the input items.  Besides the input
+array, it uses only O(1) or perhaps O(log n) additional memory.
+
+To do an in-place insertion sort, we partition the array into two pieces:  the
+left portion (initially empty) holds S, and the right portion holds I.  With
+each iteration, the dividing line between S and I moves one step to the right.
+
+#+BEGIN_EXAMPLE
+     ----------    ----------    ----------    ----------    ----------
+     ][7|3|9|5| => |7][3|9|5| => |3|7][9|5| => |3|7|9][5| => |3|5|7|9][
+     ----------    ----------    ----------    ----------    ----------
+       \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+          I              I         S    I         S              S
+#+END_EXAMPLE
+** features for speeding up insertion-sort
+1. If the input list I is "almost" sorted, insertion sort can be as fast as
+   Theta(n)--if the algorithm starts its search from the _end_ of S. In this
+   case, the running time is proportional to n plus the number of _inversions_.
+   An inversion is a pair of keys j < k such that j appears after k in I. I
+   could have anywhere from zero to n (n - 1) / 2 inversions.
+
+2. If S is a _balanced search tree_ (like a 2-3-4 tree or splay tree),which
+   means S is a linked List then the running time is in O(n log n); but that's
+   not what computer scientists mean when they discuss "insertion sort." This is
+   our first _O(n logn)_ sorting algorithm, but we'll pass it by for others that
+   use less memory and have smaller constants hidden in the asymptotic running
+   time bounds.
+* Selection Sort :S and I:                                   :InPlace:Stable:
+Selection sort is equally simple, and also runs in quadratic time. Again we
+employ a list S, and _maintain the invariant that S is sorted_. Now, however, we
+walk through I and pick out the _smallest_ item, which we append to the _end_ of
+S.
+
+#+BEGIN_SRC java
+  Start with an empty list S and the unsorted list I of n input items.
+  for (i = 0; i < n; i++) {
+    Let x be the item in I having smallest key.
+    Remove x from I.
+    Append x to the end of S.
+  }
+
+#+END_SRC
+
+** Running time is always O(n^2)
+Whether S is an array or linked list, finding the smallest item takes Theta(n)
+time, so selection sort takes Theta(n^2) time, even in the best case! Hence,
+it's even worse than insertion sort.
+** In-place by array
+If S is an array, we can do an in-place selection sort.  After finding the
+item in I having smallest key, swap it with the first item in I, as shown here.
+
+#+BEGIN_EXAMPLE
+     ----------    ----------    ----------    ----------    ----------
+     ][7|3|9|5| => |3][7|9|5| => |3|5][9|7| => |3|5|7][9| => |3|5|7|9][
+     ----------    ----------    ----------    ----------    ----------
+       \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+          I              I         S    I         S              S
+#+END_EXAMPLE
+
+If I is a data structure faster than an array, we call it
+* Heap Sort(a selection sort whose 'I' is a Heap) :S and I:         :InPlace:
+回忆 binary heap 的特色:
+1. Binary Heaps 是对 priority queue 的最佳实现方式;
+2. priority queue 一个很好的应用是：event queue
+3. 所以 Binary Heaps 能以最快速度找到最小值（事件时间最小，则事件发生）
+
+Heapsort is a selection sort in which I is a heap.
+
+Start with an empty list S and an unsorted list I of n input items. toss all the
+items in I onto a heap h (ignoring the heap-order property).
+#+BEGIN_SRC java
+  h.bottomUpHeap();                         // O(n), Enforces the heap-order property
+  for (i = 0; i < n; i++) {
+    x = h.removeMin();
+    Append x to the end of S.
+  }
+#+END_SRC
+** Running time
+bottomUpHeap() runs in linear time, and each removeMin() takes O(log n)
+
+#+BEGIN_QUOTE
+（由树的深度决定的 running-time，一般都是 O(logn)）time.
+#+END_QUOTE
+
+Hence, heapsort is an O(n log n)-time sorting algorithm.
+
+** In-place by array
+There are several ways to do heapsort in place; I'll describe just one.
+Maintain the heap _backward_ at the _end_ of the array.
+
+从数组末尾开始，往数组头的方向生成 heap. root 在数组末尾.
+
+This makes the indexing a little more complicated, but not substantially so. As
+items are removed from the heap, the heap _shrinks toward the end of the array_,
+making room to add items to the end of S.
+
+#+BEGIN_EXAMPLE
+     bottomUpHeap() removeMin()   removeMin()   removeMin()   removeMin()
+    5             3             5             7             9
+   / \           / \           / \           /
+  9   3   =>    7   5   =>    7   9   =>    9       =>            =>   empty
+ /             /
+7             9
+---------    ----------    ----------    ----------    ----------    ----------
+|7|3|9|5| => ][9|5|7|3| => |3][9|7|5| => |3|5][9|7| => |3|5|7][9| => |3|5|7|9][
+---------    ----------    ----------    ----------    ----------    ----------
+ \_____/       \_____/      S  \___/      \_/  \_/      \___/  I      \_____/
+    I             I              I         S    I         S              S
+#+END_EXAMPLE
+
+** Disadvantage
+Heapsort is excellent for sorting arrays, but it is an _awkward_ choice for
+_linked lists_. The easiest way to heapsort a linked list is to create a new
+array of n references to the listnodes. Sort the array of references (using the
+keys in the listnodes for comparisons). When the array is sorted, link all the
+listnodes together into a sorted list.
+
+The array of references uses extra memory. There is another O(n log n) algorithm
+that can sort linked lists using very little additional memory.
+
+* Merge Sort(a selection sort whose 'S' and 'I' are sorted list) :NoInPlace:DivideAndConquer:IandI:Stable:
+opposite to heap sort who is excelent for array, awkward for linkedList Merge
+sort is excelent for linkedList and awkward for array.
+
+Mergesort is based on the observation that it's possible to merge two sorted
+lists into one sorted list in linear time. In fact, we can do it with queues:
+
+
+  #+BEGIN_SRC java
+    Let Q1 and Q2 be two sorted queues.  Let Q be an empty queue.
+
+    while (neither Q1 nor Q2 is empty) {
+      item1 = Q1.front();
+      item2 = Q2.front();
+      move the smaller of item1 and item2 from its present queue to end of Q.
+    }
+
+    concatenate the remaining non-empty queue (Q1 or Q2) to the end of Q.
+  #+END_SRC
+
+The merge routine is a kind of selection sort. At each iteration, it chooses the
+item having smallest key from the two input lists, and appends it to the output
+list. Since the two input lists are sorted, there are only two items to test, so
+each iteration takes constant time. Hence, merging takes O(n) time.
+** Divide and conquer and Recursive
+Mergesort is a _recursive_ _divide-and-conquer_ algorithm, in which the merge
+routine is what allows us to reunite what we divided:
+
+#+BEGIN_EXAMPLE
+  Start with the unsorted list I of n input items.
+  Break I into two halves I1 and I2, having ceiling(n/2) and floor(n/2) items.
+  Sort I1 recursively, yielding the sorted list S1.
+  Sort I2 recursively, yielding the sorted list S2.
+  Merge S1 and S2 into a sorted list S.
+#+END_EXAMPLE
+
+** Running time
+The recursion bottoms out at one-item lists.
+
+How long does mergesort take?
+
+The answer is made apparent by examining its recursion tree.
+
+这里仅仅展示了 bottom2up 的 conquer 的过程，这里的树型结构是递归的 分割合并 产生的，
+- 向下 divede 时 ：每次都在 2/n 处分割，耗时 O(1)*(1+ceiling(log_2 n)), 可以忽略不计。总共产生了深度为 1+ ceiling(log_2 n) 的递归调用栈;
+- 向上 conquer 时：排序就是在这个阶段执行的，每一层都需要处理 O(n)个数据的合并排序, 耗时 O(n)*(1+ceiling(log_2 n))= O(nlogn)
+
+这样看，merge-sort 取名很贴切，就是在 divide and conquer 的 merge 阶段执行 sort
+
+#+BEGIN_EXAMPLE
+ conquer                                                                            |
+   ^       -------------------------------  --\                                     |
+   |       |0 | 1 | 3 | 4 | 5 | 7 | 8 | 9|    |                                     |
+   |       -------------------------------    |                                     |
+   |              /               \           |                                     |
+   |       --------------- ---------------    |                                     |
+   |       |3 | 5 | 7 | 9| |0 | 1 | 4 | 8|    |                                     |
+   |       --------------- ---------------    \                                     |
+   |          /       \       /       \        >  1 + ceiling(log_2  n) levels      |
+   |       ------- ------- ------- -------    /                     |               |
+   |       |3 | 7| |5 | 9| |4 | 8| |0 | 1|    |                     |               |
+   |       ------- ------- ------- -------    |                     |               |
+   |        /   \   /   \   /   \   /   \     |                     |               |
+   |       --- --- --- --- --- --- --- ---    |                     |               |
+   |       |7| |3| |9| |5| |4| |8| |0| |1|    |                     |               v
+   |       --- --- --- --- --- --- --- ---  --/                     |             divide
+           \_____________________________/                          |
+                         v                                          v
+                    O(n) time per level ----------------------->  O(nlogn)time
+
+#+END_EXAMPLE
+
+(Note that this tree is not a data structure. It's the structure of a sequence
+of recursive calls, like a game tree.)
+
+Each level of the tree involves O(n) operations, and there are O(log n) levels.
+Hence, mergesort runs in O(n log n) time.
+
+** NO in-place and Inefficient for Array
+What makes mergesort a memory-efficient algorithm for sorting linked lists
+makes it a memory-inefficient algorithm for sorting arrays?
+
+Unlike the other sorting algorithms we've considered, mergesort is not an
+in-place algorithm. There is no reasonably efficient way to merge two arrays in
+place. Instead, use an _extra array of O(n) size_ to temporarily hold the result
+of a merge.

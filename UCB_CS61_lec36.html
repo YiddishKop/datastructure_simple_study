@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:37 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十六课 Splay Tree</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十六课 Splay Tree</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org9e90eb5">1. Splay trees</a>
+<ul>
+<li><a href="#org14c5e52">1.1. Tree Rotations</a>
+<ul>
+<li><a href="#orga18a4ec">1.1.1. zig and zag</a></li>
+<li><a href="#orgea8fac9">1.1.2. See up two(one) levels: G and P, every time</a></li>
+</ul>
+</li>
+<li><a href="#org63c401b">1.2. Main api of Splay Tree</a>
+<ul>
+<li><a href="#org842c4ca">1.2.1. [1]  Entry find(Object k);</a></li>
+<li><a href="#orga2fa11a">1.2.2. [2]  Entry min(); Entry max();</a></li>
+<li><a href="#org3dbd111">1.2.3. [3]  Entry insert(Object k, Object v);</a></li>
+<li><a href="#org2676e30">1.2.4. [4]  Entry remove(Object k);</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgc066ca8">2. Postscript:  Babble about Splay Trees (not examinable, but good for you)</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="org9e90eb5" class="outline-2">
+<h2 id="org9e90eb5"><span class="section-number-2">1</span> Splay trees</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+A splay tree is a type of <span class="underline">balanced binary search tree</span>, Binary Search Tree
+</p>
+</blockquote>
+<p>
+splaytree 并不是一颗一直保持 balanced 的二叉树，而是 in a long term, it will
+more and more balance, 他是在演进（每一步 api 操作都会演进）的过程中不断把访问过的 node 调整到根节点位置， <span class="underline">这样下次访问该 node 时，cost O(1)</span>.
+</p>
+
+<p>
+Structurally, it is identical to an ordinary binary search tree; the only
+difference is in the algorithms for finding, inserting, and deleting entries.
+</p>
+
+<p>
+All splay tree operations run in O(log n) time <span class="underline">on_average</span>, where n is the
+number of entries in the tree. Any single operation can take Theta(n) time in
+the worst case. But any sequence of k splay tree operations, with the tree
+initially empty and never exceeding n items, takes O(k log n) worst-case time.
+</p>
+
+<p>
+论单个的 operation（API 里的那几个），splay tree 都只有线性时间 theta(n), 这并不是很快，但是 splay tree 是一棵岁操作而优化的树，节点被访问的越多越靠近树根，而且每一个 api 里的 operation都会做 rotation 操作，去重新 balance 这颗树。所以长久来看一系列的操作平均复杂度是 O(log n),n是树的节点数量。
+</p>
+
+<p>
+Although 2-3-4 trees make a stronger guarantee (_every_ operation on a 2-3-4
+tree takes O(log n) time), splay trees have several advantages.  Splay trees
+are simpler and easier to program.  Because of their simplicity, splay tree
+insertions and deletions are typically faster in practice (sometimes by a
+constant factor, sometimes asymptotically).  Find operations can be faster or
+slower, depending on circumstances.
+</p>
+
+<p>
+Splay trees are designed to give especially fast access to entries that have
+been accessed recently, so they really excel in applications where a small
+fraction of the entries are the targets of most of the find operations.
+</p>
+
+<p>
+Splay trees have become the most widely used basic data structure invented in
+the last 30 years, because they're the fastest type of balanced search tree for
+many applications.
+</p>
+</div>
+
+<div id="org14c5e52" class="outline-3">
+<h3 id="org14c5e52"><span class="section-number-3">1.1</span> Tree Rotations</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+rotation 是唯一一个可以使树的高度减一的操作。这给树的 rebalance 带来很好的启发。
+</p>
+<pre class="example" id="anotherRotationInterpretation">
+                              +----+
+                              | w  |
+                              +----+--
+                            -/        \---
+                          -/             /\
+                  +----+-/              /  \
+                  | u  |               /    \
+                  +/---+-             /      \
+                 -/      \-          /---------
+               -/          \-
+             -/              X
+            /\              / \
+           /  \            /   \
+          /    \          /     \
+         /      \        /       \
+        /---------      /----------
+
+First, just forget the links, then rotate
+
+
+                              +----+                                     +----+
+                              | w  |                                     | u  |
+                              +----+                                     +----+
+
+                                         /\
+                  +----+                /  \                                         +----+
+                  | u  |               /    \                      X                 | w  |
+                  + ---+              /      \                    / \                +----+
+                                     /---------    ======&gt;       /   \
+                                                                /     \
+                             X                                 /--------        /\              /\
+            /\              / \                                                /  \            /  \
+           /  \            /   \                                              /    \          /    \
+          /    \          /     \                                            /      \        /      \
+         /      \        /       \                                          /---------      /---------
+        /---------      /----------
+
+</pre>
+
+
+<p>
+从上图可以得出：
+</p>
+<ul class="org-ul">
+<li>rotation(u, w) : u-l,w-r unchanged; u-r-old is w-l; u-r-new is w;</li>
+</ul>
+<p>
+同理(从右往左看上图)：
+</p>
+<ul class="org-ul">
+<li>rotation(u, w) : w-r,u-l unchanged; w-l-old is u-r; w-l-new is u;</li>
+</ul>
+
+
+<pre class="example">
+Like many types of balanced search         Y       &lt;&lt;tree rotation&gt;&gt;     X
+trees, splay trees are kept balanced      / \        rotate left        / \
+with the help of structural changes      X   ^      &lt;------------      ^   Y
+called _rotations_.  There are two      / \ /C\                       /A\ / \
+types--a left rotation and a right     ^  ^         ------------&gt;         ^  ^
+rotation--and each is the other's     /A\/B\         rotate right        /B\/C\
+reverse.  Suppose that X and Y are
+binary tree nodes, and A, B, and C are subtrees.  A rotation transforms either
+of the configurations illustrated above to the other.  Observe that the binary
+search tree invariant is preserved:  keys in A are less than or equal to X;
+keys in C are greater than or equal to Y; and keys in B are &gt;= X and &lt;= Y.
+</pre>
+
+<p>
+<span class="underline">Rotations are also used in AVL trees and red-black trees</span>, which are discussed
+by Goodrich and Tamassia, but are not covered in this course.
+</p>
+
+<p>
+树的 rotation:
+</p>
+<ul class="org-ul">
+<li>X 向右 rotation，就相当于拎着 X，这时候 Y 自动向下来到右边，右子树太重所以没拎动，来到 Y 这了。</li>
+<li>X 向左 rotation，。。。。。。X，。。。Y。。。。。。左边，左。。。。。。。。。，来到 Y 这了。</li>
+</ul>
+
+<p>
+Unlike 2-3-4 trees, splay trees are not kept perfectly balanced, but they tend
+to stay reasonably well-balanced most of the time, thereby averaging O(log n)
+time per operation in the worst case (and sometimes achieving O(1) average
+running time in special cases).
+</p>
+</div>
+<div id="orga18a4ec" class="outline-4">
+<h4 id="orga18a4ec"><span class="section-number-4">1.1.1</span> zig and zag</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<ul class="org-ul">
+<li>zig step rotate to left;</li>
+<li>zag step rotate to right</li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">l of l</td>
+<td class="org-left">l of r</td>
+<td class="org-left">l</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">r of r</td>
+<td class="org-left">r of l</td>
+<td class="org-left">r</td>
+</tr>
+
+<tr>
+<td class="org-left">rotation</td>
+<td class="org-left">Parent,Me</td>
+<td class="org-left">Me,parent</td>
+<td class="org-left">me</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">zi(a)g zi(a)g</td>
+<td class="org-left">zi(a)g za(i)g</td>
+<td class="org-left">zi(a)g</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+zi(a)g zi(a)g rule 的主要作用就是 balance the tree.
+防止遇到，unbalanced tree
+</p>
+</div>
+</div>
+
+<div id="orgea8fac9" class="outline-4">
+<h4 id="orgea8fac9"><span class="section-number-4">1.1.2</span> See up two(one) levels: G and P, every time</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ol class="org-ol">
+<li>先看
+<ol class="org-ol">
+<li>首先记录自己是父亲的左 or 右孩子，eg l</li>
+<li>再看父亲是祖父的左 or 右孩子,    eg r</li>
+</ol></li>
+<li>看完，按照 l r 找对应操作： 对应 zag zig, 对应 右转 左传</li>
+<li>开始转
+<ol class="org-ol">
+<li>先从以自己的父亲为跟节点的子树开始转，按照 zag zig 顺序，这里是 zag 右转;</li>
+<li>再按照自己的祖父为根节点的子树开始转，按照 zag zig 顺序，这里是 zig 左转;</li>
+</ol></li>
+<li>自己来到新的位置,有了新的父亲和祖父，从 1 开始重复</li>
+</ol>
+
+<p>
+采用层层递‘上’的策略：
+</p>
+
+<p>
+每次向前看两代 Grandparent and parent, 确定自己是 lofl(rofr),lofr(rofl),l(r)然后，
+rotation 2 times according to lr. 这样之后自己上升了两层，然后， 再向前看两代，然后在 rotation, 又前进两层。。。。当父亲节点就是跟节点 root 时，就只要 rotation
+一次即可。
+</p>
+
+<pre class="example">
+   +-------+
+   V       |
+ 检视 ---&gt; 旋转  ===&gt; near root
+</pre>
+</div>
+</div>
+</div>
+
+<div id="org63c401b" class="outline-3">
+<h3 id="org63c401b"><span class="section-number-3">1.2</span> Main api of Splay Tree</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+<span class="underline">所有的操作都和 BinarySearchTree 一样， 不一样的就是每种操作之后都要加上 Splay it to root.</span>
+</p>
+</div>
+<div id="org842c4ca" class="outline-4">
+<h4 id="org842c4ca"><span class="section-number-4">1.2.1</span> [1]  Entry find(Object k);</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+The find() operation in a splay tree begins just like the find() operation in
+an ordinary binary search tree:  we walk down the tree until we find the entry
+with key k, or reach a dead end (a node from which the next logical step leads
+to a null pointer).
+</p>
+
+<p>
+
+</p>
+
+<p>
+However, a splay tree isn't finished its job.  Let X be the node where the
+search ended, whether it contains the key k or not.  We <span class="underline">splay</span> X up the tree
+through a sequence of rotations, so that X becomes the root of the tree.  Why?
+One reason is so that recently accessed entries are near the root of the tree,
+and if we access the same few entries repeatedly, accesses will be very fast.
+Another reason is because if X lies deeply down an unbalanced branch of the
+tree, the splay operation will improve the balance along that branch.
+</p>
+
+<p>
+When we splay a node to the root of the tree, there are three cases that
+determine the rotations we use.
+</p>
+
+<pre class="example">
+1.      X is the right child of a left      G               G               X
+   child (or the left child of a right     / \             / \             / \
+   child):  let P be the parent of X,     P   ^           X   ^           P   G
+   and let G be the grandparent of X.    / \ /D\  ==&gt;    / \ /D\  ==&gt;    / \ / \
+   We first rotate X and P left,        ^  X            P  ^            ^  ^ ^  ^
+   and then rotate X and G right, as   /A\/ \          / \/C\          /A\/BVC\/D\
+   illustrated at right.                  ^  ^        ^  ^
+                                         /B\/C\      /A\/B\     Zig-Zag
+   The mirror image of this case--
+   where X is a left child and P is a right child--uses the same rotations in
+   mirror image:  rotate X and P right, then X and G left.  Both the case
+   illustrated above and its mirror image are called the "zig-zag" case.
+</pre>
+
+<pre class="example">
+2.      X is the left child of a left     G               P               X
+   child (or the right child of a right  / \             / \             / \
+   child):  the ORDER of the rotations  P   ^           X   G           ^   P
+   is REVERSED from case 1.  We        / \ /D\  ==&gt;    / \ / \    ==&gt;  /A\ / \
+   start with the grandparent,        X  ^            ^  ^ ^  ^            ^  G
+   and rotate G and P right.         / \/C\          /A\/BVC\/D\          /B\/ \
+   Then, we rotate P and X right.   ^  ^                                     ^  ^
+                                   /A\/B\                       Zig-Zig     /C\/D\
+   The mirror image of this case--
+   where X and P are both right children--uses the same rotations in mirror image:
+   rotate G and P left, then P and X left.  Both the case illustrated above and
+   its mirror image are called the "zig-zig" case.
+
+   We repeatedly apply zig-zag and zig-zig rotations to X; each pair of rotations
+   raises X two levels higher in the tree.  Eventually, either X will reach the
+   root (and we're done), or X will become the child of
+   the root.  One more case handles the latter
+   circumstance.
+</pre>
+
+<pre class="example">
+                                                              P             X
+                                                             / \           / \
+                                                            X   ^         ^   P
+3.      X's parent P is the root:  we rotate X and P       / \ /C\  ==&gt;  /A\ / \
+   so that X becomes the root.  This is called the        ^  ^               ^  ^
+   "zig" case.                                           /A\/B\     Zig     /B\/C\
+
+Here's an example of "find(7)".  Note how the tree's balance improves.
+
+    11                     11                      11                  [7]
+   /  \                   /  \                    /  \                 / \
+  1    12                1    12                [7]   12              1   11
+ / \                    / \                     / \                  /\   / \
+0   9                  0   9                   1   9                0 5   9  12
+   / \                    / \                 / \ / \                / \ / \
+  3   10  =zig-zig=&gt;    [7]  10  =zig-zag=&gt;  0  5 8  10   =zig=&gt;    3  6 8  10
+ / \                    / \                    / \                 / \
+2   5                  5   8                  3   6               2   4
+   / \                / \                    / \
+  4  [7]             3   6                  2   4
+     / \            / \
+    6   8          2   4
+</pre>
+
+<pre class="example">
+By inspecting each of the three cases (zig-zig, zig-zag, and zig), you can
+observe a few interesting facts.  _First_, in none of these three cases does the
+depth of a subtree increase by more than
+two.  Second, every time X takes two                       9
+steps toward the root (zig-zig or zig-zag),               / \
+every node in the subtree rooted at X moves              8   10
+at least one step closer to the root.                   /                         &lt;&lt;unbalanced tree&gt;&gt;
+As more and more nodes enter X's subtree,              7
+more of them get pulled closer to the root.           /
+                                                     6           1
+A node that initially lies at depth d on            /           / \
+the access path from the root to X moves           5           0   8
+to a final depth no greater than 3 + d/2.         /               / \
+In other words, all the nodes deep               4               6   9
+down the search path have their                 /               / \   \
+depths roughly halved.  This tendency          3  ==========&gt;  4   7   10
+of nodes on the access path to move           /     find(1)   / \
+toward the root prevents a splay tree        2               2   5
+from staying unbalanced for long            /                 \
+(as the example at right illustrates).     1                   3
+                                          /
+                                         0
+</pre>
+</div>
+</div>
+
+<div id="orga2fa11a" class="outline-4">
+<h4 id="orga2fa11a"><span class="section-number-4">1.2.2</span> [2]  Entry min(); Entry max();</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<p>
+These methods begin by finding the entry with minimum or maximum key, just like
+in an ordinary binary search tree.  Then, they splay the node containing the
+minimum or maximum key to the root.
+</p>
+</div>
+</div>
+
+<div id="org3dbd111" class="outline-4">
+<h4 id="org3dbd111"><span class="section-number-4">1.2.3</span> [3]  Entry insert(Object k, Object v);</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<p>
+insert() begins by inserting the new entry (k, v), just like in an ordinary
+binary search tree.  Then, it splays the new node to the root.
+</p>
+</div>
+</div>
+
+<div id="org2676e30" class="outline-4">
+<h4 id="org2676e30"><span class="section-number-4">1.2.4</span> [4]  Entry remove(Object k);</h4>
+<div class="outline-text-4" id="text-1-2-4">
+<p>
+An entry having key k is removed from the tree, just as with ordinary binary
+search trees.  Recall that the node containing k is removed if it has zero or
+one children.  If it has two children, the node with the next higher key is
+removed instead.  In either case, let X be the node removed from the tree.
+After X is removed, splay X's parent to the root.  Here's a sequence
+illustrating the operation remove(2).
+</p>
+
+<pre class="example">
+  2             4               5
+ / \           / \             / \
+1   7         1   7           4   7
+   / \   ==&gt;     / \   ==&gt;   /     \
+  5   8         5   8       1       8
+ /
+4
+</pre>
+
+<p>
+In this example, the key 4 moves up to replace the key 2 at the root.  After
+the node containing 4 is removed, its parent (containing 5) splays to the root.
+</p>
+
+<p>
+If the key k is not in the tree, splay the node where the search ended to the
+root, just like in a find() operation.
+</p>
+
+<p>
+对于 remove() 当有一个 key 没有找到时，你仍需要返回一些东西,为什么呢？因为，当你找的时候，也许他位于很深的位置，如果这次找你不做点什么，那么下次你再找同一个 key
+的时候他仍然花费这么多时间，所以为了符合 splaytree 的核心特色（不断优化的树），即便什么都找不到，你仍然要做 splay，仍然要继续 balance 这颗树。这时就 splay the
+node last visited(where the search ended) to the root.
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="orgc066ca8" class="outline-2">
+<h2 id="orgc066ca8"><span class="section-number-2">2</span> Postscript:  Babble about Splay Trees (not examinable, but good for you)</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+It may improve your understanding to watch the splay tree animation at
+<a href="http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/SplayTree-Example.html">http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/SplayTree-Example.html</a> .
+</p>
+
+<p>
+Splay trees can be rigorously shown to run in O(log n) average time per
+operation, over any sequence of operations (assuming we start from an empty
+tree), where n is the largest size the tree grows to.  However, the proof is
+quite elaborate.  It relies on an interesting algorithm analysis technique
+called <span class="underline">amortized_analysis</span>, which uses a <span class="underline">potential_function</span> to account for
+the time saved by operations that execute more quickly than expected.  This
+"saved-up time" can later be spent on the rare operations that take longer than
+O(log n) time to execute.  By proving that the potential function is never
+negative (that is, our "bank account" full of saved-up time never goes into the
+red), we prove that the operations take O(log n) time on average.
+</p>
+
+<p>
+The proof is given in Goodrich &amp; Tamassia Section 10.3.3 and in the brilliant
+original paper in the Journal of the Association for Computing Machinery,
+volume 32, number 3, pages 652-686, July 1985.  Unfortunately, there's not much
+intuition for why the proof works.  You crunch the equations and the result
+comes out.
+</p>
+
+<p>
+In 2000, Danny Sleator and Robert Tarjan won the ACM Kanellakis Theory and
+Practice Award for their papers on splay trees and amortized analysis.
+</p>
+
+
+<pre class="example">
+Splay trees are used in Windows NT (in the virtual memory, networking, and file
+system code), the gcc compiler and GNU C++ library, the sed string editor, Fore
+Systems network routers, the most popular implementation of Unix malloc, Linux
+loadable kernel modules, and in much other software.                          .
+                                                                             .
+                                                                            .
+When do operations occur that take more than O(log n) time?                /
+Consider inserting a long sequence of numbers in order:  1, 2, 3,         4
+etc.  The splay tree will become a long chain of left children (as       /
+illustrated at right).  Now, find(1) will take Theta(n) time.           3
+However, each of the n insert() operations before the find took O(1)   /
+time, so the average for this example is O(1) time per operation.     2
+                                                                     /
+                                                                    1
+</pre>
+
+<p>
+The fastest implementations of splay trees don't use the bottom-up splaying
+strategy discussed here. Splay trees, like 2-3-4 trees, come in bottom-up and
+top-down versions. Instead of doing one pass down the tree and another pass up,
+top-down splay trees do just one pass down. This saves a constant factor in the
+running time.
+</p>
+
+<p>
+There is an interesting conjecture about splay trees called the <span class="underline">dynamic</span>
+<span class="underline">optimality_conjecture</span>: that splay trees are as asymptotically fast on <span class="underline">any</span>
+sequence of operations as <span class="underline">any</span> other type of search tree with rotations. What
+does this mean? Any sequence of splay tree operations takes amortized O(log n)
+time per operation, but sometimes there are sequences of operations that can be
+processed faster by a sufficiently smart data structure. One example is
+accessing the same ten keys over and over again (which a splay tree can do in
+amortized O(1) time per access). The dynamic optimality conjecture guesses that
+if <span class="underline">any</span> search tree can exploit the structure of a sequence of accesses to
+achieve asymptotically faster running time, so can splay trees.
+</p>
+
+<p>
+The conjecture has never been proven, but it's not clear whether it's been
+disproven, either.
+</p>
+
+<p>
+One special case that has been proven is that if you perform the find operation
+on each key in a splay tree in order from the smallest key to the largest key,
+the total time for all n operations is O(n), and not O(n log n) as you might
+expect.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

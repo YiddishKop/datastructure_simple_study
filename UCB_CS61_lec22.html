@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:13 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十二课 Dictionay-2, Hash Table</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十二课 Dictionay-2, Hash Table</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org21d109a">DICTIONARIES (continued)</a>
+<ul>
+<li><a href="#org4296f3a">Hash Codes</a></li>
+<li><a href="#org256f23f">Resizing Hash Tables</a></li>
+<li><a href="#org2765b03">Transposition Tables:  Using a Dictionary to Speed Game Trees</a></li>
+</ul>
+</li>
+<li><a href="#orge7eb195">STACKS</a>
+<ul>
+<li><a href="#org61cad96">Expression Parsing</a>
+<ul>
+<li><a href="#org712a473">Evaluated by a stack of numbers</a></li>
+<li><a href="#orgba14a75">Converting Infix to Postfix</a></li>
+<li><a href="#orgafb98a6">Why does this work</a></li>
+<li><a href="#org0974a74">Example of infix</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9c301a8">QUEUES</a></li>
+<li><a href="#org68fa667">DEQUES</a>
+<ul>
+<li><a href="#orgd7abd84">Postscript:  A Faster Hash Code (not examinable)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org21d109a" class="outline-2">
+<h2 id="org21d109a">DICTIONARIES (continued)</h2>
+<div class="outline-text-2" id="text-org21d109a">
+</div>
+<div id="org4296f3a" class="outline-3">
+<h3 id="org4296f3a">Hash Codes</h3>
+<div class="outline-text-3" id="text-org4296f3a">
+<p>
+Since hash codes often need to be designed specially for each new object, you're
+left to your own wits. Here is an example of a good hash code for Strings.
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">hashCode</span>(<span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">key</span>) {
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">hashVal</span> = <span style="color: #a45bad;">0</span>;
+  <span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">0</span>; i &lt; key.<span style="color: #ce537a; font-weight: bold;">length</span>(); i++) {
+    hashVal = (<span style="color: #a45bad;">127</span> * hashVal + key.charAt(i)) % <span style="color: #a45bad;">16908799</span>;
+  }
+  <span style="color: #4f97d7; font-weight: bold;">return</span> hashVal;
+}
+</pre>
+</div>
+
+<p>
+By multiplying the hash code by 127 before adding in each new character, we make
+sure that each character has a different effect on the final result. The "%"
+operator with a prime number tends to "mix up the bits" of the hash code. The
+prime is chosen to be large, but not so large that 127 * hashVal + key.charAt(i)
+will ever exceed the maximum possible value of an int.
+</p>
+
+<p>
+The best way to understand good hash codes is to understand why bad hash codes
+are bad.  Here are some examples of bad hash codes on Words.
+</p>
+
+<ol class="org-ol">
+<li>Sum up the ASCII values of the characters. Unfortunately, the sum will
+rarely exceed 500 or so, and most of the entries will be bunched up in a
+few hundred buckets. Moreover, anagrams like "pat," "tap," and "apt" will
+collide.</li>
+<li>Use the first three letters of a word, in a table with 26^3 buckets.
+Unfortunately, words beginning with "pre" are much more common than words
+beginning with "xzq", and the former will be bunched up in one long list.
+This does not approach our uniformly distributed ideal.</li>
+<li>Consider the "good" hashCode() function written out above. Suppose the
+prime modulus is 127 instead of 16908799. Then the return value is just the
+last character of the word, because <code>(127 * hashVal) % 127 = 0</code>. That's why
+127 and 16908799 were chosen to have no common factors.</li>
+</ol>
+
+<p>
+<b>Why is the <code>hashCode()</code> function presented above good?</b>  Because we can find no
+obvious flaws, and it seems to work well in practice.  (A black art indeed.)
+</p>
+</div>
+</div>
+
+<div id="org256f23f" class="outline-3">
+<h3 id="org256f23f">Resizing Hash Tables</h3>
+<div class="outline-text-3" id="text-org256f23f">
+<p>
+   Sometimes we can't predict in advance how many entries we'll need to store. If
+the load factor n/N (entries per bucket) gets too large, we are in danger of
+losing constant-time performance.
+</p>
+
+<p>
+One option is to enlarge the hash table when the load factor becomes too large
+(typically larger than 0.75). Allocate a new array (typically at least twice as
+long as the old), then walk through all the entries in the old array and
+<span class="underline">rehash</span> them into the new.
+</p>
+
+<p>
+Take note:  you CANNOT just copy the linked lists to the same buckets in the
+new array, because the compression functions of the two arrays will certainly
+be incompatible.  You have to rehash each entry individually.
+</p>
+
+<p>
+You can also shrink hash tables (e.g., when n/N &lt; 0.25) to free memory, if you
+think the memory will benefit something else. (In practice, it's only sometimes
+worth the effort.)
+</p>
+
+<p>
+Obviously, an operation that causes a hash table to resize itself takes more
+than O(1) time; nevertheless, the <span class="underline">average</span> over the long run is still O(1) time
+per operation.
+</p>
+</div>
+</div>
+
+<div id="org2765b03" class="outline-3">
+<h3 id="org2765b03">Transposition Tables:  Using a Dictionary to Speed Game Trees</h3>
+<div class="outline-text-3" id="text-org2765b03">
+<p>
+An inefficiency of unadorned game tree search is that some grids can be reached
+through many different sequences of moves, and so the same grid might be
+evaluated many times. To reduce this expense, maintain a hash table that records
+previously encountered grids. This dictionary is called a <span class="underline">transposition_table</span>.
+Each time you compute a grid's score, insert into the dictionary an entry whose
+key is the grid and whose value is the grid's score. Each time the minimax
+algorithm considers a grid, it should first check whether the grid is in the
+transposition table; if so, its score is returned immediately. Otherwise, its
+score is evaluated recursively and stored in the transposition table.
+</p>
+
+<p>
+Transposition tables will only help you with your project if you can search to
+a depth of at least three ply (within the five second time limit).  It takes
+three ply to reach the same grid two different ways.
+</p>
+
+<p>
+After each move is taken, the transposition table should be emptied, because
+you will want to search grids to a greater depth than you did during the
+previous move.
+</p>
+</div>
+</div>
+</div>
+
+<div id="orge7eb195" class="outline-2">
+<h2 id="orge7eb195">STACKS</h2>
+<div class="outline-text-2" id="text-orge7eb195">
+<p>
+A <span class="underline">stack</span> is a crippled list.  You may manipulate only the item at the top of
+the stack.  The main operations: you may "push" a new item onto the top of the
+stack; you may "pop" the top item off the stack; you may examine the "top" item
+of the stack.  A stack can grow arbitrarily large.
+</p>
+
+<pre class="example">
+| |          | |            | | -size()-&gt; 2 |d| -top()-&gt; d     | |
+|b| -pop()-&gt; | | -push(c)-&gt; |c|             |c|                | | -top()--
+|a|    |     |a|            |a| -push(d)--&gt; |a| --pop() x 3--&gt; | |        |
+---    v     ---            ---             ---                ---        v
+       b                                                                 null
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">interface</span> <span style="color: #ce537a; font-weight: bold;">Stack</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">size</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #bc6ec5; font-weight: bold;">isEmpty</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">push</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">item</span>);
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #bc6ec5; font-weight: bold;">pop</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #bc6ec5; font-weight: bold;">top</span>();
+}
+</pre>
+</div>
+
+<p>
+In any reasonable implementation, all these methods run in O(1) time. A stack is
+easily implemented as a singly-linked list, using just the <code>front()</code>,
+<code>insertFront()</code>, and <code>removeFront()</code> methods.
+</p>
+
+<p>
+Why talk about Stacks when we already have Lists?  Mainly so you can carry on
+discussions with other computer programmers.  If somebody tells you that
+an algorithm uses a stack, the limitations of a stack give you a hint how
+the algorithm works.
+</p>
+
+<p>
+Sample application: <b>Verifying matched parentheses</b> in a String like
+"<code>{[(){[]}]()}</code>". Scan through the String, character by character.
+</p>
+<ul class="org-ul">
+<li>When you encounter a lefty&#x2013;'{', '[', or '('&#x2013;push it onto the stack.</li>
+<li>When you encounter a righty, pop its counterpart from atop the stack, and
+check that they match.</li>
+</ul>
+<p>
+If there's a mismatch or null returned, or if the stack is not empty when you
+reach the end of the string, the parentheses are not properly matched.
+</p>
+</div>
+<div id="org61cad96" class="outline-3">
+<h3 id="org61cad96">Expression Parsing</h3>
+<div class="outline-text-3" id="text-org61cad96">
+<ul class="org-ul">
+<li>Infix  : 3 + 4 * 7</li>
+<li>Prefix : + 3 * 4 7 (scheme)</li>
+<li>Postfix: 3 4 7 * +</li>
+</ul>
+
+<p>
+<b>postfix</b> write operator after its operands, each operand can be postfix
+ expression
+</p>
+<pre class="example">
+1  2  +  3  4  +  *  =  3  7  *  =  21
+--^----  -----^-
+  |           |
+  +--operand--+
+
+</pre>
+</div>
+<div id="org712a473" class="outline-4">
+<h4 id="org712a473">Evaluated by a stack of numbers</h4>
+<div class="outline-text-4" id="text-org712a473">
+<blockquote id="ParsePostfix">
+<ol class="org-ol">
+<li>Read expression left to right
+<ol class="org-ol">
+<li>Number: push it onto the stack.</li>
+<li>Operator: pop top 2 numbers of stack;
+perfor operation(first number popped as second operand));
+push result on stack</li>
+</ol></li>
+</ol>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-java" id="org81fc8de"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">operate</span>(<span style="color: #ce537a; font-weight: bold;">Stack</span> <span style="color: #7590db;">numStack</span>, <span style="color: #ce537a; font-weight: bold;">char</span> <span style="color: #7590db;">operator</span>)
+    <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">StackEmptyException</span>{
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">operand2</span> = ((<span style="color: #ce537a; font-weight: bold;">Integer</span>) numStackpop()).intValue();
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">operand1</span> = ((<span style="color: #ce537a; font-weight: bold;">Integer</span>) numStackpop()).intValue();
+    System.out.print(operator + <span style="color: #2d9574;">" "</span>);
+
+    <span style="color: #4f97d7; font-weight: bold;">switch</span>(operator){
+    <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #2d9574;">'+'</span>:
+        numStack.push(<span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Integer</span>(operand1 + operand2));
+        <span style="color: #4f97d7; font-weight: bold;">break</span>;
+    <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #2d9574;">'-'</span>:
+        numStack.push(<span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Integer</span>(operand1 - operand2));
+        <span style="color: #4f97d7; font-weight: bold;">break</span>;
+    <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #2d9574;">'*'</span>:
+        numStack.push(<span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Integer</span>(operand1 * operand2));
+        <span style="color: #4f97d7; font-weight: bold;">break</span>;
+    <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #2d9574;">'/'</span>:
+        numStack.push(<span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Integer</span>(operand1 / operand2));
+        <span style="color: #4f97d7; font-weight: bold;">break</span>;
+    }
+
+}
+
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Reads a postfix expr, evaluated &amp; prints it.</span>
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">java ParsePostfix '73*2+'</span>
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">output: 7 3 * 2 +  result: 23</span>
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">main</span>(<span style="color: #ce537a; font-weight: bold;">String</span>[] <span style="color: #7590db;">args</span>)
+    <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">StackEmptyException</span>{
+    <span style="color: #ce537a; font-weight: bold;">LinkedStack</span> <span style="color: #7590db;">numStack</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">LinkedStack</span>();
+
+    <span style="color: #4f97d7; font-weight: bold;">for</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">0</span>; i &lt; <span style="color: #ce537a; font-weight: bold;">args</span>[<span style="color: #a45bad;">0</span>].length(); i++){
+        <span style="color: #ce537a; font-weight: bold;">char</span> <span style="color: #7590db;">c</span> = args[<span style="color: #a45bad;">0</span>].charAt(i);
+        <span style="color: #4f97d7; font-weight: bold;">if</span>(Character.isDigit(c)){                                       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">if Digit?</span>
+            System.out.print(c + <span style="color: #2d9574;">" "</span>);                                  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">push</span>
+            numStack.push(<span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Integer</span>(Character.digit(c, <span style="color: #a45bad;">36</span>)))              <span style="color: #2aa1ae; background-color: #292e34;">//</span>
+        }<span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #4f97d7; font-weight: bold;">if</span>((c == <span style="color: #2d9574;">'+'</span>) || (c == <span style="color: #2d9574;">'-'</span>)|| (c == <span style="color: #2d9574;">'*'</span>)||(c == <span style="color: #2d9574;">'/'</span>)){    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">else</span>
+            operate(numStack, c);                                       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">operate</span>
+        }
+    }
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="orgba14a75" class="outline-4">
+<h4 id="orgba14a75">Converting Infix to Postfix</h4>
+<div class="outline-text-4" id="text-orgba14a75">
+<pre class="example">
+Precedence rules: Exponentiation(^) &gt;
+                  multiply(*),divide(/) &gt;
+                  add(+),subtract(-)
+
+Associated rules: + - * / left-associative,  2-3-5 = (2-3)-5
+                        ^ right-associative, 2^3^4 != 2^12; 2^3^4 = 2^81
+</pre>
+
+<pre class="example" id="ConverPostfix2Infix">
+Read expr. left -&gt; right
+ 1. Number:      print it out.
+ 2. Operator:    put it on stack until an operator
+                 with lower or equal precedence appears(for exponentiation, strictly lower), where upon we pop it &amp; print it.
+ 3. String ends: pop &amp; print each item on stack
+</pre>
+</div>
+</div>
+
+<div id="orgafb98a6" class="outline-4">
+<h4 id="orgafb98a6">Why does this work</h4>
+<div class="outline-text-4" id="text-orgafb98a6">
+<pre class="example">
+1. '3 * 2' ---&gt; "3 2 *"
+2. Newest operator has lower precedence;
+   1. "3 * 2 +" ---&gt; "3 2 *",
+   2. push the "+" &amp; continue.
+3. "3 * 2 ^" ---&gt; "3 2", |^| on stack.
+                         |*|
+                         ---
+   "*" stays on stack until 2nd operand done
+</pre>
+</div>
+</div>
+<div id="org0974a74" class="outline-4">
+<h4 id="org0974a74">Example of infix</h4>
+<div class="outline-text-4" id="text-org0974a74">
+<pre class="example" id="stackOfConvertInfix2PostFix">
+infix "3*5+4^5^6
+
+|    |    |    |    |    |    |    |    |    |    |    |
+|    |    |    |    |    |    |    |    |    |    |    |
+|    |---&gt;|    |---&gt;|    |---&gt;|    |---&gt;|    |---&gt;|    |
+|    | 3  |    | *  | *  | 5  | *  | +  | +  | 4  | +  |
++----+    +----+    +----+    +----+    +----+    +----+
+Output:3                   5         *         4
+
+    |    |    |    |    |    |    |    |
+    |    |    |    |    | ^  |    | ^  |    End, and
+---&gt;| ^  |---&gt;| ^  |---&gt;| ^  |---&gt;| ^  |---&gt;pop all items
+ ^  | +  | 5  | +  | ^  | +  | 6  | +  |    in stack
+    +----+    +----+    +----+    +----+
+Output:    5                   6            ^ ^ +
+
+postfix: 3 5 * 4 5 6 ^ ^ +
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="org9c301a8" class="outline-2">
+<h2 id="org9c301a8">QUEUES</h2>
+<div class="outline-text-2" id="text-org9c301a8">
+<p>
+A <span class="underline">queue</span> is also a crippled list.  You may read or remove only the item at the
+front of the queue, and you may add an item only to the back of the queue.  The
+main operations:  you may "enqueue" an item at the back of the queue; you may
+"dequeue" the item at the front; you may examine the "front" item.  Don't be
+fooled by the diagram; a queue can grow arbitrarily long.
+</p>
+
+<pre class="example">
+===              ===               ===               === -front()-&gt; b
+ab. -dequeue()-&gt; b.. -enqueue(c)-&gt; bc. -enqueue(d)-&gt; bcd
+===     |        ===               ===               === -dequeue() x 3--&gt; ===
+        v                                                                  ...
+        a                                                 null &lt;-front()-- ===
+</pre>
+
+<p>
+Sample Application:  Printer queues.  When you submit a job to be printed at
+a selected printer, your job goes into a queue.  When the printer finishes
+printing a job, it dequeues the next job and prints it.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">interface</span> <span style="color: #ce537a; font-weight: bold;">Queue</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">size</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #bc6ec5; font-weight: bold;">isEmpty</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">enqueue</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">item</span>);
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #bc6ec5; font-weight: bold;">dequeue</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #bc6ec5; font-weight: bold;">front</span>();
+}
+</pre>
+</div>
+
+<p>
+In any reasonable implementation, all these methods run in O(1) time.  A queue
+is easily implemented as a singly-linked list with a tail pointer.
+</p>
+</div>
+</div>
+
+<div id="org68fa667" class="outline-2">
+<h2 id="org68fa667">DEQUES</h2>
+<div class="outline-text-2" id="text-org68fa667">
+<p>
+A <span class="underline">deque</span> (pronounced "deck") is a Double-Ended QUEue. You can insert and remove
+items at both ends. You can easily build a fast deque using a doubly-linked
+list. You just have to add removeFront() and removeBack() methods, and deny
+applications direct access to listnodes. Obviously, deques are less powerful
+than lists whose listnodes are accessible. 
+</p>
+</div>
+<div id="orgd7abd84" class="outline-3">
+<h3 id="orgd7abd84">Postscript:  A Faster Hash Code (not examinable)</h3>
+<div class="outline-text-3" id="text-orgd7abd84">
+<p>
+Here's another hash code for Strings, attributed to one P. J. Weinberger, which
+has been thoroughly tested and performs well in practice.  It is faster than
+the one above, because it relies on bit operations (which are very fast) rather
+than the % operator (which is slow by comparison).  You will learn about bit
+operations in CS 61C.  Please don't ask me to explain them to you.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">hashCode</span>(<span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">key</span>) {
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">code</span> = <span style="color: #a45bad;">0</span>;
+
+  <span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">0</span>; i &lt; key.<span style="color: #ce537a; font-weight: bold;">length</span>(); i++) {
+    code = (code &lt;&lt; <span style="color: #a45bad;">4</span>) + key.charAt(i);
+    code = (code &amp; <span style="color: #a45bad;">0x0fffffff</span>) ^ ((code &amp; <span style="color: #a45bad;">0xf0000000</span>) &gt;&gt; <span style="color: #a45bad;">24</span>);
+  }
+
+  <span style="color: #4f97d7; font-weight: bold;">return</span> code;
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

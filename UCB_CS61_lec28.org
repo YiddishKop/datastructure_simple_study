@@ -1,0 +1,604 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第二十八课 Graph-DFS
+#+PROPERTY: header-args:ipython :session 第二十八课 Graph-DFS
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第二十八课 Graph-DFS
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+* GRAPHS
+有很多算法都是对 DFS 的改进形成的，比如查看有无环路, find Strongly connected
+components(directed Graph) DFS can identify planar graph, in time propotional to
+the nodes in linear time.
+
+* some definition
+
+A graph G is a set V of vertices (sometimes called nodes), and a set E of edges
+(sometimes called arcs) that each connect two vertices together.  To confuse
+you, mathematicians often use the notation G = (V, E).  Here, "(V, E)" is an
+_ordered_pair_ of sets.  This isn't as deep and meaningful as it sounds;
+some people just love formalism.  The notation is convenient when you want to
+discuss several graphs with the same vertices; e.g. G = (V, E) and T = (V, F).
+
+Graphs come in two types:  _directed_ and _undirected_.  In a directed graph
+(or _digraph_ for short), every edge e is directed from some vertex v to some
+vertex w.  We write "e = (v, w)" (also an ordered pair), and draw an arrow
+pointing from v to w.  The vertex v is called the _origin_ of e, and w is the
+_destination_ of e.
+
+digraph   = directed graph
+undigraph = undirected graph
+
+In an undirected graph, edges have no favored direction, so we draw a curve
+connecting v and w.  We still write e = (v, w), but now it's an unordered pair,
+which means that (v, w) = (w, v).
+
+One application of a graph is to _model a street map_.  For each intersection,
+define a vertex that represents it.  If two intersections are connected by a
+length of street with no intervening intersection, define an edge connecting
+them.  We might use an undirected graph, but if there are one-way streets, a
+directed graph is more appropriate.  We can model a two-way street with two
+edges, one pointing in each direction.  On the other hand, if we want a graph
+that tells us which cities adjoin each other, an undirected graph makes sense.
+
+#+BEGIN_EXAMPLE
+     ---   Bancroft  ---             ---             --------      ------------
+     |1|<------------|2|<------------|3|             |Albany|------|Kensington|
+     ---             ---             ---             --------      ------------
+      |               ^              | ^                     \       /
+ Dana |     Telegraph |     Bowditch | |     ------------     ----------
+      v               |              v |     |Emeryville|-----|Berkeley|
+     ---             ---             ---     ------------     ----------
+     |4|------------>|5|------------>|6|              \      /
+     ---    Durant   ---             ---            ---------     ----------
+                                                    |Oakland|-----|Piedmont|
+Multiple copies of an edge are forbidden,           ---------     ----------
+but a directed graph may contain both (v, w)
+and (w, v).  Both types of graph can have _self-edges_ of the form (v, v),
+which connect a vertex to itself.  (Many applications, like the two illustrated
+above, don't use these.)
+#+END_EXAMPLE
+
+* adjacent matrix
+  #+BEGIN_EXAMPLE
+     A    K   E   B   O   P
+    +---+---+---+---+---+---+
+ A  | - | t |   | t |   |   |
+    +---+---+---+---+---+---+
+ K  | t | - |   | t |   |   |
+    +---+---+---+---+---+---+
+ E  |   |   | - | t | t |   |
+    +---+---+---+---+---+---+
+ B  | t | t | t | - | t |   |
+    +---+---+---+---+---+---+
+ O  |   |   | t | t | - | t |
+    +---+---+---+---+---+---+
+ P  |   |   |   |   | t | - |
+    +---+---+---+---+---+---+
+  #+END_EXAMPLE
+
+* adjacent list
+  #+BEGIN_EXAMPLE
+Directed Graph: every edge occur twice;
+Undirected Graph: every edge occur once;
+     +---+
+  A  | 0 |--->1 --->3
+     +---+
+  K  | 1 |--->0 --->3
+     +---+
+  E  | 2 |--->3 --->4
+     +---+
+  B  | 3 |--->0 --->1 --->2 --->4
+     +---+
+  O  | 4 |--->2 --->3 --->5
+     +---+
+  P  | 5 |--->4
+     +---+
+  #+END_EXAMPLE
+
+* path vs length vs distance
+A ~_path_~ is a sequence of vertices such that each adjacent pair of vertices is
+connected by an edge. If the graph is directed, the edges that form the path
+must all be aligned with the direction of the path.
+
+The ~length~ of a path is the number of edges it traverses. Above, <4, 5, 6, 3>
+is a path of length 3. It is perfectly respectable to talk about a path of
+length zero, such as <2>.
+
+The ~distance~ from one vertex to another is the length of the shortest path
+from one to the other.
+
+A graph is ~strongly_connected~ (in digraph)if there is a path from every vertex
+to every other vertex. (This is just called ~connected~ in undirected graphs.)
+Both graphs above are strongly connected.
+
+The ~degree~ of a vertex is the number of edges incident on that vertex.
+(Self-edges count just once in 61B.) Hence, Berkeley has degree 4, and Piedmont
+has degree 1.
+
+A vertex in a directed graph has an ~indegree~ (the number of edges directed
+toward it) and an
+
+~Outdegree~ (the number of edges directed away). Intersection 6 above has
+indegree 2 and outdegree 1.
+
+* planar graph
+planar graph: have no edges crossing. some algo is running faster in planar
+graph than regular graph. so it's important to identify a planar graph. If a
+graph is not a planar, then it has one of these inside: complete 5 node graph,
+and 3-3 complete graph.
+
+* Toplogical Sorting
+教授说，任何一个算法都不能脱离数据结构，
+
+当你使用一个算法的时候，最好根据具体问题，事先制定好自己所使用的数据结构，然后再
+在数据结构基础上定义 api.最后实现算法。
+
+数据结构是存储和操作数据的工具;
+
+算法是操作工具的步骤;
+
+需要注意的是算法的本质和核心就是步骤，一般要么是循环，要么是递归，所以 应该让算法做的操作尽可能的少;
+
+什么意思，就是在数据结构阶段，多做一些预处理，多把一些食物咀嚼碎放在勺子里等待算
+法去取。
+
+#+BEGIN_EXAMPLE
+     +---+                                +---+
+  A  | 0 |--->1 --->3                  A  | 0 |--->1 --->3--->4--->5--->2---->0
+     +---+                                +---+
+  K  | 1 |--->0 --->3                  K  | 1 |
+     +---+                                +---+
+  E  | 2 |--->3 --->4                  E  | 2 |
+     +---+                                +---+
+  B  | 3 |--->0 --->1 --->2 --->4      B  | 3 |
+     +---+                                +---+
+  O  | 4 |--->2 --->3 --->5            O  | 4 |
+     +---+                                +---+
+  P  | 5 |--->4                        P  | 5 |
+     +---+                                +---+
+
+#+END_EXAMPLE
+
+注意，为什么 graph 算法复杂度中经常出现 n（节点数量），因为对于有向图如果所有边
+都连接 A，而其他节点都没有边，那么根据算法检查 A 之后你还需要依次检查其余所有节
+点，所以最差复杂度会包含 n 个节点,但实际上他们并没有边连接。如果有边连接那就直接
+算在边里算一次就好了，没有边连接所以需要加上节点数量。
+
+Toplogical sorting 开始
+#+BEGIN_EXAMPLE
+      A------>B ------>C--------+
+      +---\   ^        |        |
+           \  |        |        |
+        /---\-+        |        |
+       /     v         V        V
+      O------>C------->E------->F
+                                   Indegree                                  queue: ->
++---+                                 +---+---+                          _________________
+| A |--->B--->C                       | 0 | A |--->B--->C                      C B +O+ +A+
++---+                                 +---+---+                          -----------------
+| B |--->D                            | 2 | B |--->D
++---+                                 +---+---+
+| C |--->E                            | 2 | C |--->E
++---+                                 +---+---+
+| D |--->E--->F                       | 1 | D |--->E--->F
++---+                                 +---+---+
+| E |--->F                            | 2 | E |--->F
++---+                                 +---+---+
+| F |                                 | 2 | F |
++---+                                 +---+---+
+| O |--->B--->C                       | 0 | O |--->B--->C
++---+                                 +---+---+
+
+#+END_EXAMPLE
+
+~*DAG*~: directed a cyclic graph.which means if a grpah has a cycle it's not
+toplogical ordering graph.
+
+Only make sense when the graph is Directed.
+1. ~O(n+e)~: find all nodes that have no arrows going into them --- ~in-degree =
+   0~
+2. delete them, ouput them. repeat step 1. until graph is empty.
+
+这个算法的复杂度基本是： ~O(n*(n+e))~
+
+*Improvement-1:*
+
+在数据结构阶段多做一些，多咀嚼一些数据给算法。增加一列存放每个 node 的
+in-degree. 并不直接操作后面的 adjacent list。算法仅仅操作 indegree 这一列：遍历
+indegree=0 的 node，凡出现者，in-degree --;但是，你没法区分新出现的 0,和早就已经
+是 0 的节点。毕竟你不想重复遍历之前已经为 0 的那些节点了。
+
+*Improvement-2:*
+
+我们需要能保证某种顺序的结构---queue.把每次检索到的 inDegree=0 的节点 enqueue();
+dequeue()一个，遍历连接 nodes，凡所出现，indegree--, 如果某个 indegree--之后为
+0,直接 enqueue. 当 queue is empty, algorithms done!
+
+算法复杂度仅仅是：你 enqueue() 了 n 个节点，每个节点的连接检测一次 e，so, O(n+e)
+or approximate O(e)
+
+* Graph Representations
+There are two popular ways to represent a graph.  The first is an _adjacency_
+_matrix_, a |V|-by-|V| array of boolean values (where |V| is the number of
+vertices in the graph).  Each row and column represents a vertex of the graph.
+Set the value at row i, column j to true if (i, j) is an edge of the graph.  If
+the graph is undirected (below right), the adjacency matrix is _symmetric_:
+row i, column j has the same value as row j, column i.
+
+#+BEGIN_EXAMPLE
+          1 2 3 4 5 6                           Alb Ken Eme Ber Oak Pie
+        1 - - - T - -                    Albany  -   T   -   T   -   -
+        2 T - - - - -                Kensington  T   -   -   T   -   -
+        3 - T - - - T                Emeryville  -   -   -   T   T   -
+        4 - - - - T -                  Berkeley  T   T   T   -   T   -
+        5 - T - - - T                   Oakland  -   -   T   T   -   T
+        6 - - T - - -                  Piedmont  -   -   -   -   T   -
+
+        这个有向图，                             由于这个图是对称矩阵，
+        row --> cloumn                         所以也可以只存储：对角线+上半 或 对角线+下半
+
+#+END_EXAMPLE
+
+It should be clear that the maximum possible number of edges is |V|^2 for a
+directed graph, and slightly more than(上图中因为包含对角线所以是 slightly more
+than ) half that for an undirected graph.
+
+In many applications, however, the number of edges is much less than
+Theta(|V|^2). For instance, our maps above are _planar_graphs_ (graphs that can
+be drawn without edges crossing), and all planar graphs have O(|V|) edges. A
+graph is called _sparse_ if it has far fewer edges than the maximum possible
+number. ("Sparse" has no precise definition, but it usually implies that the
+number of edges is asymptotically smaller than |V|^2.)
+
+For a sparse graph, an adjacency matrix representation is very wasteful.
+A more memory-efficient data structure for sparse graphs is the _adjacency_
+_list_.  An adjacency list is actually a collection of lists.  Each vertex v
+maintains a list of the edges directed out from v.  The standard list
+representations all work--arrays (below left), linked lists (below right), even
+search trees (because you can traverse one in linear time).
+
+#+BEGIN_EXAMPLE
+      ---   -----                       ---   ------   ------
+    1 |.+-> | 4 |                Albany |.+-> |Ken.+-> |Ber*|
+      ---   =====                       ===   ======   ======
+    2 |.+-> | 1 |            Kensington |.+-> |Alb.+-> |Ber*|
+      ---   =====----                   ===   ======   ======
+    3 |.+-> | 2 | 6 |        Emeryville |.+-> |Ber.+-> |Oak*|
+      ---   =====----                   ===   ======   ======   ------   ------
+    4 |.+-> | 5 |              Berkeley |.+-> |Alb.+-> |Ken.+-> |Eme.+-> |Oak*|
+      ---   =====----                   ===   ======   ======   ======   ------
+    5 |.+-> | 2 | 6 |           Oakland |.+-> |Eme.+-> |Ber.+-> |Pie*|
+      ---   =====----                   ===   ======   ------   ------
+    6 |.+-> | 3 |              Piedmont |.+-> |Oak*|
+      ---   -----                       ---   ------
+#+END_EXAMPLE
+
+The total memory used by all the lists is Theta(|V| + |E|).
+
+* choose data structure for adjacency list
+If your vertices have consecutive integer names, you can declare an array of
+lists, and find any vertex's list in O(1) time.
+index-> key(num); value-> list of vertices
+
+If your vertices have names like "Albany," you can use a hash table to map names
+to lists. Each entry in the hash table uses a vertex name as a key, and a List
+object as the associated value. You can find the list for any label in O(1) average time.
+key-> vertex name; value-> list of vertices
+
+An adjacency list is more space- and time-efficient than an adjacency matrix
+for a _sparse graph_, but less efficient for a _complete_graph_.  A complete
+graph is a graph having every possible edge; that is, for every vertex u and
+every vertex v, (u, v) is an edge of the graph.
+
+同理如果是满载矩阵，而且 verex 都是字符串，该怎么办呢？
+
+先用 hash table 对字符串做映射：string -> ints. 然后 再用数字作为矩阵的行列来存
+储在二维数组中。
+
+
+* A bare skeleton of DFS
+
+#+NAME: skeleton of GFS
+#+BEGIN_SRC java
+// DFS 某个独立的图伪代码
+1. DFS(randomly choose i)
+2. mark(i);
+@. <Input some code here 1>
+4. for all j adjacent to i, if j is unmarked:
+@.      <Input some code here 2>
+5.      DFS(j);
+@.      <Input some code here 3>
+@. <Input some code here 4>
+// 对于包含多个非联通的独立子图的图
+1. For i = 1 to n, if i is unmarked:
+@.      <Input some code here 1>
+2.      DFS(i)
+@.      <Input some code here 2>
+@. <Input some code here 3>
+
+#+END_SRC
+通过在 skeleton 中不同位置添加不同代码来实现不同的功能：大图中包含独立小图，图中
+环路，toplogical sorting,strongly connected
+
+** 如果不是完全联通的图，比如有三个内部相连外部独立的图，我该怎么输出每个图的遍历结果呢？
+1. 设置外循环，去遍历每一个节点执行 dfs(i)，而不是只 dfs()一个节点
+2. 对每一个内部递归去 stack 某个点，并在本次循环执行完毕之后 empty and output
+   the stack,最好设置 count 变量保存这个独立的图的是第几个。
+#+NAME: algo for several separte GFS
+#+BEGIN_SRC java
+// DFS 某个独立的图伪代码
+1. DFS(randomly choose i)
+2. mark(i);
+@. <Input some code here 1>: add i to statck
+4. for all j adjacent to i, if j is unmarked:
+@.      <Input some code here 2>
+5.      DFS(j);
+@.      <Input some code here 3>
+@. <Input some code here 4>
+// 对于包含多个非联通的独立子图的图
+1. For i = 1 to n, if i is unmarked:
+@.      <Input some code here 1>
+2.      DFS(i)
+@.      <Input some code here 2>: print and empty elements in stack
+@. <Input some code here 3>
+#+END_SRC
+
+** TODO 如何识别并找出图中的环路？
+要识别环路就要区分几种边： ~forward edge, backward edge, cross edge, tree edge~.
+tree edge: 就是真正 visited 的路径; backward edge:TODO
+
+#+BEGIN_SRC java
+// DFS 某个独立的图伪代码
+1. DFS(randomly choose i)
+2. mark(i);
+@. <Input some code here 1>
+4. for all j adjacent to i, if j is unmarked:
+@.      <Input some code here 2>: parent(j) = i
+5.      DFS(j);
+@.      <Input some code here 3>
+@. <Input some code here 4>
+// 对于包含多个非联通的独立子图的图
+1. For i = 1 to n, if i is unmarked:
+@.      <Input some code here 1>
+2.      DFS(i)
+@.      <Input some code here 2>
+@. <Input some code here 3>
+
+#+END_SRC
+
+** Toglogical sortting by DFS
+这是一种比之前使用的方法更好的解决 toplogical sortting 更好的方法。可以通过记录
+每一个你遍历过的节点，然后反向输出即可得到这个 toplogical sortting
+
+** Strongly connected
+Strongly connected graph 是指图中任何一点都可以到达其他点的有向图。
+有很多算法都是建构在 stongly connected graph 的基础之上，所以识别
+这个属性非常重要
+
+#+BEGIN_EXAMPLE
+      ................         ..............
+      .   *------->*-.---------.>*<-------* .
+      .    ^      / \.         .  \      ^  .
+      .     \    /   .+--\     .   \    /   .
+      .      \  /    .    \    .    \  /    .
+      .       \v     .     v   .     v/     .
+      .        *     .      *--.---->*      .
+      ................      |  ..............
+               |            |         |
+               |            |         |
+               |            |         |
+               |            |         |
+               |            |         |
+               |            |         |
+               |            |         |
+       +---------------------------------------+
+       |   3 strongly     connected components |
+       +---------------------------------------+
+
+#+END_EXAMPLE
+every directed graph can be split up into an equivalence class of strongly
+connected components. These 3 are considered equivalence class of strongly
+connected.
+
+这对于你求有很多独立有向小图的大图的 minimum spanning tree 也很有作用，你首先就
+需要得到这么多小图这里‘独立’就是指是否 strongly connected，‘连接而不独立’ 就
+是指 connected but not strongly connected. 相当于连接性整体上升了一个档次。
+
+#+NAME: algo for identifing strongly connected graph
+#+BEGIN_EXAMPLE
+1. DFS search and calculat finishing times of each node
+   1. one for finishing times useful, algo for topological sort
+   2. finishing times of a DFS give us in reverse the topological sort
+2. reverse the edges in graph
+3. call DFS on the nodes in the reverse graph, in reverse order of the finishing times
+
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+Original graph:
+          a------->b------>c<------d
+           ^      / \       \      ^
+            \    /   \       \    /
+             \  /     \       \  /
+              \v       v       v/
+               e        f----->g
+
+DFS and caculate finishing times:
+                   6       3       1
+        7 a------->b------>c<------d
+           ^      / \       \      ^
+            \    /   \       \    /
+             \  /     \       \  /
+              \v       v       v/
+               e        f----->g
+               4        5      2
+
+Reverse edges:
+          a<-------b<------c------<d
+           \      ^ ^       ^      /
+            \    /   \       \    /
+             \  /     \       \  /
+              v/       \       \v
+               e        f<-----g
+
+#+END_EXAMPLE
+
+Call DFS on nodes in reverse graph, in reverse order of finishing times
+#+BEGIN_EXAMPLE
+         (1)                         (2)
+a<-------b<------c------<d   a<-------b<------c------<d
+.\      ^ ^       ^      /   .\      ^.^       ^      /
+ .\    /   \       \    /     .\    /.  \       \    /
+  .\  /     \       \  /       .\  /.    \       \  /
+   .v/       \       \v         .v/.      \       \v
+     e        f<-----g            e        f<-----g
+
+        (3)                          (4)                         (5)
+                                               .......                     .......
+a<-------b<------c------<d   a<-------b<------c------<d  a<-------b<------c------<d
+.\      ^.^       ^      /   .\      ^.^       ^      /  .\      ^.^       ^      /.
+ .\    /.  \       \    /     .\    /.  \       \    /    .\    /.  \       \    /.
+  .\  /.    \       \  /       .\  /.    \       \  /      .\  /.    \       \  /.
+   .v/.      \       \v         .v/.      \       \v        .v/.      \       \v.
+     e        f<-----g            e        f<-----g           e        f<-----g
+             ...                          ...                         ...
+
+#+END_EXAMPLE
+
+in (5) every _connected tree_ represents a _strongly connected component_ in the
+original grapha
+
+* Graph Traversals:DFS
+We'll look at two types of graph traversals, which can be used on either
+directed or undirected graphs to visit each vertex once.
+
+Depth-first search (DFS) starts at an arbitrary vertex and searches a graph as
+"deeply" as possible as early as possible. For example, if your graph is an
+undirected tree, DFS performs a preorder (or if you prefer, postorder) tree
+traversal.
+
+Breadth-first search (BFS) starts by visiting an arbitrary vertex, then visits
+all vertices whose distance from the starting vertex is one, then all vertices
+whose distance from the starting vertex is two, and so on.  If your graph is an
+undirected tree, BFS performs a level-order tree traversal.
+有点像 level-order traversal
+
+In a graph, unlike a tree, there may be several ways to get from one vertex to
+another.
+
+*如何处理多路径造成的 vertex 多次被访问的问题？*
+
+Therefore, each vertex has a boolean field called "visited" that tells us if we
+have visited the vertex before, so we don't visit it twice. When we say we are
+"marking a vertex visited", we are setting its "visited" field to true.
+
+Assume that we are traversing a strongly connected graph, thus there is a path
+from the starting vertex to every other vertex.
+
+When _DFS_ visits a vertex u, it checks every vertex v that can be _reached_ by
+some edge (u, v).  If v has not yet been visited, DFS visits it _recursively_.
+
+#+NAME: DFS
+#+BEGIN_SRC java
+public class Graph {
+  // Before calling dfs(), set every "visited" flag to false; takes O(|V|) time
+  public void dfs(Vertex u) {
+    u.visit();                                // Do some unspecified thing to u
+    u.visited = true;                              // Mark the vertex u visited
+    for (each vertex v such that (u, v) is an edge in E) {       (ref:for-loop)
+      if (!v.visited) {
+        dfs(v);
+      }
+    }
+  }
+}
+#+END_SRC
+这里需要注意，‘遍历’ 和 ‘访问’ 是分开的，意思是说，当你‘遍历’的时候未必
+‘访问’，而只有被标记为‘访问过（visited）’的节点，才不会被再次‘访问’，而最
+终结果是输出所有‘访问过的节点及其路径’。‘遍历’ 就像一个游标一样只具有‘指’
+的作用;而‘访问’才是真正的处理这个节点。
+
+In this DFS pseudocode, a "visit()" method is defined that performs some action
+on a specified vertex.
+
+For instance, if we want to count the total population of the city graph above,
+"visit()" might add the population of the visited city to the grand total. The
+order in which cities are visited depends partly on their order in the adjacency
+lists.
+
+The sequence of figures below shows the behavior of DFS on our street map,
+starting at vertex 1.
+- A "~V~" is currently visited;
+- an "~x~" is marked visited;
+- a "~*~" is a vertex which we try to visit but discover has already been visited.
+
+  #+BEGIN_EXAMPLE
+V<-2<-3   x<-2<-3   x<-2<-3   x<-V<-3   *<-V<-3    x<-x<-3   x<-x<-V   x<-*<-V    x<-x<-V
+|  ^  ^   |  ^  ^   |  ^  ^   |  ^  ^   |  ^  ^    |  ^  ^   |  ^  ^   |  ^  ^    |  ^  ^
+v  |  v   v  |  v   v  |  v   v  |  v   v  |  v    v  |  v   v  |  v   v  |  v    v  |  v
+4->5->6   V->5->6   x->V->6   x->x->6   x->x->6    x->x->V   x->x->x   x->x->x    x->x->*
+| --  |   | --  |   | --  |   | --  |   | --   |   | --  |   | --  |   |      |   |   |
+|     |   |     |   |     |   |     |   |      |   |     |   |     |   | u=2* |   |   |
+|     |   |     |   |     |   |     |   | u=1* |   |     |   | u=3 |   | u=3* |   |   |
+|     |   |     |   |     |   | u=2 |   | u=2* |   | u=6 |   | u=6 |   | u=6* |   |   |
+|     |   |     |   | u=5 |   | u=5 |   | u=5  |   | u=5 |   | u=5 |   | u=5  |   |   |
+|     |   | u=4 |   | u=4 |   | u=4 |   | u=4  |   | u=4 |   | u=4 |   | u=4  |   |   |
+| u=1 |   | u=1 |   | u=1 |   | u=1 |   | u=1  |   | u=1 |   | u=1 |   | u=1  |   |   |
+
+  #+END_EXAMPLE
+DFS runs in:
+
+O(|V| + |E|) (为什么还要加上 edge？因为每个 vertex 的每个 edge 都要检
+测->[[(for-loop)]]) time if you use an adjacency list;
+
+O(|V|^2) time if you use an adjacency matrix. Hence, an adjacency list is
+asymptotically faster if the graph is sparse.
+
+*What's an application of DFS?*
+
+Suppose you want to determine _whether there is a path_ from a vertex u to
+another vertex v. Just do DFS from u, and see if v gets visited. (If not, you
+can't there from here.)
+
+* How to specify 'Cycle path' in graph
+  1. 通过设置 visited 可以 check 是否含有 cycle path，但是没法将这个 cycle path
+     完整的打印出来
+* More on the Running Time of DFS
+Why does DFS on an adjacency list run in ~O(|V| + |E|)~ time?
+
+The ~O(|V|)~ component comes up solely because we have to initialize all the
+"visited" flags to false (or at least construct an array of flags) before we
+start.
+
+The ~O(|E|)~ component is trickier. Take a look at the "for" loop of the ~dfs()~
+pseudocode above. How many times does it iterate? If the vertex u has outdegree
+~d(u)~, then the loop iterates ~d(u)~ times. Different vertices have different
+degrees. Let the total degree D be the sum of the outdegrees of all the vertices
+in V.
+
+#+BEGIN_EXAMPLE
+  D =  sum  d(v).
+     v in V
+#+END_EXAMPLE
+
+A call to ~dfs(u)~ takes ~O(d(u))~ time, NOT counting the time for the recursive
+calls it makes to ~dfs()~. A depth-first search never calls ~dfs()~ more than
+once on the same vertex, so the total running time of all the calls to ~dfs()~
+is in ~O(D)~. How large is D?
+
+- If G is a directed graph, then ~D = |E|~, the number of edges.
+- If G is an undirected graph with no self-edges, then ~D = 2|E|~, because each
+  edge offers a path out of two vertices.
+- If G is an undirected graph with one or more self-edges, then ~D < 2|E|~.
+
+In all three cases, the running time of depth-first search is in ~O(|E|)~, NOT
+counting the time required to initialize the "visited" flags.

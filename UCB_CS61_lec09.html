@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-10 五 00:09 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第九课 Java 内存 Stack&amp;Heap</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第九课 Java 内存 Stack&amp;Heap</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org65aa937">THE STACK AND THE HEAP</a>
+<ul>
+<li><a href="#orgf207c96">Parameter Passing</a></li>
+<li><a href="#org721aadc">Binary search</a></li>
+<li><a href="#org4ce759b">Scope and Recursion</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="org65aa937" class="outline-2">
+<h2 id="org65aa937">THE STACK AND THE HEAP</h2>
+<div class="outline-text-2" id="text-org65aa937">
+<p>
+Java stores stuff in two separate pools of memory:  the stack and the heap.
+</p>
+
+<blockquote>
+<p>
+The <span class="underline">heap</span> stores all objects, including all arrays, and all class variables
+(i.e. those declared "static").
+</p>
+</blockquote>
+
+<blockquote>
+<p>
+The <span class="underline">stack</span> stores all local variables, including all parameters.
+</p>
+</blockquote>
+
+<p>
+When a method is called, the Java Virtual Machine creates a <span class="underline">stack_frame</span> (also
+known as an <span class="underline">activation_record</span>) that stores the parameters and local variables
+for that method. One method can call another, which can call another, and so on,
+so the JVM maintains an internal <span class="underline">stack</span> of stack frames, with "main" at the
+bottom, and the most recent method call on top.
+</p>
+
+<p>
+Here's a snapshot of the stack while Java is executing the SList.insertEnd
+method. The stack frames are on the left. Everything on the right half of the
+page is in the heap. Read the stack from bottom to top, because that's the order
+in which the stack frames were created.
+</p>
+
+<pre class="example">
+STACK                                         |                            HEAP
+                                              |
+method call      parameters &amp; local variables |
+----------------------------------------------|
+                                       ---    |       -------------------
+                                  this |.+-----------&gt;|item |.|  next |X|
+SListNode.SListNode         ---        ---    |       -------+-----------
+                        obj |.+--------------------------\   |
+                            ---               |          |   |
+----------------------------------------------|          v   v
+                            ---               |        ------------
+                        obj |.+-----------------------&gt;|  string  |
+                            ---               |        ------------
+SList.insertEnd             ---               |          ^
+                       this |.+--------------------------+---------\
+                            ---               |          |         |
+----------------------------------------------|          |         |
+                            ---               |          |         |
+                        str |.+--------------------------/         v
+                            ---      ---      |           ---------------------
+                                list |.+-----------------&gt;|head |X|  size | 0 |
+                                     ---      |           ---------------------
+SList.main                  ---               |         ---------   -----------
+                       args |.+------------------------&gt;| . | .-+--&gt;|  words  |
+                            ---               |         --+------   -----------
+                                              |           |    -----------
+----------------------------------------------|           \---&gt;|  input  |
+                                                               -----------
+</pre>
+
+<p>
+The method that is currently executing (at any point in time) is the one whose
+stack frame is on top. All the other stack frames represent methods waiting for
+the methods above them to return before they can continue executing.
+</p>
+
+<p>
+When a method finishes executing, its stack frame is erased from the top of the
+stack, and its local variables are erased forever.
+</p>
+
+<p>
+The java.lang library has a method "Thread.dumpStack" that prints a list of the
+methods on the stack (but it doesn't print their local variables).  This method
+can be convenient for debugging&#x2013;for instance, when you're trying to figure out
+which method called another method with illegal parameters.
+</p>
+</div>
+
+<div id="orgf207c96" class="outline-3">
+<h3 id="orgf207c96">Parameter Passing</h3>
+<div class="outline-text-3" id="text-orgf207c96">
+<p>
+As in Scheme, Java passes all parameters <span class="underline">by_value</span>.  This means that the
+method has <span class="underline">copies</span> of the actual parameters, and cannot change the originals.
+The copies reside in the method's stack frame for the method.  The method can
+change these copies, but the original values that were copied are not changed.
+</p>
+
+<p>
+In this example, the method doNothing sets its parameter to 2, but it has no
+effect on the value of the calling method's variable a:
+</p>
+
+<pre class="example">
+method:                            | STACK (just before the method returns)
+                                   |
+  static void doNothing(int x) {   |      -----
+    x = 2;                         |    x | 2 |
+  }                                |      -----     stack frame for doNothing
+                                   |-----------------------------------------
+method call:                       |
+                                   |      -----
+  int a = 1;                       |    a | 1 |
+  doNothing(a);                    |      -----     stack frame for main
+</pre>
+
+<p>
+When the method call returns, a is still 1.  The doNothing method, as its name
+suggests, failed to change the value of a or do anything relevant at all.
+</p>
+
+<p>
+However, when a parameter is a reference to an object, the reference is copied,
+but the object is not; the original object is shared.  A method can modify an
+object that one of its parameters points to, and the change will be visible
+everywhere.  Here's an example that shows how a method can make a change to an
+object that is visible to the calling method:
+</p>
+
+<pre class="example">
+method:                            | STACK              | HEAP
+                                   |                set3|
+class IntBox {                     |      -----         |
+  public int i;                    |   ib | .-+----------------\
+  static void set3(IntBox ib) {    |      -----         |      |
+    ib.i = 3;                      |                    |      |
+  }                                |--------------------|      v
+                                   |      -----         |    ------
+method call:                       |    b | .-+-------------&gt;|i |3|
+                                   |      -----     main|    ------
+  IntBox b = new IntBox();
+  set3(b);
+</pre>
+
+<p>
+For those of you who are familiar with programming languages that have "pass
+by reference," the example above is as close as you can get in Java.  But it's
+not "pass by reference."  Rather, it's passing a reference by value.
+</p>
+
+
+
+<p>
+Here's an example of a common programming error, where a method tries and fails
+to make a change that is visible to the calling method.  (Assume we've just
+executed the example above, so b is set up.)
+</p>
+
+<pre class="example">
+method:                            | STACK              | HEAP
+                                   |             badSet4|
+class IntBox {                     |      -----         |    ------
+  static void badSet4(IntBox ib) { |   ib | .-+-------------&gt;|i |4|
+    ib = new IntBox();             |      -----         |    ------
+    ib.i = 4;                      |                    |
+  }                                |--------------------|
+                                   |      -----         |    ------
+method call:                       |    b | .-+-------------&gt;|i |3|
+                                   |      -----     main|    ------
+  badSet4(b);
+
+</pre>
+</div>
+</div>
+
+<div id="org721aadc" class="outline-3">
+<h3 id="org721aadc">Binary search</h3>
+<div class="outline-text-3" id="text-org721aadc">
+<p>
+When a method calls itself recursively, the JVM's internal stack holds two or
+more stack frames connected with that method.  Only the top one can be
+accessed.
+</p>
+
+<p>
+Here's a recursive method that searches a sorted array of ints for a particular
+int.  Let i be an array of ints sorted from least to greatest&#x2013;for instance,
+{-3, -2, 0, 0, 1, 5, 5}.  We want to search the array for the value "findMe".
+If we find "findMe", we return its array index; otherwise, we return FAILURE.
+</p>
+
+<p>
+We could simply check every element of the array, but that would be slow.
+A better strategy is to check the middle array element first.  If findMe is
+lesser, we know it can only be in the left half of the array; if findMe is
+greater, we know it can only be in the right half.  Hence, we've eliminated
+half the possibilities with one comparison.  We still have half the array to
+check, so we recursively check the middle element of that half, and so on,
+cutting the possibilites in half each time.  Suppose we search for 1.
+</p>
+
+<pre class="example">
+-------------------
+| -3 -2 0 0 1 5 5 |
+----------^--------
+ compare with 0 |
+                |
+                v
+          ---------
+          | 1 5 5 |
+          ----^----
+            | compare with 5
+            |
+            V
+          -----
+          | 1 |
+          -----
+</pre>
+
+<p>
+The recursion has two base cases.
+</p>
+<ol class="org-ol">
+<li>If findMe equals the middle element, return its index; in the example above,
+we return index 4.</li>
+<li><p>
+If we try to search a subarray of length zero, the array does not contain
+"findMe", and we return FAILURE.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">FAILURE</span> = -<span style="color: #a45bad;">1</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">bsearch</span>(<span style="color: #ce537a; font-weight: bold;">int</span>[] <span style="color: #7590db;">i</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">left</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">right</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">findMe</span>) {
+  <span style="color: #4f97d7; font-weight: bold;">if</span> (left &gt; right) {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> FAILURE;                   <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Base case 2:  subarray of size zero.</span>
+  }
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">mid</span> = (left + right) / <span style="color: #a45bad;">2</span>;            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Halfway between left and right.</span>
+  <span style="color: #4f97d7; font-weight: bold;">if</span> (findMe == i[mid]) {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> mid;                                     <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Base case 1:  success!</span>
+  } <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #4f97d7; font-weight: bold;">if</span> (findMe &lt; <span style="color: #ce537a; font-weight: bold;">i</span>[mid]) {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> bsearch(i, left, mid - <span style="color: #a45bad;">1</span>, findMe);            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Search left half.</span>
+  } <span style="color: #4f97d7; font-weight: bold;">else</span> {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> bsearch(i, mid + <span style="color: #a45bad;">1</span>, right, findMe);          <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Search right half.</span>
+  }
+}
+
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">bsearch</span>(<span style="color: #ce537a; font-weight: bold;">int</span>[] <span style="color: #7590db;">i</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">findMe</span>) {
+  <span style="color: #4f97d7; font-weight: bold;">return</span> bsearch(i, <span style="color: #a45bad;">0</span>, i.length - <span style="color: #a45bad;">1</span>, findMe);
+}
+</pre>
+</div></li>
+</ol>
+
+<p>
+How long does binary search take? Suppose the array has n elements. In one call
+to bsearch, we eliminate at least half the elements from consideration. Hence,
+it takes log_2 n (the base 2 logarithm of n) bsearch calls to pare down the
+possibilities to one. Binary search takes time proportional to log_2 n. If
+you're not comfortable with logarithms.
+</p>
+
+<pre class="example">
+STACK    bsearch    left [4]             |
+                   right [4]  findMe [1] |
+                     mid [4]       i [.]-+---------\
+         --------------------------------|         |
+         bsearch    left [4]             |         |
+                   right [6]  findMe [1] |         |
+                     mid [5]       i [.]-+---------|
+         --------------------------------|         |
+         bsearch    left [0]             |         |
+                   right [6]  findMe [1] |         |
+                     mid [3]       i [.]-+---------|
+         --------------------------------|         |
+         bsearch  findMe [1]       i [.]-+---------|   -------------------
+         --------------------------------|         \--&gt;| -3 -2 0 0 1 5 5 |
+         main                   args [.]-+-&gt;[]         -------------------
+                                         |                                 HEAP
+</pre>
+
+<p>
+The stack frames appear at right in the figure above. There are three different
+local variables named "left" on the stack, three named "right", three named
+"mid", four named "i", and four named "findMe". While the current invocation of
+<code>bsearch()</code> is executing, only the topmost copy of "left" is in scope, and
+likewise for "right" and "mid". The other copies are hidden and cannot be
+accessed or changed until the current invocation of <code>bsearch()</code> terminates.
+</p>
+
+<p>
+Most operating systems give a program enough stack space for a few thousand
+stack frames.  If you use a recursive procedure to walk through a million-node
+list, Java will try to create a million stack frames, and the stack will
+run out of space.  The result is a run-time error.  You should use iteration
+instead of recursion when the recursion will be very deep.
+</p>
+
+<p>
+However, our recursive binary search method does not have this problem.  Most
+modern microprocessors cannot address more than 2^64 bytes of memory.  Even if
+an array of bytes takes this much space, we will only have to cut the array in
+half 64 times to run a binary search.  There's room on the stack for 64 stack
+frames, with plenty to spare.  In general, recursion to a depth of roughly
+log n (where n is the number of items in a data structure) is safe, whereas
+recursion to a depth of roughly n is not.
+</p>
+
+<p>
+Unfortunately, binary search can't be used on linked lists.  Think about why.
+</p>
+</div>
+</div>
+
+<div id="org4ce759b" class="outline-3">
+<h3 id="org4ce759b">Scope and Recursion</h3>
+<div class="outline-text-3" id="text-org4ce759b">
+<p>
+The <span class="underline">scope</span> of a variable is the portion of the program that can access the
+variable.  Here are some of Java's scoping rules.
+</p>
+
+<ul class="org-ul">
+<li>Local variables and parameters are in scope only inside the method that
+declares them, and only for the topmost stack frame.  Furthermore, a local
+variable is in scope only from the variable declaration down to the innermost
+closing brace that encloses it.  A local variable declared in the
+initialization part of a "for" loop is in scope only in the loop body.</li>
+<li>Class variables (static fields) are in scope everywhere in the class, except
+when shadowed by a local variable or parameter of the same name.</li>
+<li>Fully qualified class variables ("System.out", rather than "out") are in
+scope everywhere in the class, and cannot be shadowed.  If they're public,
+they're in scope in <span class="underline">all</span> classes.</li>
+<li>Instance variables (non-static fields) are in scope in non-static methods of
+the class, except when shadowed.</li>
+<li>Fully qualified instance variables ("amanda.name", "this.i") are in scope
+everywhere in the class, and cannot be shadowed.  If they're public, they're
+in scope in all classes.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

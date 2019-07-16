@@ -1,0 +1,406 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第三十八课: Randomized Analysis
+#+PROPERTY: header-args:ipython :session 第三十八课: Randomized Analysis
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第三十八课: Randomized Analysis
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+- Randomized analysis， 要求的是广度;
+- Amortized analysis， 要求的是深度;
+
+_*广度的意思是说*_ , 我希望样本的分布更 *均匀* ，像 quicksort(pivot)，
+hashtable(hashcode), 有依赖 *随机* 的属性. 这个属性会影响算法结果, _*深度的意思
+是说*_ ，我的结果依赖于我之前执行的次数，执行的越多越好，有点像 *循环进化* 的意
+思，比如 disjoint set(path compression), splaytree
+
+
+* Principle of randomized analysis
+randomized analysis is also proving the average running time of an algorithm.
+
+quickSort 最差复杂度是 O(n^2),但是如果你运行 quickSort again and agian and again...
+it will get the average running time O(nlogn),which is the best result in
+comparison-based(2-way desicion) algorithms.
+
+需要注意的是，这里的原理跟以 hashtable,splayTree,disjointSet 为代表的演进派数据
+结构（amortized analysis）不同这里不是因为一直优化一直 balance the tree 而获得的
+时间复杂度的减少，而是通过一直投硬币一直投硬币...来获得一个稳定的概率分布。
+* what is a randomized algorithms
+_Randomized_algorithms_ are algorithms that make decisions based on rolls of the
+dice. The random numbers actually help to keep the running time low. Examples
+are quicksort, quickselect, and hash tables with random hash codes.
+
+Randomized analysis, like amortized analysis, is a mathematically rigorous way
+of saying, "The average running time of this operation is fast, even though the
+worst-case running time is slow." Unlike amortized analysis, the "average" is
+taken over an infinite number of runs of the program. A randomized algorithm
+will sometimes run more slowly than the average, but the probability that it
+will run _asymptotically_ slower is extremely low.
+
+Randomized analysis requires a little bit of probability theory.
+
+* Expectation
+Expectation 实际就是一种 average，一种概率分布下的平均。
+
+** Use x() simulate, running one kind of api()
+
+Suppose a method x() flips a coin. If the coin comes up heads, x() takes one
+second to execute. If it comes up tails, x() takes three seconds.
+
+Let X be the exact running time of one call to x(). With probability 0.5, X is
+1, and with probability 0.5, X is 3. For obvious reasons, X is called a
+_random_variable_.
+
+The _expected_ value of X is the average value X assumes in an infinite sequence
+of coin flips,
+
+#+BEGIN_EXAMPLE
+  E[X] = 0.5 * 1 + 0.5 * 3 = 2 seconds expected time.
+#+END_EXAMPLE
+
+** Use x() x() simulate, running two kinds of api()
+Suppose we run the code sequence
+
+#+BEGIN_SRC java
+  x();     // takes time X
+  x();     // takes time Y
+#+END_SRC
+
+and let Y be the running time of the _second_ call. The total running time is T
+= X + Y. (Y and T are also random variables.) What is the expected total running
+time E[T]?
+
+The main idea from probability we need is called _linearity_of_expectation_,
+which says that expected running times sum linearly.
+
+#+BEGIN_EXAMPLE
+  E[x()] = E[X + Y]
+  E[X + Y] = E[X] + E[Y]
+           = 2 + 2
+           = 4 seconds expected time.
+#+END_EXAMPLE
+
+The interesting thing is that linearity of expectation holds true whether or not
+X and Y are _independent_. Independence means that the first coin flip has no
+effect on the outcome of the second. If X and Y are independent, the code will
+take four seconds on average. But what if they're not? Suppose the second coin
+flip always matches the first--we always get two heads, or two tails. Then the
+code still takes four seconds on average. If the second coin flip is always the
+opposite of the first--we always get one head and one tail-- the code still
+takes four seconds on average.
+
+** when get each api()'s EXPECTATION, we get total program's EXPECTATION
+*So if we determine the expected running time of each individual operation, we*
+*can determine the expected running time of a whole program by adding up the*
+*expected costs of all the operations.*
+* use Randomized analysis in HashTables
+#+BEGIN_EXAMPLE
+    用在 hashtable，处理的核心估计问题是：
+      处理 collision，当一个 bucket 中存有多个 item 时
+      hashtable 的 api()的 average running time.
+    用到的基本模型是：
+      n 个弹珠（key）放进 N 个袋子（bucket）中，平均起来看（Expectation）
+      会有多少个弹珠出现在袋子 b 中
+#+END_EXAMPLE
+
+#+BEGIN_QUOTE
+ when i say a randomly chosen bucket, I do not mean that every time we hash a
+ key we roll a dice,no no no Nooooooooo! _you ONLY roll the dice once per key._
+
+ Because for a hash table to work, _the same key has to hash to the same bucket_
+ _every time_.
+
+ So, yes, every key has a randomly chosen bucket, but _one that bucket has
+ chosen_ _it stays that way forever._
+#+END_QUOTE
+
+ The implementations of hash tables we have studied don't use random numbers,
+ but we can model the effects of collisions on running time by pretending we
+ have a random hash code.
+
+ A _random_hash_code_ maps each possible key to a number that's chosen randomly.
+ This does _not_ mean we roll dice every time we hash a key.  A hash table can
+ only work if a key maps to the same bucket every time.  Each key hashes to a
+ randomly chosen bucket in the table, but a key's random hash code never
+ changes.
+
+ Unfortunately, it's hard to choose a hash code randomly from all possible hash
+ codes, because you need to remember a random number for each key, and that
+ would seem to require another hash table.  However, random hash codes are
+ a good _model_ for how a good hash code will perform.  The model isn't perfect,
+ and it doesn't apply to bad hash codes, but for a hash code that proves
+ effective in experiments, it's a good rough guess.  Moreover, there is a sneaky
+ number-theoretical trick called _universal_hashing_ that generates random hash
+ codes.  These random hash codes are chosen from a relatively small set of
+ possibilities, yet they perform just as well as if they were chosen from the
+ set of all possible hash codes.  (If you're interested, you can read about it
+ in the textbook "Algorithms" by Cormen, Leiserson, Rivest, and Stein.)
+** assuming using chaining and no duplicate keys
+Assume our hash table uses chaining and does not allow duplicate keys. If an
+entry is inserted whose key matches an existing entry, the old entry is
+replaced.
+** analyze find(), n 个弹珠（keys）放在 N 个袋子（buckets）中
+Suppose we perform the operation find(k), and the key k hashes to a bucket b.
+Bucket b contains at most one entry with key k, so the cost of the search is one
+dollar, plus an additional dollar for every entry stored in bucket b whose key
+is not k. (Recall from last lecture that a _dollar_ is a unit of time chosen
+large enough to make this statement true.)
+
+Suppose there are n keys in the table besides k.  Let V1, V2, ..., Vn be random
+variables such that for each key ki, the variable
+
+#+BEGIN_EXAMPLE
+     / 1,  if key ki hashes to bucket b
+Vi = |
+     \ 0,  else
+#+END_EXAMPLE
+
+Then the cost of _find(k)_ is
+
+#+BEGIN_EXAMPLE
+  T = 1 + V1 + V2 + ... + Vn.
+#+END_EXAMPLE
+
+The expected cost of find(k) is (by linearity of expectation)
+
+#+BEGIN_EXAMPLE
+  E[T] = 1 + E[V1] + E[V2] + ... + E[Vn].
+#+END_EXAMPLE
+
+What is E[Vi]?  Since there are N buckets, and the hash code is random, each
+key has a 1/N probability of hashing to bucket b.
+
+#+BEGIN_EXAMPLE
+  E[Vi] = 1/N
+
+  E[T] = 1 + n/N,
+#+END_EXAMPLE
+
+到这里，看到一些概率论里的影子了，其实这里就是 n 个 key，往 N 个桶里随即分配的问题。只不过加了
+一些限制，比如 n 不能超过 N 太多（collision 太多），比如 N 不能超 n 太多（内存空间浪费太多）。
+对于每一个 key 来说，从 N 个桶中选一个，都是 1/N 的概率。
+
+** Load factor occurs
+
+    #+BEGIN_EXAMPLE
+     E[find()] = 1 + n/N
+               = 1 + LoadFactor
+    #+END_EXAMPLE
+
+which is one plus the load factor! If we keep the load factor n/N below some
+constant c as n grows, find operations cost expected O(1) time.
+
+The same analysis applies to insert and remove operations.  All three hash
+table operations take O(1) expected amortized time.  (The word "amortized"
+accounts for table resizing, as discussed last lecture.)
+
+Observe that the running times of hash table operations are _not_ independent.
+If key k1 and key k2 both hash to the same bucket, it increases the running time
+of both find(k1) and find(k2). Linearity of expectation is important because it
+implies that we can add the expected costs of individual operations, and obtain
+the expected total cost of all the operations an algorithm performs.
+** Summarized
+
+    - Hash table ops take O(1) expected  time,if not resized.
+    - Hahs talbe ops take O(1) amortized time,if resized.
+* use Randomized analysis in Quicksort
+    [TODO]
+#+BEGIN_EXAMPLE
+    用在 hashtable，处理的核心估计问题是：
+      处理 collision，当一个 bucket 中存有多个 item 时
+      hashtable 的 api()的 average running time.
+    用到的基本模型是：
+      n 个弹珠（key）放进 N 个袋子（bucket）中，平均起来看（Expectation）
+      会有多少个弹珠出现在袋子 b 中
+#+END_EXAMPLE
+
+#+CAPTION: difference between mergeSort and quickSort
+#+BEGIN_EXAMPLE
+                     MergeSort                       QuickSort
+           / +--------------------------+      +----------------------------+
+          |  |                          |      |                            |
+          |  +-------/----------\-------+      +----/--------------\--------+
+          |  +-----------+  +-----------+      +-------+  +-----------------+
+  O(logn) <  |           |  |           |      |       |  |                 |
+          |  +-/------\--+  +--/-----\--+      +-/---\-+  +-----/--------\--+
+          |  +----+ +----+  +----+ +----+      +--+ +--+  +----------+ +----+
+          |  |    | |    |  |    | |    |      |  | |  |  |          | |    |
+           \ +----+ +----+  +----+ +----+      +--+ +--+  +---/----\-+ +----+
+                                                          +------+ +-+
+              \------------------------/                  |      | | |    (ref:level deeper, sort less, cost less)
+                          v                               +-/--\-+ +-+
+                         O(n)                             +-+ +--+
+                                                          | | |  |
+                                                          +-+ +--+
+
+#+END_EXAMPLE
+
+- mergeSort 和 quickSort 看起来一样，其实大相径庭，简直就是相反的：
+- mergeSort 重合不重分，合完了排序才算完; 时间主要用在合上; 每一层都需要合并 n 个数值，合并每层都耗时相似 O(n)
+- quickSort 重分不重合，分完了排序就完了; 时间主要用在分上; [[(level deeper, sort less, cost less)][越往深层走，这层需要
+  排序(分割)的数列越少，这层的耗时越少]]
+
+Recall that mergesort sorts n items in O(n log n) time because the recursion
+tree has =1 + ceiling(log_2 n)= levels, and each level involves O(n) time spent
+merging lists.
+
+Quicksort also spends linear time at each level (partitioning the lists), but it
+is trickier to analyze because the recursion tree is not perfectly balanced, and
+_some keys survive to deeper levels than others._
+
+To analyze quicksort, let's analyze the EXPECTED depth the input key k will
+reach in the tree. (In effect, we're measuring a _vertical slice_ of the
+recursion tree instead of a horizontal slice.) Assume no two keys are equal,
+since that is the slowest case.
+
+
+这里的意思是说，我没法向分析 mergeSort 那样按水平切片去分析，取而代之我使用竖直
+切片去分析 quickSort我去看每一个元素的会存活(未排序定)的深度(时间复杂度随深度降
+低)的 Expected 值，然后把他们加起来求整体 Expected 值。
+
+Quicksort chooses a random pivot. The pivot is equally likely to be the smallest
+key, the second smallest, the third smallest, ..., or the largest. For each
+case, the probability is 1/n. Since we want a roughly balanced partition, let's
+say that the least floor(n/4) keys(排定数列中位置最前的 1/4) and the greatest
+floor(n/4) keys(排定数列中位置最靠后的 1/4) are "bad" pivots, and the other keys
+are "good" pivots. Since there are at most n/2 bad pivots, the probability of
+choosing a bad pivot is <= 0.5.
+
+
+这个意思是说 pivot 的选择，<<带来两种结果>>，如果选择的 pivot 很好，正好处在排序
+完成后的中间位置，那么 key k 有可能处在 1/4-3/4其中一个 partition 中，这两个
+partition 的问题空间都比原来的要小不少，good;但是如果选择差的 pivot，而且他正好
+处在排序完成后的末尾 or 开头位置，那么 key k 有可能处在 0 - 1中的 1 位置，也就是
+说，整个问题空间完全没改变。这样他更容易 survivor in deep level.耗时也就更多。
+
+If we choose a good pivot, we'll have a 1/4-3/4 split or better, and our chosen
+key k will go into a subset containing at most three quarters of the keys, which
+is sorted recursively. If we choose a bad pivot, k might go into a subset with
+nearly all the other keys.
+
+Let D(n) be a random variable equal to the _deepest depth_ at which key k
+appears when we sort n keys. D(n) varies from run to run, but we can reason
+about its expected value. Since we choose a bad key no more than half the time,
+
+由于 D(n) 是 deepest depth, [[带来两种结果]] 每一种都选最差的：
+
+- 1/4 - 3/4 选 key k 在 3/4 中;
+- 0  -  1  选 key k 在 1 中;
+
+  #+BEGIN_EXAMPLE
+  E[D(n)] <= 1 + 0.5 E[D(n)] + 0.5 E[D(3n / 4)].
+  #+END_EXAMPLE
+
+Multiplying by two and subtracting E[D(n)] from both sides gives
+
+#+BEGIN_EXAMPLE
+  E[D(n)] <= 2 + E[D(3n / 4)].
+#+END_EXAMPLE
+
+This inequality is called a _recurrence_, and you'll learn how to solve them in
+CS 170. (No, recurrences won't be on the CS 61B final exam.) The base cases for
+this recurrence are D(0) = 0 and D(1) = 0. It's easy to check by substitution
+that a solution is
+
+#+BEGIN_EXAMPLE
+  E[D(n)] <= 2 log    n.
+                  4/3
+#+END_EXAMPLE
+
+** Summarized
+So any arbitrary key k appears in expected O(log n) levels of the recursion
+tree, and causes O(log n) partitioning work. By linearity of expectation, we can
+sum the expected O(log n) work for each of the n keys, and we find that
+quicksort runs in expected O(n log n) time.
+
+* use Randomized analysis in Quickselect
+For quickselect, we can analyze the expected running time more directly.
+Suppose we run quickselect on n keys.  Let P(n) be a random variable equal to
+the total number of keys partitioned, summed over all the partitioning steps.
+Then the running time is in Theta(P(n)).
+
+Quickselect is like quicksort, but when we choose a good pivot, at least one
+quarter of the keys are discarded.  We choose a good pivot at least half the
+time, so
+
+#+BEGIN_EXAMPLE
+  E[P(n)] <= n + 0.5 E[P(n)] + 0.5 E[P(3n / 4)],
+#+END_EXAMPLE
+
+which is solved by ~E[P(n)] <= 8n~. Therefore, the expected running time of
+quickselect on n keys is in O(n).
+
+* Amortized Time vs. Expected Time
+There's a subtle but important difference between amortized running time and
+expected running time.
+
+Quicksort with random pivots takes O(n log n) expected running time, but its
+worst-case running time is in Theta(n^2).  This means that there is a small
+possibility that quicksort will cost Omega(n^2) dollars, but the probability
+of that happening approaches zero as n approaches infinity.
+
+A splay tree operation takes O(log n) amortized time, but the worst-case
+running time for a splay tree operation is in Theta(n).  Splay trees are not
+randomized, and the "probability" of an Omega(n)-time splay tree operation is
+not a meaningful concept.  If you take an empty splay tree, insert the items
+1...n in order, then run find(1), the find operation _will_ cost n dollars.
+But a sequence of n splay tree operations, starting from an empty tree, _never_
+costs more than O(n log n) actual running time.  Ever.
+
+Hash tables are an interesting case, because they use both amortization and
+randomization.  Resizing takes Theta(n) time.  With a random hash code, there
+is a tiny probability that every item will hash to the same bucket, so the
+worst-case running time of an operation is Theta(n)--even without resizing.
+
+To account for resizing, we use amortized analysis.  To account for collisions,
+we use randomized analysis.  So when we say that hash table operations run in
+O(1) time, we mean they run in O(1) _expected_, _amortized_ time.
+
+| Splay trees                | O(log n) amortized time / operation         | ${*    }$ |
+| Disjoint sets (tree-based) | O(alpha(f + u, u)) amortized time / find op | ${**   }$ |
+| Quicksort                  | O(n log n) expected time                    | ${***  }$ |
+| Quickselect                | Theta(n) expected time                      | ${**** }$ |
+| Hash tables                | Theta(1) expected amortized time / op       | ${*****}$ |
+
+If you take CS 170, you will learn an amortized analysis of disjoint sets
+there.  Unfortunately, the analyses of both disjoint sets and splay trees are
+complicated.  Goodrich & Tamassia give the amortized analysis of splay trees,
+but you're not required to read or understand it for this class.
+
+|---------+--------------------------------------------------------------------------|
+| $*$     | Worst-case time is in Theta(n), worst-case amortized time is in          |
+|         | Theta(log n), best-case time is in Theta(1).                             |
+|---------+--------------------------------------------------------------------------|
+| $**$    | For find operations, worst-case time is in Theta(log u), worst-case      |
+|         | amortized time is in Theta(alpha(f + u, u)), best-case time is in        |
+|         | Theta(1).  All union operations take Theta(1) time.                      |
+|---------+--------------------------------------------------------------------------|
+| $***$   | Worst-case time is in Theta(n^2)--if we get worst-case input AND         |
+|         | worst-case random numbers.  "Worst-case expected" time is in             |
+|         | Theta(n log n)--meaning when the _input_ is worst-case, but we take the  |
+|         | average over all possible sequences of random numbers.  Recall that      |
+|         | quicksort can be implemented so that keys equal to the pivot go into a   |
+|         | separate list, in which case the best-case time is in Theta(n), because  |
+|         | the best-case input is one where all the keys are equal.  If quicksort   |
+|         | is implemented so that keys equal to the pivot are divided between lists |
+|         | I1 and I2, as is the norm for array-based quicksort, then the best-case  |
+|         | time is in Theta(n log n).                                               |
+|---------+--------------------------------------------------------------------------|
+| $****$  | Worst-case time is in Theta(n^2)--if we get worst-case input AND worst-  |
+|         | case random numbers.  Worst-case expected time, best-case time, and      |
+|         | best-case expected time are in Theta(n).                                 |
+|---------+--------------------------------------------------------------------------|
+| $*****$ | Worst-case time is in Theta(n), expected worst-case time is in Theta(n)  |
+|         | (worst case is when table is resized), amortized worst-case time is in   |
+|         | Theta(n) (worst case is when every item is in one bucket), worst-case    |
+|         | expected amortized time is in Theta(1), best-case time is in Theta(1).   |
+|         | Confused yet?                                                            |
+|---------+--------------------------------------------------------------------------|

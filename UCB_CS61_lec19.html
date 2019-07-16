@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:33 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第十九课 Encapsulated Lists</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第十九课 Encapsulated Lists</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org52c04c9">ENCAPSULATED LISTS (a case study in encapsulation)</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="org52c04c9" class="outline-2">
+<h2 id="org52c04c9">ENCAPSULATED LISTS (a case study in encapsulation)</h2>
+<div class="outline-text-2" id="text-org52c04c9">
+<p>
+Homeworks 3, 4, and 5 introduced you to three different implementations of
+linked lists, each fundamentally different.
+</p>
+
+<p>
+With the Homework 3 lists, if an application writer wants to query the identity
+of every item in the list without modifying the list, it takes time
+proportional to the square of n, the number of items in the list (i.e.,
+Theta(n^2) time), because you have to use nth(i) to identify each item in time
+proportional to i.
+</p>
+
+<p>
+The lists in Homeworks 4 and 5 allow an application to directly hold a node in
+a list.  By alternating between the next() method and the item field or method,
+you can query all the list's items in Theta(n) time.  Similarly, if an
+application holds a node in the middle of a list, it can insert or delete c
+items there in time proportional to c, no matter how long the list is.
+</p>
+
+<p>
+The Homework 5 lists (SList and DList) are well-encapsulated, whereas the
+Homework 4 DList has flaws.  I will discuss these flaws today to illustrate why
+designing the really good list ADTs of Homework 5 was tricky.  Let's ask some
+questions about how lists should behave.
+</p>
+
+<pre class="example">
+(1)  What happens if we invoke l.remove(n)--but the node n is in a different
+     list than l?
+
+     In Homework 4, Part II asks whether it is possible for an application to
+     break the DList invariants.  One way to do this is to mismatch nodes and
+     lists in method calls.  When an application does this, the "size" field of
+     the wrong list is updated, thereby breaking the invariant that a list's
+     size field should be correct.  How can we fix this?
+
+     ADT interface answer:  The methods remove(), insertAfter(), etc. should
+     always update the right list's "size" field.
+
+     Implementation answer:  It's unacceptably slow to walk through a whole
+     list just to see if the node n is really in the list l.  Instead, every
+     node should keep a reference to the list that contains it.  In Homework 5,
+     each ListNode has a "myList" field.
+
+(2)  Should insertAfter(), remove(), etc. be methods of List or ListNode?
+
+     Normally, we expect the methods that modify a data structure (like a List)
+     to be methods within that data structure's class.  However, if we define
+     methods like insertAfter() and remove() in the ListNode class, rather than
+     the List class, we completely avoid the question of what happens if
+     they're invoked for a node that's not in "this" list.  This way, the
+     interface is more elegant.
+
+     ADT interface answer:  the list methods are divided among List and
+     ListNode.
+
+</pre>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Some methods of List</td>
+<td class="org-left">Some methods of ListNode</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">public boolean isEmpty()</td>
+<td class="org-left">public Object item()</td>
+</tr>
+
+<tr>
+<td class="org-left">public void insertFront(Object item)</td>
+<td class="org-left">public ListNode next()</td>
+</tr>
+
+<tr>
+<td class="org-left">public ListNode front()</td>
+<td class="org-left">public void insertAfter(Object item)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Implementation answer:  again, each node has a "myList" field so we can
+update a list's "size" field when we call n.remove(), n.insertAfter(),
+etc.
+</p>
+
+<pre class="example">
+(3)  What happens if we invoke l.remove(n), then l.insertAfter(i, n)?
+
+     Another way to trash the DList invariants is to treat a node that's been
+     removed from a list as if it's still active.  If we call insertAfter on a
+     node we've already removed, we may mangle the pointers.
+
+                                                                  AARGHH!!!
+---   ---   ---               ---       ---                   ---           ---
+|x|&lt;-&gt;|n|&lt;-&gt;|y|  --remove()-&gt; |x|&lt;-----&gt;|y| --insertAfter()-&gt; |x|----------&gt;|y|
+---   ---   ---               ---       ---                   ---           ---
+                               ^         ^                     ^             ^
+                               |   ---   |                     |  ---   ---  |
+                               \---|n|---/                     \--|n|&lt;-&gt;| |&lt;-/
+                                   ---                            ---   ---
+</pre>
+
+<p>
+The result violates the invariant that if x.next <code>= y, then y.prev =</code> x. We
+would prevent the pointer mangling if remove(n) set n's pointers to null,
+but that wouldn't stop insertAfter() from incrementing the list's "size"
+field (or throwing a NullPointerException), which is not a reasonable
+result.
+</p>
+
+<p>
+Calling remove(n) twice on the same node also corrupts "size".
+</p>
+
+<p>
+<b>How can we fix this?</b>
+</p>
+
+<p>
+ADT interface answer:  After n.remove() is executed, removing n from the
+list, n is considered to be an "invalid" node.  Any attempt to use n,
+except to call n.isValidNode(), throws an exception.
+</p>
+
+<p>
+Why do we change the node, rather than erasing the reference to it?
+First, the remove() method can't erase the reference, which is passed by
+value.  Second, there might be lots of other references to the same node,
+and we need to erase all of them too!  All those other references could be
+used to corrupt the data structure if the node itself isn't neutralized.
+</p>
+
+<p>
+Implementation answer:  When an item is removed from a list, the
+corresponding ListNode's "myList" reference is set to null.  This is just
+a convenient way to mark a node as "invalid".  The "next" and "prev"
+references are also set to null.  These steps eliminate opportunities for
+accidentally corrupting a list as illustrated above.  (Also, they help
+Java's garbage collection to reclaim unused DListNodes.  We'll discuss
+garbage collection near the end of the semester.)
+</p>
+
+<p>
+Any ListNode whose "myList" reference is null is considered "invalid",
+and any attempt to use it will incite an exception.
+</p>
+
+<pre class="example">
+(4)  What happens if we walk off the end of a list?  (Using the next() method.)
+
+     ADT interface answer:  In Homework 4, if you invoke next() on the last
+     node in a list, it returns null.  In Homework 5, it returns an invalid
+     node instead.  There are two reasons for this change.  First, it provides
+     consistency, because invoking next() at the end of a list yields the same
+     result as removing a node.  Second, if you call a method on the result--
+     for instance, n.next().item()--it throws an InvalidNodeException instead
+     of a NullPointerException.  This eliminates ambiguity; you can catch an
+     InvalidNodeException without wondering why it was thrown, whereas many
+     different bugs can cause NullPointerExceptions.
+
+     Implementation answer:  Recall that our implementation uses a doubly-,
+     circularly-linked list with a sentinel node.  Any sentinel is considered
+     an invalid node.  This simplifies the implementations of the next() and
+     prev() methods in the DList class.
+
+     However, if you apply next() to a sentinel, you won't get the first node
+     of the list; you'll get an InvalidNodeException.  Why?  When n is the last
+     node in a list, why not let n.next().next() be the first node?  First, the
+     fact that the implementation uses a sentinel should be completely hidden
+     from the application.  Second, we want to be able to change the
+     implementation without breaking the application.  Suppose we switch from
+     DLists to SLists that don't have sentinels.  We would need to "fix" SList
+     so that n.next().next() still behaves the way it does with DLists.  It's
+     better not to allow applications to take advantage of such quirks from the
+     start.
+
+</pre>
+
+<pre class="example">
+(5)  How do we access an item?
+
+     ADT interface answer:  In Homework 4, each node's "item" field is public.
+     In Homework 5, we make the "item" field protected; applications must use
+     the item() and setItem() methods to access it.  Why?  To make sure that
+     applications can't store items in deleted nodes or sentinels.  Any attempt
+     to invoke item() or setItem() on an invalid node causes an exception.
+     Why?  So that the implementation can be changed without breaking an
+     application.  Suppose, for instance, that an application stores items in
+     sentinel nodes.  Would the application still work the same way if you
+     switched from DLists to SLists, which don't have sentinel nodes?
+
+     This may seem like a strange justification.  But in real-world
+     programming, programmers often take advantage of undocumented quirks, like
+     being able to store items in sentinel nodes.  Once applications have been
+     written that depend on these quirks, the quirks become "features" that
+     must be preserved in any new List implementation.  That's why ADTs should
+     never do _more_ than what the documentation says they do.
+
+     In Frederick P. Brooks, Jr.'s famous book on software engineering, "The
+     Mythical Man-Month" (page 65), he writes
+
+       Invalid syntax always produces some result; in a policed system that
+       result is an invalidity indication _and_nothing_more_.  In an unpoliced
+       system all kinds of side effects may appear, and these may have been
+       used by programmers.  When we undertook to emulate the IBM 1401
+       [processor] on System/360 [an operating system], for example, it
+       developed that there were 30 different "curios"--side effects of
+       supposedly invalid operations--that had come into widespread use and had
+       to be considered as part of the definition.  The implementation as a
+       definition [of the functionality] overprescribed; it not only said what
+       the machine must do, it also said a great deal about how it had to do
+       it.
+
+     By ensuring that an implementation does not produce any result not
+     specified in the interface--even for invalid inputs--a programmer makes it
+     easy to fix bugs, optimize performance, and add new features without
+     compromising existing applications.
+
+</pre>
+
+<p>
+This lecture's lesson is that design decisions can be complicated and have
+unexpected repercussions.
+</p>
+
+<p>
+Our design decisions for the Homework 5 lists, described above, will carry over
+to our tree interfaces, which you'll encounter in an upcoming assignment.
+</p>
+
+<p>
+One final thought.  Why don't we simply keep a boolean "valid" flag in each
+ListNode, and use that to distinguish valid nodes from invalid ones?  It would
+make the implementation clearer, and therefore more maintainable.  However, it
+would also make each ListNode occupy more memory.  I chose reduced memory use
+over readability, but this was an arbitrary choice.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

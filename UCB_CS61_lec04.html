@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-10 五 00:27 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第四课 Java 中的原始类型</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第四课 Java 中的原始类型</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org1d60ec8">1. PRIMITIVE TYPES</a>
+<ul>
+<li><a href="#org20f74cb">1.1. Boolean Values</a></li>
+</ul>
+</li>
+<li><a href="#org0f16d8b">2. CONDITIONALS</a></li>
+<li><a href="#orga4d8fbd">3. THE "return" KEYWORD</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="org1d60ec8" class="outline-2">
+<h2 id="org1d60ec8"><span class="section-number-2">1</span> PRIMITIVE TYPES</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Not all variables are references to objects.  Some variables are primitive
+types, which store values like "3", "7.2", "h", and "false".  They are:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">byte</td>
+<td class="org-left">A 8-bit integer in the range -128&#x2026;127.  (One bit is the sign.)</td>
+</tr>
+
+<tr>
+<td class="org-left">short</td>
+<td class="org-left">A 16-bit integer in the range -32768&#x2026;32767.</td>
+</tr>
+
+<tr>
+<td class="org-left">int</td>
+<td class="org-left">A 32-bit integer in the range -2147483648&#x2026;2147483647.</td>
+</tr>
+
+<tr>
+<td class="org-left">long</td>
+<td class="org-left">A 64-bit integer, range -9223372036854775808&#x2026;9223372036854775807.</td>
+</tr>
+
+<tr>
+<td class="org-left">double</td>
+<td class="org-left">A 64-bit floating-point number like 18.355625430920409.</td>
+</tr>
+
+<tr>
+<td class="org-left">float</td>
+<td class="org-left">A 32-bit floating-point number; has fewer digits of precision.</td>
+</tr>
+
+<tr>
+<td class="org-left">boolean</td>
+<td class="org-left">"true" or "false".</td>
+</tr>
+
+<tr>
+<td class="org-left">char</td>
+<td class="org-left">A single character.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+long values are written with an L on the end:  long x = 43L;
+This tells the compiler to internally write out "43" in a 64-bit format.
+double and float values must have a decimal point:  double y = 18.0;
+float values are written with an f at the end:  float f = 43.9f;
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">Object types</th>
+<th scope="col" class="org-left">Primitive types</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Variable contains a</td>
+<td class="org-left">reference</td>
+<td class="org-left">value</td>
+</tr>
+
+<tr>
+<td class="org-left">How defined?</td>
+<td class="org-left">class definition</td>
+<td class="org-left">built into Java</td>
+</tr>
+
+<tr>
+<td class="org-left">How created?</td>
+<td class="org-left">"new"</td>
+<td class="org-left">"6", "3.4", "true"</td>
+</tr>
+
+<tr>
+<td class="org-left">How initialized?</td>
+<td class="org-left">constructor</td>
+<td class="org-left">default (usually zero)</td>
+</tr>
+
+<tr>
+<td class="org-left">How used?</td>
+<td class="org-left">methods</td>
+<td class="org-left">operators ("+", "*", etc.)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Operations on int, long, short, and byte types.
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">-x</td>
+<td class="org-left">x * y</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">x + y</td>
+<td class="org-left">x / y</td>
+<td class="org-left">&lt;&#x2013; rounds toward zero (drops the remainder).</td>
+</tr>
+
+<tr>
+<td class="org-left">x - y</td>
+<td class="org-left">x % y</td>
+<td class="org-left">&lt;&#x2013; calculates the remainder of x / y.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Except for "%", these operations are also available for doubles and floats.
+Floating-point division ("/") doesn't round to an integer, but it does
+round off after a certain number of bits determined by the storage space.
+</p>
+
+<p>
+The java.lang library has more operations in&#x2026;
+</p>
+
+<ul class="org-ul">
+<li>the Math class.
+x = Math.abs(y);  // Absolute value.  Also see Math.sqrt, Math.sin, etc.</li>
+<li>the Integer class.
+int x = Integer.parseInt("1984");  // Convert a string to a number.</li>
+<li>the Double class.
+double d = Double.parseDouble("3.14");</li>
+</ul>
+
+<p>
+Converting types:  integers can be assigned to variables of longer types.
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">43</span>;
+<span style="color: #ce537a; font-weight: bold;">long</span> <span style="color: #7590db;">l</span> = <span style="color: #a45bad;">43</span>;    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Okay, because longs are a superset of ints.</span>
+l = i;          <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Okay, because longs are a superset of ints.</span>
+i = l;          <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Compiler ERROR.</span>
+i = (<span style="color: #ce537a; font-weight: bold;">int</span>) l;    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Okay.</span>
+</pre>
+</div>
+
+<p>
+The string "(int)" is called a cast, and it casts the long into an int.  In the
+process, high bits will be lost if l does not fit in the range -2147483648&#x2026;
+</p>
+<ol class="org-ol">
+<li>Java won't let you compile "i = l" because it's trying to protect</li>
+</ol>
+<p>
+you from accidentally creating a nonsense value and a hard-to-find bug.  Java
+requires you to explicitly cast longs to ints to show your acknowledgment that
+you may be destroying information.
+</p>
+
+<p>
+Similarly, "float f = 5.5f; double d = f;" is fine, but you need an explicit
+cast for "double d = 5.5; float f = (float) d;".  Integers (even longs) can be
+directly assigned to floating-point variables (even floats) without a cast, but
+the reverse requires a cast because the number is truncated to an integer.
+</p>
+</div>
+
+<div id="org20f74cb" class="outline-3">
+<h3 id="org20f74cb"><span class="section-number-3">1.1</span> Boolean Values</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+A boolean value is either "true" or "false".  Booleans have operations of their
+own, signified "&amp;&amp;" (and), "||" (or), and "!" (not).
+</p>
+
+<pre class="example">
+   a    |    b    ||  a &amp;&amp; b  |  a || b  |    !a
+==================||==============================
+ false  |  false  ||  false   |  false   |   true
+ false  |   true  ||  false   |   true   |
+  true  |  false  ||  false   |   true   |  false
+  true  |   true  ||   true   |   true   |
+</pre>
+
+<p>
+Boolean values can be specified directly ("true", "false") or be created by
+the comparison operators "<code>=", "&lt;", "&gt;", "&lt;</code>", "&gt;=", "!=" (not equal to).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #7590db;">x</span> = <span style="color: #a45bad;">3</span> == <span style="color: #a45bad;">5</span>;       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x is now false.</span>
+x = <span style="color: #a45bad;">4</span>.<span style="color: #a45bad;">5</span> &gt;= <span style="color: #a45bad;">4</span>.<span style="color: #a45bad;">5</span>;           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x is now true.</span>
+x = <span style="color: #a45bad;">4</span> != <span style="color: #a45bad;">5</span> - <span style="color: #a45bad;">1</span>;           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x is now false.</span>
+x = <span style="color: #a45bad;">false</span> == (<span style="color: #a45bad;">3</span> == <span style="color: #a45bad;">0</span>);    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x is now true.</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="org0f16d8b" class="outline-2">
+<h2 id="org0f16d8b"><span class="section-number-2">2</span> CONDITIONALS</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+An "if" statement uses a boolean expression to decide whether to execute a set
+of statements.  The form is
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">if</span> (boolValue) {
+  statements;
+}
+</pre>
+</div>
+
+<p>
+The statements are executed if and only if "boolValue" is "true".  The
+parentheses around the boolean expression are required (for no good reason).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #7590db;">pass</span> = score &gt;= <span style="color: #a45bad;">75</span>;
+<span style="color: #4f97d7; font-weight: bold;">if</span> (pass) {
+  output(<span style="color: #2d9574;">"You pass CS 61B"</span>);
+} <span style="color: #4f97d7; font-weight: bold;">else</span> {
+  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">The following line executes if and only if score &lt; 75.</span>
+  output(<span style="color: #2d9574;">"You are such an unbelievable loser"</span>);
+}
+</pre>
+</div>
+
+<p>
+if-then-else clauses can be (1) nested and (2) daisy-chained.  Nesting allows
+you to build decision trees.  Daisy-chaining allows you to present more than
+two alternatives.  For instance, suppose you want to find the maximum of three
+numbers.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">if</span> (x &gt; y) {
+  <span style="color: #4f97d7; font-weight: bold;">if</span> (x &gt; z) {
+    maximum = x;
+  } <span style="color: #4f97d7; font-weight: bold;">else</span> {
+    maximum = z;
+  }
+} <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #4f97d7; font-weight: bold;">if</span> (y &gt; z) {
+  maximum = y;
+} <span style="color: #4f97d7; font-weight: bold;">else</span> {
+  maximum = z;
+}
+</pre>
+</div>
+<p>
+Some long chains of if-then-else clauses can be simplified by using a "switch"
+statement.  "switch" is appropriate only if every condition tests whether a
+variable x is equal to some constant.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">switch</span> (month) {        |      <span style="color: #4f97d7; font-weight: bold;">if</span> (month == <span style="color: #a45bad;">2</span>) {
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">2</span>:                 |        days = <span style="color: #a45bad;">28</span>;
+  days = <span style="color: #a45bad;">28</span>;            |      } <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #4f97d7; font-weight: bold;">if</span> ((month == <span style="color: #a45bad;">4</span>) || (month == <span style="color: #a45bad;">6</span>) ||
+  <span style="color: #4f97d7; font-weight: bold;">break</span>;                |                 (month == <span style="color: #a45bad;">9</span>) || (month == <span style="color: #a45bad;">11</span>)) {
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">4</span>:                 |        days = <span style="color: #a45bad;">30</span>;
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">6</span>:                 |      } <span style="color: #4f97d7; font-weight: bold;">else</span> {
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">9</span>:                 |        days = <span style="color: #a45bad;">31</span>;
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">11</span>:                |      }
+  days = <span style="color: #a45bad;">30</span>;            |
+  <span style="color: #4f97d7; font-weight: bold;">break</span>;
+<span style="color: #4f97d7; font-weight: bold;">default</span>:
+  days = <span style="color: #a45bad;">31</span>;
+  <span style="color: #4f97d7; font-weight: bold;">break</span>;
+}                   <span style="color: #2aa1ae; background-color: #292e34;">//  </span><span style="color: #2aa1ae; background-color: #292e34;">These two code fragments do exactly the same thing.</span>
+</pre>
+</div>
+
+<p>
+IMPORTANT:  "break" jumps to the end of the "switch" statement.  If you forget
+a break statement, the flow of execution will continue right through past the
+next "case" clause, which is why cases 4, 6, and 9 work right.  If month == 12
+in the following example, both Strings are printed.
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">switch</span> (month) {
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">12</span>:
+  output(<span style="color: #2d9574;">"It's December."</span>);
+  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Just keep moving right on through.</span>
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">1</span>:
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">2</span>:
+<span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">11</span>:
+  output(<span style="color: #2d9574;">"It's cold."</span>);
+}
+</pre>
+</div>
+
+
+<p>
+However, this is considered bad style, because it's hard to read and
+understand.  If there's any chance that other people will need to read or
+modify your code (which is the norm when you program for a business), don't
+code it like this.  Use break statements in the switch, and use subroutines to
+reuse code and clarify the control flow.
+</p>
+
+<p>
+Observe that the last example doesn't have a "default:" case.  If "month" is
+not 1 nor 2 nor 11 nor 12, Java jumps right to the end of the "switch"
+statement (just past the closing brace) and continues execution from there.
+
+</p>
+</div>
+</div>
+<div id="orga4d8fbd" class="outline-2">
+<h2 id="orga4d8fbd"><span class="section-number-2">3</span> THE "return" KEYWORD</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Like conditionals, "return" affects the flow of control of a program.  It
+causes a method to end immediately, so that control returns to the calling
+method.
+</p>
+
+<p>
+Here's a recursive method that prints the numbers from 1 to x.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">oneToX</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span>) {
+  <span style="color: #4f97d7; font-weight: bold;">if</span> (x &lt; <span style="color: #a45bad;">1</span>) {
+    <span style="color: #4f97d7; font-weight: bold;">return</span>;
+  }
+  oneToX(x - <span style="color: #a45bad;">1</span>);
+  System.out.println(x);
+}
+</pre>
+</div>
+
+<p>
+The return keyword serves a dual purpose:  it is also the means by which a
+function returns a value.  A <span class="underline">function</span> is a method that is declared to return
+a non-void type.  For instance, here's a function that returns an int.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">daysInMonth</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">month</span>) {
+  <span style="color: #4f97d7; font-weight: bold;">switch</span> (month) {
+  <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">2</span>:
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">28</span>;
+  <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">4</span>:
+  <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">6</span>:
+  <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">9</span>:
+  <span style="color: #4f97d7; font-weight: bold;">case</span> <span style="color: #a45bad;">11</span>:
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">30</span>;
+  <span style="color: #4f97d7; font-weight: bold;">default</span>:
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">31</span>;
+  }
+}
+
+</pre>
+</div>
+
+<p>
+The "return" value can be an expression.  Some examples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">return</span> x + y - z;
+
+<span style="color: #4f97d7; font-weight: bold;">return</span> car.velocity(time);
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

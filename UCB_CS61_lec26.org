@@ -1,0 +1,365 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第二十六课 Binary Search Tree
+#+PROPERTY: header-args:ipython :session 第二十六课 Binary Search Tree
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第二十六课 Binary Search Tree
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+* disadvantage of binary search tree
+#+BEGIN_QUOTE
+If you have a _regular binary search tree_ and you just keep adding stuff to it,
+it really gets thin and scrawny and then when you search, the search is going to
+_take proportional to the number of elements in the tree_ (all node absolutely
+in one 'line'), _instead of the O(logn)_ ,the difference between n and logn is
+huge. So, it's true we have all this( _R&B-tree_ ) overhead and our red black
+tree,but it guarantees us that out _height stays just 2logn_, 2logn is really
+small compared to N and what's the _payoff_, all we have to do is _fix_ it
+everytime we do an insertion when you do a regular binary search, it takes
+O(logn) just to find the thing and this fixing(solve the problem trigged by
+insertion and deleteion in R&B-tree) is taking just another _O(logn)_, _it's an
+alternative to heap_
+#+END_QUOTE
+* Representing Binary Trees
+Recall that a binary tree is a rooted tree wherein no node has more than two
+children. Additionally, every child is either a _left_child_ or a _right_child_
+of its parent, even if it is its parent's only child.
+
+In the most popular binary tree representation, each tree node has three
+references to neighboring tree nodes: a "parent" reference, and "left" and
+"right" references for the two children. (For some algorithms, the "parent"
+references are unnecessary.) Each node also has an "item" reference.
+
+#+NAME: BinaryTree&BinaryTreeNode
+#+BEGIN_SRC java
+public class BinaryTreeNode {        |  public class BinaryTree {
+  Object item;                       |    BinaryTreeNode root;
+  BinaryTreeNode parent;             |    int size;
+  BinaryTreeNode left;               |  }
+  BinaryTreeNode right;              |
+
+  public void inorder() {
+    if (left != null) {
+      left.inorder();
+    }
+    this.visit();
+    if (right != null) {
+      right.inorder();
+    }
+  }
+}
+
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+
+               ================================================
+               + BINARY TREE | -------------------            +
+               =============== |---          --- |            +
+               +               ||.|root  size|7| |            +
+               +               |-+-          --- |            +
+               +               --|----------------            +
+               +                 v  BinaryTree object         +
+               +               -----                          +
+               +               | * |                          +
+               +               -----             ------------ +
+               + Root node =>  |add|             |  parent  | +
+               +               -----             ------------ +
+               +               |.|.|             |   item   | +
+               +               /---\             ------------ +
+               +              /  ^^ \            |left|right| +
+               +             v  /  \ v           ------------ +
+               +            ---/-  -\---         structure of +
+               +            | . |  | . |      BinaryTreeNodes +
+               +            -----  -----                      +
+               +            |sub|  |div|                      +
+               +            -----  -----                      +
+               +           >|.|.|  |.|.|<                     +
+               +          / /--|-  -|--\ \                    +
+               +         / /  ^|    |^  \ \                   +
+               +        / v   |v    v|   v \                  +
+               +     --+--  --+--  --+--  --+--               +
+               +     | . |  | . |  | . |  | . |               +
+               +     -----  -----  -----  -----               +
+               +     | 6 |  | 5 |  | 9 |  | 3 |               +
+               +     -----  -----  -----  -----               +
+               +     |*|*|  |*|*|  |*|*|  |*|*|               +
+               +     -----  -----  -----  -----               +
+               ================================================
+
+#+END_EXAMPLE
+
+* BINARY SEARCH TREES
+An _ordered_dictionary_ is a dictionary in which the keys have a total order,
+just like in a heap. You can insert, find, and remove entries, just as with a
+hash table, for more details, see lec-22 Dictionries-2 and Hash Table.
+
+But unlike a hash table, you can quickly find the entry with minimum or maximum
+key, or the entry nearest another entry <<1>> in the total order.
+
+An ordered dictionary does anything a dictionary or binary heap can do and more,
+albeit more slowly.
+
+五种搜索结果：最大，最小，正好，比正好稍小（大）
+
+[[1]] 的一个很好的例子是 spell 自动纠错，当你忘记某些单词的拼法，就打近似的，这样
+binary search tree 可以帮你定位到相近的系统存储的单词中（the entry nearest
+another entry）;当你处理的 key 是数字时，你可以这样搜索：give me the smallest
+entry that's greater than or equal to 26.
+
+binary search tree 的功能覆盖了 heap 和 hash table, 而且提供的更多，但是更慢。
+#+BEGIN_EXAMPLE
++L_child <= parent <= R_child+
+This is WRONG, insteaded:
+L_descendent <= parent <= R_descendent
+This is RIGHT!
+
+A simple implementation of an ordered dictionary is a binary search tree,
+                   wherein entries are maintained in a (somewhat) sorted order.
+       18          The _left_subtree_ of a node is the subtree rooted at the
+      /  \         node's left child; the _right_subtree_ is defined similarly.
+    12    25       A binary search tree satisfies the _binary_search_tree_
+   / \    / \      _invariant_:  for any node X, every key in the left subtree
+  4  15  25  30    of X is less than or equal to X's key, and every key in the
+ /  /  \    /      right subtree of X is greater than or equal to X's key.  You
+1  13  17  28      can verify this in the search tree at left:  for instance,
+ \  \       \      the root is 18, its left subtree (rooted at 12) contains
+  3  14      29    numbers from 1 to 17, and its right subtree (rooted at 25)
+                   contains numbers from 25 to 30.
+#+END_EXAMPLE
+
+When a node has only one child, that child is either a left child or a right
+child, depending on whether its key is smaller or larger than its parent's key.
+(A key equal to the parent's key can go into either subtree.)
+
+** Main api of binary search tree
+An inorder traversal of a binary search tree visits the nodes in sorted order.
+In this sense, a search tree maintains a sorted list of entries. However,
+operations on a search tree are usually more efficient than the same operations
+on a sorted linked list.
+
+Let's replace the "Object item;" declaration in each node with "Entry entry;"
+where each Entry object stores a key and an associated value.
+
+_The keys implement the Comparable interface_, and the key.compareTo() method
+induces a total order on the keys (e.g. alphabetical or numerical order).
+
+*** [1]  Entry find(Object k);
+
+ #+NAME: whileLoop4find
+ #+BEGIN_SRC java
+public Entry find(Object k) {
+  BinaryTreeNode node = root;                   // Start at the root.
+  while (node != null) {
+    int comp = ((Comparable) k).compareTo(node.entry.key());
+    if (comp < 0) {                             // Repeatedly compare search
+      node = node.left;                         // key k with current node; if
+    } else if (comp > 0) {                      // k is smaller, go to the left
+      node = node.right;                        // child; if k is larger, go to
+    } else {    /* The keys are equal */        // the right child.  Stop when
+      return node.entry;                        // we find a match (success;
+    }                                           // return the entry) or reach
+  }                                             // a null pointer (failure;
+  return null;                                  // return null).
+}
+ #+END_SRC
+
+ 当你想精确的查找某个 entry，用 hashtable 会更有效率。
+
+ This method only finds exact matches.  What if we want to find the smallest key
+ greater than or equal to k, or the largest key less than or equal to k?
+ Fortunately, when searching downward through the tree for a key k that is not
+ in the tree, we are certain to encounter both
+   - the node containing the smallest key greater than k (if any key is greater)
+   - the node containing the largest key less than k (if any key is less).
+
+ See [[*Footnote 1][Footnote 1]] for an explanation why.
+     #+BEGIN_EXAMPLE
+       +--+         For instance, suppose we search for the key 27 in the tree
+       |18|         at left.  Along the way, we encounter the keys 25 and 28,
+       /--\--+      which are the keys closest to 27 (below and above).
+     12   |25|
+    / \   +/-\--+   Here's how to implement a method smallestKeyNotSmaller(k):
+   4  15  25 |30|   search for the key k in the tree, just like in find().
+  /  /  \  +-/+-+   As you go down the tree, keep track of the smallest key
+ 1  13  17 |28|     not smaller than k that you've encountered so far.  If you
+  \  \     +-\+     find the key k, you can return it immediately.  If you reach
+   3  14      29    a null pointer, return the best key you found on the path.
+                    You can implement largestKeyNotLarger(k) symmetrically.
+     #+END_EXAMPLE
+
+ 很明显，如果你查找的 key 不在 binary search tree 中，你的搜索会‘路过’比你大的
+ 最小 entry 和比你小的最大 entry这时，你只需要在代码中增加两个变量分别记录‘比你
+ 小的最大值’和‘比你大的最小值’即可找到他们。or 你可以通过另一个 trick 找到两
+ 个值，就是最近的一次'choose left'和'choose right',以上图为例，最近一次‘向左’
+ 是28， 最近的一次向右是 25.通过在代码中记录并随时覆盖，就可以找到他们。（个人认
+ 为这种方法更好）
+*** [2]  Entry min(); Entry max();
+
+~min()~ is very simple. If the tree is empty, return null. Otherwise, start at
+the root. Repeatedly go to the left child until you reach a node with no left
+child. That node has the minimum key.
+
+~max()~ is the same, except that you repeatedly go to the right child. In the
+tree above, observe the locations of the minimum (1) and maximum (30) keys.
+
+*** [3]  Entry insert(Object k, Object v);
+
+~insert()~ starts by following the same path through the tree as find(). (find()
+works _because_ it follows the same path as insert().) When it reaches a null
+reference, replace that null with a reference to a new node storing the entry
+(k, v).
+
+Duplicate keys are allowed. If insert() finds a node that already has the key k,
+it puts the new entry in the left subtree of the older one. (We could just as
+easily choose the right subtree; it doesn't matter.)
+
+*** TODO [4]  Entry remove(Object k);
+    If the node is a leaf then you just deleted.
+    If the node is an internal node, then you find its successor or predeccessor,
+    you swap and then you delete the successor or predeccessor. And , this successor(suppose it is)
+    cannot have a right child, if it has, then the left child should be the successor.
+    So, what we really do about deleting , _we just delete a leaf or a leaf' partent_
+
+    删除要分三种情况，待删节点没有孩子，只有一个孩子，有两个孩子有两个孩子就删
+    除其 successor, 其 successor 肯定没有左孩子 or 干脆没孩子，因为如果有左孩
+    子说明排序是这样的，待删<'successor_L'<successor<successor_R因为是直接后继
+    （successor）, 所以 successor 肯定没有左孩子
+
+    If it has 2 children, i went to the successor of that node, I copied the
+    content of this successor into that node then, I deleted the successor.
+    The actual node I deleted was the successor node and successor node has
+    only one or no children
+
+    所以删除带有两个孩子的节点，实际就归结为 ‘有一个孩子的’ or ‘没有孩子的’
+    两个问题。AVL-tree Splay-tree 的所有操作，其实跟这里的 binary search tree
+    的操作很相似,不同的是都要 avl 和 splay 都要 rotation
+
+    ~remove()~ is the most difficult operation. First, find a node with key k using
+    the same algorithm as find(). Return null if k is not in the tree; otherwise,
+    let n be the first node with key k.
+
+    1. If n has no children, we easily detach it from its parent and throw it away.
+    2. If n has one child, move n's child up to take n's place.  n's parent becomes
+       the parent of n's child, and n's child becomes the child of n's parent.Dispose of n.
+    3. If n has two children, however, we have to be a bit more clever.  Let x be the
+       node in n's right subtree with the smallest key.  Remove x; since x has the
+       minimum key in the subtree, x has no left child and is easily removed.
+       Finally, replace n's entry with x's entry.  x has the key closest to k that
+       isn't smaller than k, so the binary search tree invariant still holds.
+
+       这里使用了一种‘步进’的方式，把'two child'问题，转换为'one child'问题：如果
+       待删节点有左右两个子树，那么选择右子树中最小的节点（比待删节点大的节点中最小
+       的）与待删节点互换，互换的方法分两步：
+       1. 用‘if n has one child’方法删除这个最小的节点，因为这个节点肯定没有左子树；
+       2. 用这个节点替换待删节点
+
+
+    #+BEGIN_EXAMPLE
+              18                          18                            18
+             /  \                        /  \                          /  \
+           12    25                    12    25                      12    25
+          / \    / \                  / \    / \                    / \    / \
+         4  15  25  30 -insert(2)->  4  15  25  30 -remove(30)->   4  15  25  28
+        /  /  \    /                /  /  \    /                  /  /  \      \
+       1  13  17  28               1  13  17  28                 1  13  17      29
+        \  \       \                \  \       \                  \  \
+         3  14      29               3  14      29                 3  14
+                                    /                             /
+                                   2                             2
+
+                                 18                   18
+                             +--/  \                 /  \
+                             |12|   25             13    25
+                             /-\+   / \           / \    / \
+            -remove(12)->   4  15  25  28   ->   4  15  25  28
+                           /+-/+ \      \       /  /  \      \
+                          1 |13| 17      29    1  14  17      29
+                           \+-\+                \
+                            3  14                3
+                           /                    /
+                          2                    2
+    #+END_EXAMPLE
+
+    To ensure you understand the binary search tree operations, especially
+    remove(), I recommend you inspect Goodrich and Tamassia's code on page 446.
+    Be aware that Goodrich and Tamassia use sentinel nodes for the leaves of
+    their binary trees; I think these waste an unjustifiably large amount of space.
+
+    #+BEGIN_EXAMPLE
+    [TODO] 这个 remove()一定要注意：
+        2
+       / --\
+      1    7
+          / \
+         5   8
+        /
+       4
+    #+END_EXAMPLE
+    比如这里要删除 root 2, 但是 2 有左右子树，不能直接删除，要删除 nearest higher:4
+    先用 4 replace 2, 然后把带有 4 的 node 删除, 问题是，这个 node 是否是字典型 node，
+    包含 value 和 key 的？这里树中的数字明显是 key，那么如果仅仅是“用 key4 去替换
+    key2”，那么是不是就改变了原来的 key:value 对了？
+** Running Times of Binary Search Tree Operations
+
+   #+BEGIN_EXAMPLE
+                                                                    1
+     o       In a perfectly balanced binary tree (left) with         \
+    / \      height h, the number of nodes n is 2^(h+1) - 1.          2
+   o   o     (See Footnote 2.)  Therefore, no node has depth           \
+  /\   /\    greater than log_2 n.  The running times of                3
+ o o   o o   find(), insert(), and remove() are all proportional         \
+/\ /\ /\ /\  to the depth of the last node encountered, so they all run   4
+oo oo oo oo  in _O(log n)_ worst-case time on a perfectly balanced tree.   \
+                                                                            5
+On the other hand, it's easy to form a severely imbalanced tree like         \
+the one at right, wherein these operations will usually take linear time.     6
+That's _O(n)_.
+
+   #+END_EXAMPLE
+
+There's a vast middle ground of binary trees that are reasonably well-balanced,
+albeit certainly not perfectly balanced, for which search tree operations will
+run in O(log n) time.  You may need to resort to experiment to determine
+whether any particular application will use binary search trees in a way that
+tends to generate somewhat balanced trees or not.  If you create a binary
+search trees by inserting keys in a randomly chosen order, or if the keys are
+generated by a random process from the same distribution, then with high
+probability  the tree will have height O(log n), and operations on the tree
+will take O(log n) time.
+
+Unfortunately, there are occasions where you might fill a tree with entries
+that happen to be already sorted.  In this circumstance, you'll create the
+disastrously imbalanced tree depicted at right.  Technically, all operations on
+binary search trees have Theta(n) worst-case running time.
+
+For this reason, researchers have developed a variety of algorithms for keeping
+search trees balanced.  Prominent examples include 2-3-4 trees (which we'll
+cover next lecture), splay trees (in one month), and B-trees (in CS 186).
+* FootNote
+** Footnote 1
+
+    When we search for a key k not in the binary search tree, why are we
+guaranteed to encounter the two keys that bracket it? Let x be the smallest key
+in the tree greater than k. Because k and x are "adjacent" keys, the result of
+comparing k with any other key y in the tree is the same as comparing x with y.
+Hence, find(k) will follow exactly the same path as find(x) until it reaches x.
+(After that, it may continue downward.) The same argument applies to the largest
+key less than k.
+
+** Footnote 2
+A perfectly balanced binary tree has 2^i nodes at depth i, where
+
+#+BEGIN_EXAMPLE
+                                                   h   i    h+1
+0 <= i <= h.  Hence, the total number of nodes is Sum 2  = 2    - 1.
+                                                  i=0
+#+END_EXAMPLE

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:44 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第十五课 Exception</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第十五课 Exception</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org94279b8">1. EXCEPTIONS</a>
+<ul>
+<li><a href="#org39ed0ec">1.1. Purpose #1:  Coping with Errors</a></li>
+<li><a href="#org0959ae8">1.2. Purpose #2:  Escaping a Sinking Ship</a></li>
+<li><a href="#org1371738">1.3. Checked and Unchecked Throwables</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org94279b8" class="outline-2">
+<h2 id="org94279b8"><span class="section-number-2">1</span> EXCEPTIONS</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+When a run-time error occurs in Java, the JVM "throws an exception," prints
+an error message, and quits.  Oddly, an exception is a Java object (named
+Exception), and you can prevent the error message from printing and the program
+from terminating by "catching" the Exception that Java threw.
+</p>
+</div>
+
+<div id="org39ed0ec" class="outline-3">
+<h3 id="org39ed0ec"><span class="section-number-3">1.1</span> Purpose #1:  Coping with Errors</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Exceptions are a way of coping with unexpected errors.  By catching exceptions,
+you can recover.  For instance, if you try to open a file that doesn't exist or
+that you aren't allowed to read, Java will throw an exception.  You can catch
+the exception, handle it, and continue, instead of letting the program crash.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">try</span> {
+  f = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">FileInputStream</span>(<span style="color: #2d9574;">"~cs61b/pj2.solution"</span>);
+  i = f.read();
+}
+<span style="color: #4f97d7; font-weight: bold;">catch</span> (<span style="color: #ce537a; font-weight: bold;">FileNotFoundException</span> <span style="color: #7590db;">e1</span>) {
+  System.out.println(e1);                       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">An exception handler.</span>
+}
+<span style="color: #4f97d7; font-weight: bold;">catch</span> (<span style="color: #ce537a; font-weight: bold;">IOException</span> <span style="color: #7590db;">e2</span>) {
+  f.close();                                    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Another exception handler.</span>
+}
+</pre>
+</div>
+
+<p>
+What does this code do?
+</p>
+<ol class="org-ol">
+<li>It executes the code inside the "try" braces.</li>
+<li>If the "try" code executes normally, we skip over the "catch" clauses.</li>
+<li><p>
+If the "try" code throws an exception, Java does not finish the "try" code.
+It jumps directly to the first "catch" clause that matches the exception, and
+executes that "catch" clause. By "matches", I mean that the actual exception
+object thrown is the same class as, or a subclass of, the static type listed
+in the "catch" clause.
+</p>
+
+<p>
+When the "catch" clause finishes executing, Java jumps to the next line of
+code immediately after all the "catch" clauses.
+</p></li>
+</ol>
+
+<p>
+The code within a "catch" clause is called an <span class="underline">exception_handler</span>.
+</p>
+
+<p>
+If the FileInputStream constructor fails to find the file, it will throw a
+FileNotFoundException.  The line "i = f.read()" is not executed; execution
+jumps directly to the first exception handler.
+</p>
+
+<p>
+FileNotFoundException is a subclass of IOException, so the exception matches
+both "catch" clauses.  However, only one "catch" clause is executed&#x2013;the first
+one that matches.  The second "catch" clause would execute if the first were
+not present.
+</p>
+
+<p>
+If the FileInputStream constructor runs without error, but the read() method
+throws an exception (for instance, because a disk track is faulty), it typi-
+cally generates some sort of IOException that isn't a FileNotFoundException.
+This causes the second "catch" clause to execute and close the file.  Exception
+handlers are often used to recover from errors and clean up loose ends like
+open files.
+</p>
+
+<p>
+Note that you don't need a "catch" clause for every exception that can occur.
+You can catch some exceptions and let others propagate.
+</p>
+</div>
+</div>
+<div id="org0959ae8" class="outline-3">
+<h3 id="org0959ae8"><span class="section-number-3">1.2</span> Purpose #2:  Escaping a Sinking Ship</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Believe it or not, you might want to throw your own exception. Exceptions are
+the easiest way to move program execution out of a method whose purpose has been
+defeated.
+</p>
+
+<p>
+For example, suppose you're writing a parser that reads Java code and analyzes
+its syntactic structure.  Parsers are quite complicated, and use many recursive
+calls and loops.  Suppose that your parser is executing a method many methods
+deep within the program stack within many levels of loop nesting.  Suddenly,
+your parser unexpectedly reaches the end of the file, because a student
+accidentally erased the last 50 lines of his program.
+</p>
+
+<p>
+It's quite painful to write code that elegantly retraces its way back up
+through the method calls and loops when a surprise happens deep within a
+parser.  A better solution?  Throw an exception!  You can even roll your own.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">ParserException</span> <span style="color: #4f97d7; font-weight: bold;">extends</span> <span style="color: #ce537a; font-weight: bold;">Exception</span> { }
+</pre>
+</div>
+
+<p>
+This class doesn't have any methods except the default constructor.  There's no
+need; the only purpose of a ParserException is to be distinguishable from other
+types of exceptions.  Now we can write some parser methods.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">ParseTree</span> <span style="color: #bc6ec5; font-weight: bold;">parseExpression</span>() <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">ParserException</span> {
+  [loops]
+      <span style="color: #4f97d7; font-weight: bold;">if</span> (somethingWrong) {
+        <span style="color: #4f97d7; font-weight: bold;">throw</span> <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">ParserException</span>();
+      }
+      [more code]
+    }
+  }
+  <span style="color: #4f97d7; font-weight: bold;">return</span> pt;
+}
+</pre>
+</div>
+
+<p>
+The "throw" statement throws a ParserException, thereby immediately getting us
+out of the routine. How is this different from a "return" statement? First, we
+don't have to return anything. Second, an exception can propagate several stack
+frames down the stack, not just one, as we'll see shortly.
+</p>
+
+<p>
+The method signature has the modifier "throws ParserException".  This is
+necessary; Java won't let you compile the method without it.  "throws" clauses
+help you and the compiler keep track of which exceptions can propagate where.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">ParseTree</span> <span style="color: #bc6ec5; font-weight: bold;">parse</span>() <span style="color: #4f97d7; font-weight: bold;">throws</span> <span style="color: #ce537a; font-weight: bold;">ParserException</span>, <span style="color: #ce537a; font-weight: bold;">DumbCodeException</span> {
+  [loops and code]
+      p = parseExpression();
+      [more code]
+    }
+  }
+}
+
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">compile</span>() {
+  <span style="color: #ce537a; font-weight: bold;">ParseTree</span> <span style="color: #7590db;">p</span>;
+  <span style="color: #4f97d7; font-weight: bold;">try</span> {
+    p = parse();
+    p.toByteCode();
+  }
+  <span style="color: #4f97d7; font-weight: bold;">catch</span> (<span style="color: #ce537a; font-weight: bold;">ParserException</span> <span style="color: #7590db;">e1</span>) { }
+  <span style="color: #4f97d7; font-weight: bold;">catch</span> (<span style="color: #ce537a; font-weight: bold;">DumbCodeException</span> <span style="color: #7590db;">e2</span>) { }
+}
+
+</pre>
+</div>
+
+<p>
+The <code>parse()</code> method above shows how to define a method that can throw two (or
+more) exceptions.  Since every exception is a subclass of Exception, we could
+have replaced the two exceptions with "Exception", but then the caller would
+have to catch all types of Exceptions.  We don't want (in this case) to catch
+NullPointerExceptions or otherwise hide our bugs from ourselves.
+</p>
+
+<p>
+When parseExpression() throws an exception, it propagates right through the
+calling method parse() and down to compile(), where it is caught.  compile()
+doesn't need a "throws ParserException" clause because it catches any
+ParserException that can occur.  In this code, the "catch" clauses don't do
+anything except stop the exceptions.
+</p>
+
+<p>
+If an exception propagates all the way out of main() without being caught, the
+JVM prints an error message and halts.  You've seen this happen many times.
+</p>
+</div>
+</div>
+<div id="org1371738" class="outline-3">
+<h3 id="org1371738"><span class="section-number-3">1.3</span> Checked and Unchecked Throwables</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+The top-level class of things you can "throw" and "catch" is called Throwable.
+Here's part of the Throwable class hierarchy.
+</p>
+
+<pre class="example">
+                           Throwable
+                          /         \
+                         /           \
+                        /             \
+                       /               \
+                      /                 \
+             Exception                   Error
+            /    \                      /     \
+ IOException  RunTimeException AssertionError  VirtualMachineError
+               /            \                           \
+NullPointerException  ClassCastException              OutOfMemoryError
+
+</pre>
+
+<p>
+An Error generally represents a fatal error, like running out of memory or
+stack space.  Failed "assert" statements also generate a subclass of Error
+called an AssertionError.  Although you can throw or catch any kind of
+Throwable, catching an Error is rarely appropriate.
+</p>
+
+<p>
+Most Exceptions, unlike Errors, signify problems you could conceivably recover
+from.  The subclass RunTimeException is made up of exceptions that might be
+thrown by the Java Virtual Machine, such as NullPointerException,
+ArrayIndexOutOfBoundsException, and ClassCastException.
+</p>
+
+<p>
+There are two types of Throwables.  <span class="underline">Unchecked</span> Throwables are those a method
+can throw without declaring them in a "throws" clause.  All Errors and
+RunTimeExceptions (including all their subclasses) are unchecked, because
+almost every method can generate them inadvertently, and it would be silly if
+we had to declare them.
+</p>
+
+<p>
+All Exceptions except RunTimeExceptions are <span class="underline">checked</span>, which means that if your
+method might throw one without catching it, it must declare that possibility in
+a "throws" clause.  Examples of checked exceptions include IOException and
+almost any Throwable subclass you would make yourself.
+</p>
+
+<p>
+When a method calls another method that can throw a checked exception, it has
+just two choices.
+</p>
+
+<ol class="org-ol">
+<li>It can catch the exception, or</li>
+<li>it must be declared so that it "throws" the same exception itself.</li>
+</ol>
+
+<p>
+The easiest way to figure out which exceptions to declare is to declare none
+and let the compiler's error messages tell you.  (This won't work on the exams,
+though.)
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

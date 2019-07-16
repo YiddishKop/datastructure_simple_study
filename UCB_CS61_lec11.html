@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-10 五 00:00 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第十一课 Java 关键函数解析</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第十一课 Java 关键函数解析</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0a8d571">1. equals()</a></li>
+<li><a href="#orgc61489b">2. "for each" LOOPS</a></li>
+<li><a href="#orgc07bcb8">3. TESTING</a>
+<ul>
+<li><a href="#orge12cfdc">3.1. (1)  Modular Testing</a></li>
+<li><a href="#orge824806">3.2. (2)  Integration Testing</a></li>
+<li><a href="#orgbbbdf62">3.3. (3)  Result Verification</a></li>
+<li><a href="#org8b996c4">3.4. Regression Testing</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org0a8d571" class="outline-2">
+<h2 id="org0a8d571"><span class="section-number-2">1</span> equals()</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Every class has an  <code>equals()</code>  method.  If you don't define one explictly, you
+inherit Object. <code>equals()</code> , for which "r1.equals(r2)" returns the same boolean
+value as "r1 <code>= r2", where r1 and r2 are references.  However, many classes
+override  =equals()</code>  to compare the <span class="underline">content</span> of two objects.
+</p>
+
+<p>
+Integer (in the java.lang library) is such a class; it stores one private int.
+Two distinct Integer objects are  <code>equals()</code>  if they contain the same int.
+In the following example,
+</p>
+
+<ul class="org-ul">
+<li>"<code>i1 = i2</code>" is <b>false</b>, but "<code>i1.equals(i2)</code>" is <b>true.</b></li>
+<li>"<code>i2 = i3</code>" and "<code>i2.equals(i3)</code>" are both true.</li>
+</ul>
+
+
+<pre class="example">
+   ---    -------            ---    -------    ---
+i1 |.+---&gt;|  7  |         i2 |.+---&gt;|  7  |&lt;---+.| i3
+   ---    -------            ---    -------    ---
+</pre>
+
+<p>
+IMPORTANT: <code>r1.equals(r2)</code> throws a run-time exception if r1 is null.
+</p>
+
+<p>
+There are at least four different degrees of equality.
+</p>
+<pre class="example">
+(1)  Reference equality, ==.  (The default inherited from the Object class.)
+(2)  Shallow structural equality:  two objects are "equals" if all their fields
+     are ==.  For example, two SLists whose "size" fields are equal and whose
+     "head" fields point to the same SListNode.
+(3)  Deep structural equality:  two objects are "equals" if all their fields
+     are "equals".  For example, two SLists that represent the same sequence of
+     items (though the SListNodes may be different).
+(4)  Logical equality.  Two examples:
+     (a)  Two "Set" objects are "equals" if they contain the same elements,
+          even if the underlying lists store the elements in different orders.
+     (b)  The Fractions 1/3 and 2/6 are "equals", even though their numerators
+          and denominators are all different.
+</pre>
+
+<p>
+The  <code>equals()</code>  method for a particular class may test any of these four levels of
+equality, depending on what seems appropriate.  Let's write an  <code>equals()</code>  method
+for SLists that tests for deep structural equality.  The following method
+returns true only if the two lists represent identical sequences of items.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">SList</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #bc6ec5; font-weight: bold;">equals</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">other</span>) {
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (<span style="color: #a45bad;">!</span>(other <span style="color: #4f97d7; font-weight: bold;">instanceof</span> SList)) {           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Reject non-SLists.</span>
+      <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">false</span>;
+    }
+
+    <span style="color: #ce537a; font-weight: bold;">SList</span> <span style="color: #7590db;">o</span> = (<span style="color: #ce537a; font-weight: bold;">SList</span>) other;
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (size != o.size) {
+      <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">false</span>;
+    }
+
+    <span style="color: #ce537a; font-weight: bold;">SListNode</span> <span style="color: #7590db;">n1</span> = head;
+    <span style="color: #ce537a; font-weight: bold;">SListNode</span> <span style="color: #7590db;">n2</span> = o.head;
+    <span style="color: #4f97d7; font-weight: bold;">while</span> (n1 != <span style="color: #a45bad;">null</span>) {
+      <span style="color: #4f97d7; font-weight: bold;">if</span> (<span style="color: #a45bad;">!</span>n1.item.equals(n2.item)) {          <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Deep equality of the items.</span>
+        <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">false</span>;
+      }
+      n1 = n1.next;
+      n2 = n2.next;
+    }
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">true</span>;
+  }
+}
+
+</pre>
+</div>
+
+<p>
+Note that this implementation may fail if the SList invariants have been
+corrupted.  (A wrong "size" field or a loop in an SList can make it fail.)
+</p>
+
+<p>
+IMPORTANT:  Overriding DOESN'T WORK if we change the signature of the original
+method, even just to change a parameter to a subclass.  In the Object class,
+the signature is equals(Object), so in the code above, we must declare "other"
+to be an Object too.  If we declare "other" to be an SList, the  <code>equals()</code>  method
+will compile but it will NOT override.  That means the code
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">s</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SList</span>();
+s.equals(s);
+</pre>
+</div>
+
+<p>
+will call Object. <code>equals()</code> , not SList. <code>equals()</code> .  Dynamic method lookup won't
+care that s is an SList, because the  <code>equals()</code>  method above is not eligible to
+override Object. <code>equals()</code> .
+</p>
+
+<p>
+Therefore, if you want to override a method, make sure the signature is EXACTLY
+the same.
+</p>
+</div>
+</div>
+
+<div id="orgc61489b" class="outline-2">
+<h2 id="orgc61489b"><span class="section-number-2">2</span> "for each" LOOPS</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Java has a "for each" loop for iterating through the elements of an array.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">int</span>[] <span style="color: #7590db;">array</span> = {<span style="color: #a45bad;">7</span>, <span style="color: #a45bad;">12</span>, <span style="color: #a45bad;">3</span>, <span style="color: #a45bad;">8</span>, <span style="color: #a45bad;">4</span>, <span style="color: #a45bad;">9</span>};
+
+<span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> : array) {
+  System.out.print(i + <span style="color: #2d9574;">" "</span>);
+}
+</pre>
+</div>
+
+<p>
+Note that i is <span class="underline">not</span> iterating from 0 to 5; it's taking on the value of each
+array element in turn.  You can iterate over arrays of any type this way.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">concat</span> = <span style="color: #2d9574;">""</span>;
+<span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">s</span> : stringArray) {
+  concat = concat + s;
+}
+</pre>
+</div>
+
+<p>
+For some reason, the type declaration <span class="underline">must</span> be in the "for" statement.  The
+compiler barfs if you try
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span>;
+<span style="color: #4f97d7; font-weight: bold;">for</span> (i : array) { ... }
+</pre>
+</div>
+<p>
+
+</p>
+</div>
+</div>
+<div id="orgc07bcb8" class="outline-2">
+<h2 id="orgc07bcb8"><span class="section-number-2">3</span> TESTING</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Complex software, like Project 1, is easier to debug if you write lots of test
+code.  We'll consider three types of testing:
+</p>
+
+<pre class="example">
+(1)  Modular testing:  testing each method and each class separately.
+(2)  Integration testing:  testing a set of methods/classes together.
+(3)  Result verification:  testing results for correctness, and testing data
+       structures to ensure they still satisfy their invariants.
+</pre>
+</div>
+
+<div id="orge12cfdc" class="outline-3">
+<h3 id="orge12cfdc"><span class="section-number-3">3.1</span> (1)  Modular Testing</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+When you write a program and it fails, it can be quite difficult to determine
+which part of the code is responsible.  Even experienced programmers often
+guess wrong.  It's wise to test every method you write individually.
+</p>
+
+<p>
+There are two types of test code for modular testing:  test drivers and stubs.
+</p>
+
+<ol class="org-ol">
+<li>Test drivers are methods that call the code being tested, then check the
+results. In Lab 3 and Homework 3, you've seen test drivers in the SList class
+that check that your code is doing the right thing.</li>
+</ol>
+
+<p>
+Both public and private methods should be tested.  Hence, a test driver usually
+needs to be inside the class it tests.  In a class intended for use by other
+classes, the obvious place to put a test driver is in the main() method, as we
+did in Lab 3 and Homework 3.  However, if a class is the entry point for the
+program, you can't put your test driver in main().  Instead, put it in a method
+with a name like testDriver(), and then write <span class="underline">another</span> class whose main()
+method calls your test driver.
+</p>
+
+<ol class="org-ol">
+<li>Stubs are small bits of code that are <span class="underline">called</span> by the code being tested. They
+are often quite short. They serve three purposes.</li>
+</ol>
+
+<p>
+(i)  If you write a method that calls other methods that haven't yet been
+     implemented, you can write simple stubs that fake the missing methods.
+</p>
+
+<p>
+(ii) Suppose you are having difficulty determining whether a bug lies in
+     a calling method, or a method it calls.  You can temporarily replace the
+     callee with a stub that returns controlled results to the caller, so you
+     can see if the caller is responsible for the problem.
+</p>
+
+<p>
+(iii)Stubs allow you to create repeatable test cases that might not arise often
+     in practice.  For instance, suppose a subroutine fetches and returns input
+     from an airline database, and your code calls this subroutine.  You might
+     want to test whether your code operates correctly when ten airplanes
+     depart at the same time.  Such an event might be rare in practice, but you
+     can replace the database access subroutine with a stub that feeds fake
+     data to your code.  There are two advantages:
+</p>
+
+<ul class="org-ul">
+<li>Stubs can produce test data that the real code rarely or never produces.</li>
+<li>Stubs produce <span class="underline">repeatable</span> test data, so that bugs can be reproduced.</li>
+</ul>
+</div>
+</div>
+
+<div id="orge824806" class="outline-3">
+<h3 id="orge824806"><span class="section-number-3">3.2</span> (2)  Integration Testing</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Integration testing is testing all the components together (preferably <span class="underline">after</span>
+you have tested them in isolation).  Sometimes bugs arise during integration
+because your test cases weren't thorough enough.  Other times, they arise
+because of misunderstandings about how the components are supposed to interact
+with each other.  Integration testing is harder than modular testing, because
+it's harder to determine where a bug is, or to identify your mistaken
+assumptions about how the components interact.
+</p>
+
+<p>
+The most important task in avoiding these bugs is to define your interfaces
+well and unambiguously.  There should be no ambiguity in the descriptions of
+the behavior of your methods, especially in unusual cases.  We'll talk a lot
+more about this in later lectures.
+</p>
+
+<p>
+The best advice I can give on integration testing:  learn to use a debugger.
+</p>
+</div>
+</div>
+
+<div id="orgbbbdf62" class="outline-3">
+<h3 id="orgbbbdf62"><span class="section-number-3">3.3</span> (3)  Result Verification</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+A result verifier is a method that checks the results of other methods.  There
+are at least two types of result verifiers you can write.
+</p>
+
+
+<p>
+(a)  Data structure integrity checkers.  A method can inspect a data structure
+     (like a list) and verify that all the invariants are satisfied.  For
+     Project 1, we are asking you to write a simple checker named "check()"
+     that verifies the integrity of your run-length encodings.
+</p>
+
+
+<p>
+(b)  Algorithm result checkers.  A method can inspect the output of another
+     method for correctness.  For example, if a method is supposed to sort an
+     array of numbers, a result checker can walk through the output and check
+     that each item really is less than or equal to its successor.
+</p>
+
+<p>
+An <span class="underline">assertion</span> is a piece of code that tests an invariant or a result.
+Java offers an "assert" keyword that tests whether an assertion evaluates to
+"true".  If the assertion comes up "false", Java terminates the program with an
+"AssertionError" error message, a stack trace, and an optional message of your
+own choosing.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">assert</span> <span style="color: #7590db;">x</span> == <span style="color: #a45bad;">3</span>;
+<span style="color: #ce537a; font-weight: bold;">assert</span> list.<span style="color: #7590db;">size</span> == list.countLength() : <span style="color: #2d9574;">"wrong SList size:  "</span> + list.size;
+</pre>
+</div>
+
+<p>
+At the end of each method that changes a data structure, add assertions
+(possibly a call to an integrity checker).  At the end of each method that
+computes a result, add an assertion that calls a result checker.
+</p>
+
+<p>
+Assertions are convenient because you can turn them on or off.  To turn them on
+when you're testing your code, run your code with "java -ea" (for "enable
+assertions").  To turn them off for greater speed, run with "java -da" (for
+"disable assertions").  The default (if you specify no switch) is -da.
+WARNING:  when assertions are turned off, the method "list.countLength()" above
+is never called.  Good for speed, but countLength() must not perform a task
+that is necessary for your program's correctness.
+</p>
+</div>
+</div>
+
+<div id="org8b996c4" class="outline-3">
+<h3 id="org8b996c4"><span class="section-number-3">3.4</span> Regression Testing</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+A <span class="underline">regression_test</span> is a test suite can be re-run whenever changes are made to
+the code.  Nearly every software company has reams of regression tests for each
+product.  They run them again every time they fix a bug or add a feature.
+</p>
+
+<p>
+Some principles of regression testing:
+</p>
+
+<p>
+(a)  All-paths testing:  your test cases should try to test every path through
+     the code.  Test every method.  For every "if" statement, you should try to
+     write a test case for each of the two paths.
+</p>
+
+
+<p>
+(b)  "Boundary cases" should be tested, as well as non-boundary cases.  For
+     instance, if you write a binary search method, test it on arrays of
+     lengths zero and one, as well as longer lengths.  Test the cases where the
+     item sought is the first element, the last element, in the middle, not
+     present.  For every loop in the code, try to test the cases where it
+     iterates zero or one times, as well as the case where it iterates several
+     times.  Test the branch "if (x &gt;= 1)" for x equal to 0, 1, and 2.
+</p>
+
+
+<p>
+(c)  Generally, methods can be divided into two types:  extenders, which
+     construct or change an object; and observers, which return information
+     about an object.  (Some methods do both, but you should always think hard
+     about whether that's good design.)  Ideally, your test cases should test
+     every combination of extender and observer.
+</p>
+
+<p>
+In real-world software development, the size of the test code is often larger
+than the size of the code being tested.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

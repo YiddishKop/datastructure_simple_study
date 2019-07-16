@@ -1,0 +1,401 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第二十一课 Dictionaries & HashTable
+#+PROPERTY: header-args:ipython :session 第二十一课 Dictionaries & HashTable
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第二十一课 Dictionaries & HashTable
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+
+* DICTIONARIES
+Suppose you have a set of two-letter words and their definitions. You want to be
+able to look up the definition of any word, very quickly. The two-letter word is
+the _key_ that addresses the definition.
+
+Since there are 26 English letters, there are 26 * 26 = 676 possible two-letter
+words. To implement a dictionary, we declare an array of 676 references, all
+initially set to null. To insert a Definition into the dictionary, we define a
+function hashCode() that maps each two-letter word (key) to a unique integer
+between 0 and 675. We use this integer as an index into the array, and make the
+corresponding bucket (array position) point to the Definition object.
+
+#+BEGIN_SRC java
+public class Word {
+  public static final int LETTERS = 26, WORDS = LETTERS * LETTERS;
+  public String word;
+
+  public int hashCode() {                  // Map a two-letter Word to 0...675.
+    return LETTERS * (word.charAt(0) - 'a') + (word.charAt(1) - 'a');
+  }
+}
+#+END_SRC
+
+#+BEGIN_SRC java
+public class WordDictionary {
+  private Definition[] defTable = new Definition[Word.WORDS];
+
+  public void insert(Word w, Definition d) {
+    defTable[w.hashCode()] = d;               // Insert (w, d) into Dictionary.
+  }
+
+  Definition find(Word w) {
+    return defTable[w.hashCode()];               // Return the Definition of w.
+  }
+}
+
+#+END_SRC
+
+What if we want to store every English word, not just the two-letter words?
+The table "defTable" must be long enough to accommodate
+pneumonoultramicroscopicsilicovolcanoconiosis, 45 letters long.  Unfortunately,
+declaring an array of length 26^45 is out of the question.  English has fewer
+than one million words, so we should be able to do better.
+
+* Hash Tables (the most common implementation of dictionaries)
+Suppose n is the number of keys (words) whose definitions we want to store, and
+suppose we use a table of N buckets, where N is perhaps a bit larger than n, but
+much smaller than the number of _possible_ keys. A hash table maps a huge set of
+possible keys into N buckets by applying a _compression_function_ to each hash
+code. The obvious compression function is
+
+#+BEGIN_SRC java
+  h(hashCode) = hashCode mod N.
+#+END_SRC
+
+Hash codes are often negative, so remember that mod is not the same as Java's
+remainder operator "%".  If you compute hashCode % N, check if the result is
+negative, and add N if it is.
+
+With this compression function, no matter how long and variegated the keys are,
+we can map them into a table whose size is not much greater than the actual
+number of entries we want to store.  However, we've created a new problem:
+several keys are hashed to the same bucket in the table if h(hashCode1) =
+h(hashCode2).  This circumstance is called a _collision_.
+
+How do we handle collisions without losing entries?  We use a simple idea
+called _chaining_.  Instead of having each bucket in the table reference one
+entry, we have it reference a linked list of entries, called a _chain_.  If
+several keys are mapped to the same bucket, their definitions all reside in
+that bucket's linked list.
+
+Chaining creates a second problem:  how do we know which definition corresponds
+to which word?  The answer is that we must store each key in the table with its
+definition.  The easiest way to do this is to have each listnode store an
+_entry_ that has references to both a key (the word) and an associated value
+(its definition).
+
+#+BEGIN_EXAMPLE
+         ---   ----------------------------------------------------------
+defTable |.+-->|   .   |   .   |   X   |   .   |   X   |   .   |   .   | ...
+         ---   ----|-------|---------------|---------------|-------|-----
+                   v       v               v               v       v
+                  ---     ---             ---             ---     ---
+                  |.+>pus |.+>evil        |.+>okthxbye    |.+>cool|.+>mud
+                  |.+>goo |.+>C++         |.+>creep       |.+>jrs |.+>wet dirt
+                  |.|     |X|             |X|             |.|     |X|
+                  -+-     ---             ---             -+-     ---
+                   |                                       |
+                   v                                       v
+                  ---                      ^              ---
+                  |.+>sin              < chains >         |.+>twerk
+                  |.+>have fun                            |.+>Miley burping
+                  |X|                                     |X| the wrong way
+                  ---                                     ---
+#+END_EXAMPLE
+
+Hash tables usually support at least three operations. An Entry object
+references a key and its associated value.
+
+- public Entry insert(key, value)
+   - Compute the key's hash code and compress it to determine the entry's bucket.
+   - Insert the entry (key and value together) into that bucket's list.
+- public Entry find(key)
+   - Hash the key to determine its bucket.  Search the list for an entry with the
+   - given key.  If found, return the entry; otherwise, return null.
+- public Entry remove(key)
+   - Hash the key to determine its bucket.  Search the list for an entry with the
+   - given key.  Remove it from the list if found.  Return the entry or null.
+
+*What if two entries with the same key are inserted?* There are two approaches.
+
+1)  Following Goodrich and Tamassia, we can insert both, and have find() or
+   remove() arbitrarily return/remove one. Goodrich and Tamassia also propose a
+   method findAll() that returns all the entries with a given key.
+2)  Replace the old value with the new one, so only one entry with a given key
+   exists in the table.
+Which approach is best?  It depends on the application.
+
+#+BEGIN_QUOTE
+*WARNING*: When an object is stored as a key in a hash table, an application
+should never change the object in a way that will change its hash code. If you
+do so, the object will thenceforth be in the wrong bucket.
+#+END_QUOTE
+
+The _load_factor_ of a hash table is n/N, where n is the number of keys in the
+table and N is the number of buckets. If the load factor stays below one (or a
+small constant), and the hash code and compression function are "good," and
+there are no duplicate keys, then the linked lists are all short, and each
+operation takes O(1) time. However, if the load factor grows too large (n >> N),
+performance is dominated by linked list operations and degenerates to O(n) time
+(albeit with a much smaller constant factor than if you replaced the hash table
+with one singly-linked list). A proper analysis requires a little probability
+theory, so we'll put it off until near the end of the semester.
+** what is a hash table?
+1. a hash table is a data structure
+2. offers fast *insertion and searching*
+3. they are limited in size because they are *based on arrays*
+   1. can be resized, but it should be avoided
+4. they are hard to order
+
+why hash table important?
+#+BEGIN_EXAMPLE
+i want the INFO with ID ---> compression(hashCode(ID)) ---> *directly* find id in hashtable and get INFO
+#+END_EXAMPLE
+
+** from Dictionaries to hashtable
+    two-letter words and definitions
+
+ - words is a key that addresses the definition 26 * 26 = 676 words.
+
+ Insert a definition into dectionary:
+ - function ~hashCode()~: maps each word, eg (key) to integer 0...675
+ - index into array, we call it buckhead, where we're going to store the definition for that word
+
+ #+BEGIN_SRC java
+public class Word{
+    public static final int
+        LETTERS = 26,
+        WORDS = LETTERS * LETTERS;
+    private String word;
+
+    public int hashCode(){
+        return LETTERS * (word.charAt(0) - 'a') +
+            (word.charAt(1) - 'a');
+        // java treat a chararter as a number
+        // char - 'a'  = 0...25
+        // this is how you map a 2 letter word to a unique num
+    }
+}
+
+public class WordDictionary{
+    private Definition[] defTable = new Definition[Word.WORDS];
+    public void insert(Word w, Definition d){
+        defTable[w.hashCode()] = d;
+    }
+
+    Definition find(Word w){
+        return defTable[w.hashCode()];
+    }
+}
+ #+END_SRC
+
+ #+BEGIN_EXAMPLE
+ Problems with long letter word
+ 2 letter word ==> 26^2 items array
+ 3 letter word ==> 26^3
+ n letter word ==> 26^n
+ #+END_EXAMPLE
+
+ #+BEGIN_QUOTE
+ this number is too large to store in computer. now hashtable comes
+ #+END_QUOTE
+
+** hash table: java
+#+BEGIN_SRC java
+import java.util.Arrays;
+
+public class HashFunction {
+
+    String[] theArray;
+    int arraySize;
+    int itemsIntArray = 0;
+
+    public static void main(String[] args){
+
+    }
+}
+
+HashFunction(int size){
+    arraySize = size;
+    theArray = new String[size];
+    Arrays.fill(theArray, "-1");
+}
+#+END_SRC
+* Hash Codes and Compression Functions
+Hash codes and compression functions are a bit of a black art. The ideal hash
+code and compression function would map each key to a uniformly distributed
+random bucket from zero to N - 1. By "random", I don't mean that the function is
+different each time; a given key always hashes to the same bucket. I mean that
+two different keys, however similar, will hash to independently chosen integers,
+so the probability they'll collide is 1/N. This ideal is tricky to obtain.
+
+In practice, it's easy to mess up and create far more collisions than necessary.
+Let's consider bad compression functions first. Suppose the keys are integers,
+and each integer's hash code is itself, so hashCode(i) = i.
+
+Suppose we use the compression function h(hashCode) = hashCode mod N, and the
+number N of buckets is 10,000.  Suppose for some reason that our application
+only ever generates keys that are divisible by 4.  A number divisible by 4 mod
+10,000 is still a number divisible by 4, so three quarters of the buckets are
+never used!  Thus the average bucket has about four times as many entries as it
+ought to.
+
+The same compression function is much better if N is prime.  With N prime, even
+if the hash codes are always divisible by 4, numbers larger than N often hash
+to buckets not divisible by 4, so all the buckets can be used.
+
+For reasons I won't explain (see Goodrich and Tamassia Section 9.2.4 if you're
+interested),
+
+#+BEGIN_EXAMPLE
+  h(hashCode) = ((a * hashCode + b) mod p) mod N
+#+END_EXAMPLE
+
+is a yet better compression function. Here, a, b, and p are positive integers, p
+is a large prime, and p >> N. Now, the number N of buckets doesn't need to be
+prime.
+
+I recommend always using a known good compression function like the two above.
+Unfortunately, it's still possible to mess up by inventing a hash code that
+creates lots of conflicts even before the compression function is used. We'll
+discuss hash codes next lecture.
+** hashcode: lec-note
+| notation | meaning                                               |
+|----------+-------------------------------------------------------|
+| n        | numbers of keys(words) actually you want to store     |
+| N        | table of N buckets, N a bit longer than n, 20% longer |
+
+A hash table maps huge set of possible keys into N buckest by applying a
+compression function to each hash code
+
+- n : i can still map every possible english word to a number from 0 ~ 26^45
+- N : but then i will compress it down, so that i'm not using more than a million buckets
+
+~h(hashCode) = hashCode mod N~
+- h is the name of compression function
+- hashCode ofen negative
+- because 'mod N' is a random *compression*, you will have collisions
+
+*Collision*:
+several keys hash to same bucket; ~if h(hashCode1) = h(hashCode2)~
+
+*How to solve Collision --- Chaining*: chaining*, each bucket is *no longer
+*store just one word*, instead, store *a references a linked list of entries*,
+*that link is called a ~chain~.
+
+then, when i seach a definition of a word, how to locate it in this chain? Not
+just install the definitions, i have to store the original words as well. Store
+eahc key in table with definition, as a pair in that table.
+
+#+BEGIN_EXAMPLE
+entry = (key, value)
+#+END_EXAMPLE
+
+
+~1.insert(key,value)~ , when getting key and value, it combines them together
+   into an entry object and stores that entry in the hash table and for some
+   reason here 'insert' will also return the entry object creates to store your
+   key in your value
+
+~public Entry insert(key, value)~
+   - compute the key's hash code
+   - compress it to determine bucket.
+   - insert the entry into the bucket's chain
+
+~public Entry find(key)~
+   - hash the key to hash code
+   - search chain for entry with given key
+   - if found, return it; else null.
+
+~public Entry remove(key)~
+   - hash key to hash code
+   - search the chain of bucket
+   - remove from chain if found
+   - return entry or null.
+
+
+But, still hava some issues:
+#+BEGIN_QUOTE
+what if you try to insert multiple copies of the same key into the dictionary,
+like maybe a word has two different definitions and you want to put each of
+those definitions in as a separate entry.
+#+END_QUOTE
+
+2 entries in same key. 2 approaches to handle this:
+
+1. G&T(book): insert both, find() arbitrary returns one. also this book give a findALL() function
+   to give all items matching a certain key.
+   so now your chain has tow different entries in it that have the
+   same key or five different entries or 100 diffenent entries.
+2. Replace old value with new. Only one entry has given key.
+
+how to choose, depend on your application.
+    #+BEGIN_QUOTE
+*A Big Warning*: insert sth into hash, eg an refference of object, you should
+NOT change the object, once you do, this will change its hashCode, because you
+change an object in a way that changes its hashcode, will make this object in
+the WRONG bucket and you'll never be able to look it up again.
+
+    #+END_QUOTE
+
+** Performance of Hash Table:
+performance of hash table is depand on how *much* stuff you try to pack into how
+*big* a hash table
+
+Load factor of a hash table:
+#+BEGIN_EXAMPLE
+n/N = (items you want to store into hashtable)/(number of buckets)
+#+END_EXAMPLE
+
+If load factor stay low, and if hash code & compress function are 'good', and no
+duplicate keys , THEN the chains are short, & each opreation takes O(1) time.
+And performance of hash table ,also depends on how big the chain is, that you
+have to search. if chain is big , it'll take >O(1)
+
+: If load factor get BIG(n>>N), O(n) time.
+
+** Troublesome 1: Compression fn
+    #+BEGIN_EXAMPLE
+key -------(hashcode func)------> hashcode ----(compression func)------> bucket[0,N-1]
+    #+END_EXAMPLE
+
+*Ideal*: Map each key to a random bucket(use random function). with each bucket
+being equally likely.
+
+Bad compression function,eg:
+#+BEGIN_EXAMPLE
+suppose keys are ints.
+hashCode(i) = i.
+Compression function h(hashCode) = hashCode mod N
+N = 10,000 buckets.
+Suppose keys are divisible by 4.
+h() is divisible by 4 too.
+Very Bad news, because 3/4 of our buckets are wasted.
+this means every bucket has a chain of 4 entries ,need handle with 4 collision.
+#+END_EXAMPLE
+
+Some compression fn better if N is prime, any num mod N, they won't be divisible
+by any particular number.
+
+#+BEGIN_EXAMPLE
+Better: chap9.2.4 of G&T
+h(hashCode) = ((a*hashCode + b) mod p) mod N)
+a,b,p : positive integers
+p: large prime
+p >> N
+
+'mod p' as scrambling the bits really well;
+'mod N' make it fit in your table
+#+END_EXAMPLE
+
+the advantage of this over below, is now, N(buckets) dosen't need to be prime.
+
+** Troublesome 2: H

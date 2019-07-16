@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 22:23 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十五课 Mergable Heap and Priority Queue</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十五课 Mergable Heap and Priority Queue</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org7e810a7">1. [postscripts]Mergeable Heap</a></li>
+<li><a href="#org70dbcb7">2. Priority Queue</a>
+<ul>
+<li><a href="#orgdaf3a30">2.1. Main api of Priority queue</a></li>
+<li><a href="#org732a4e6">2.2. Binary Heaps:  An Implementation of Priority Queues</a>
+<ul>
+<li><a href="#org789c986">2.2.1. Features-1: heap-oreder</a></li>
+<li><a href="#org709850d">2.2.2. Features-2: use array because of 'complete binary'</a></li>
+<li><a href="#orgb83785a">2.2.3. Features-3: locate the children/parent by indices</a></li>
+<li><a href="#orgf9e0e7c">2.2.4. Features-4: why 'array'</a></li>
+<li><a href="#org80984d7">2.2.5. Features-5: why 'two arrays'</a></li>
+<li><a href="#orgcd473d1">2.2.6. [1] Main API-1: Entry min();</a></li>
+<li><a href="#orgfc96b68">2.2.7. [2] Main API-2: Entry insert(Object k, Object v);</a></li>
+<li><a href="#org01c99d5">2.2.8. When we finish, is the heap-order property satisfied?</a></li>
+<li><a href="#orgc4c2f95">2.2.9. [3] Main API-3: Entry removeMin();                                             </a></li>
+<li><a href="#orgc520e0c">2.2.10. [4] Main API-4: void bottomUpHeap();                                     </a></li>
+<li><a href="#org62c9543">2.2.11. Running Times</a></li>
+<li><a href="#org5fd1a37">2.2.12. Postscript:  Other Types of Heaps (not examinable)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org7e810a7" class="outline-2">
+<h2 id="org7e810a7"><span class="section-number-2">1</span> [postscripts]Mergeable Heap</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Binary heap is complete binary tree exception at last level.
+Binary Heap, can be used for applications below:
+</p>
+<ol class="org-ol">
+<li>HeapSort</li>
+<li>Priority Scheduling</li>
+<li>Job Scheduling</li>
+<li>A* Algorithms</li>
+<li>Graph Algorithms</li>
+<li>Minimum Spanning trees</li>
+</ol>
+
+<pre class="example">
+1. Max Heap: parent key &gt;= children keys
+   15,80,90,30,45,46,1,12
+                   80               90             90           90
+                  /       =&gt;       /  \     =&gt;    /  \    =&gt;   /  \
+                 15              15   80         15  80       30  80
+                /                               /            /
+                                               30           15
+
+   =&gt; following operation
+    1. Make-Heap(H)
+    2. insert key in the Heap(H,x)
+    3. Maximum-Heap(H,x)
+    4. Increase key(H,x,k)
+    5. Extract Max(H,x)
+
+2. Min Heap: parent node &lt;= children nodes
+</pre>
+</div>
+</div>
+
+<div id="org70dbcb7" class="outline-2">
+<h2 id="org70dbcb7"><span class="section-number-2">2</span> Priority Queue</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+A priority queue, like a dictionary, contains <span class="underline">entries</span> that each consist of a
+key and an associated value. However, whereas a dictionary is used when we want
+to be able to look up arbitrary keys, a priority queue is used to prioritize
+entries. Define a total order on the keys (e.g. alphabetical order). You may
+identify or remove the entry whose key is the lowest (but no other entry). This
+limitation helps to make priority queues fast. However, an entry with any key
+may be inserted at any time.
+</p>
+</div>
+
+<div id="orgdaf3a30" class="outline-3">
+<h3 id="orgdaf3a30"><span class="section-number-3">2.1</span> Main api of Priority queue</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+For concreteness, let's use Integer objects as our keys.  The main operations:
+</p>
+<ul class="org-ul">
+<li><code>insert()</code> adds an entry to the priority queue;</li>
+<li><code>min()</code> returns the entry with the minimum key; and</li>
+<li><p>
+<code>removeMin()</code> both removes and returns the entry with the minimum key.
+</p>
+
+<pre class="example">
+                key
+---------        |         ---------              ---------
+|4: womp|        v         |4: womp|              |       |
+|7: gong|-insert(5, hoot)-&gt;|7: gong|-removeMin()-&gt;|7: gong|-&gt;min()
+|       |           ^      |5: hoot|     |        |5: hoot|    |
+---------           |      ---------     v        ---------    v
+                  value              (4, womp)             (5, hoot)
+</pre></li>
+</ul>
+
+<p>
+Priority queues are most commonly used as <span class="underline">"event queues"</span> in simulations. Each
+value on the queue is an event that is expected to take place, and each key is
+the time the event takes place. A simulation operates by removing successive
+events from the queue and simulating them. This is why most priority queues
+return the minimum, rather than maximum, key: we want to simulate the events
+that occur first first.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">interface</span> <span style="color: #ce537a; font-weight: bold;">PriorityQueue</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">size</span>();
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">boolean</span> <span style="color: #bc6ec5; font-weight: bold;">isEmpty</span>();
+  <span style="color: #ce537a; font-weight: bold;">Entry</span> <span style="color: #bc6ec5; font-weight: bold;">insert</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">key</span>, <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">value</span>);
+  <span style="color: #ce537a; font-weight: bold;">Entry</span> <span style="color: #bc6ec5; font-weight: bold;">min</span>();
+  <span style="color: #ce537a; font-weight: bold;">Entry</span> <span style="color: #bc6ec5; font-weight: bold;">removeMin</span>();
+}
+</pre>
+</div>
+
+<p>
+See page 340 of Goodrich &amp; Tamassia for how they implement an "Entry".
+</p>
+</div>
+</div>
+
+<div id="org732a4e6" class="outline-3">
+<h3 id="org732a4e6"><span class="section-number-3">2.2</span> Binary Heaps:  An Implementation of Priority Queues</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+heap 是什么，就把他简单理解为每次可以吐出最小值的 queue 即可。虽然两者根本不同，但功能上是这样。
+</p>
+
+<p>
+A <span class="underline">complete_binary_tree</span> is a binary tree in which every row(level) is full, except
+possibly the bottom row, which is filled from left to right as in the
+illustration below.  Just the keys are shown; the associated values are
+omitted.
+</p>
+
+<pre class="example">
+        2       index:  0   1   2   3   4   5   6    7   8    9   10
+       / \
+      /   \           ------------------------------------------------
+     5     3          |   | 2 | 5 | 3 | 9 | 6 | 11 | 4 | 17 | 10 | 8 |
+    / \   / \         ------------------------------------------------
+   9   6 11  4          ^
+  / \ /                 |
+17 10 8                 \--- array index 0 intentionally left empty.
+</pre>
+
+<p>
+<b>Binary Heap =&gt; complete_binary_tree + heap_order</b>
+</p>
+
+<p>
+Binary Heap 的逻辑结构是 complete binary tree;
+</p>
+
+<p>
+<b>Binary Heap -&gt; array</b>
+</p>
+
+<p>
+Binary Heap 的物理结构是 array
+</p>
+</div>
+
+<div id="org789c986" class="outline-4">
+<h4 id="org789c986"><span class="section-number-4">2.2.1</span> Features-1: heap-oreder</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+A <span class="underline">binary_heap</span> is a complete binary tree whose entries satisfy the
+<span class="underline">heap-order_property</span>:  no child has a key less than its parent's key.
+Observe that every subtree of a binary heap is also a binary heap, because
+every subtree is complete and satisfies the heap-order property.
+</p>
+</div>
+</div>
+<div id="org709850d" class="outline-4">
+<h4 id="org709850d"><span class="section-number-4">2.2.2</span> Features-2: use array because of 'complete binary'</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+Because it is complete, a binary heap can be stored compactly as an <span class="underline">array</span> of
+entries.  We map tree nodes to array indices with <span class="underline">level_numbering</span>, which
+places the root at index 1 and orders the remaining nodes by a level-order
+traversal of the tree.
+</p>
+</div>
+</div>
+<div id="orgb83785a" class="outline-4">
+<h4 id="orgb83785a"><span class="section-number-4">2.2.3</span> Features-3: locate the children/parent by indices</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+Observe that if a node's index is i, its children's indices are 2i and 2i+1, and
+its parent's index is floor(i/2). Hence, no node needs to store explicit
+references to its parent or children. (Array index 0 is left empty to make the
+indexing work out nicely. If we instead put the root at index 0, node i's
+children are at indices 2i+1 and 2i+2, and its parent is at floor([i-1]/2).)
+</p>
+</div>
+</div>
+<div id="orgf9e0e7c" class="outline-4">
+<h4 id="orgf9e0e7c"><span class="section-number-4">2.2.4</span> Features-4: why 'array'</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<p>
+We can use either an array-based or a node-and-reference-based tree data
+structure, but the array representation tends to be faster (by a significant
+constant factor) because there is no need to read and write the references that
+connect nodes to each other, cache performance is better, and finding the last
+node in the level order is easier.
+</p>
+</div>
+</div>
+<div id="org80984d7" class="outline-4">
+<h4 id="org80984d7"><span class="section-number-4">2.2.5</span> Features-5: why 'two arrays'</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<p>
+Just like in hash tables, either each tree node has two references (one for the
+key, and one for the value, so you must have 2 arrays, one for keys another for
+values), or each node references an "Entry" object (seepage 340 of Goodrich and
+Tamassia).
+</p>
+</div>
+</div>
+
+<div id="orgcd473d1" class="outline-4">
+<h4 id="orgcd473d1"><span class="section-number-4">2.2.6</span> [1] Main API-1: Entry min();</h4>
+<div class="outline-text-4" id="text-2-2-6">
+<p>
+Let's look at how we implement priority queue operations with a binary heap.
+</p>
+
+<p>
+The heap-order property ensures that the entry with the minimum key is always at
+the top of the heap. Hence, we simply return the entry at the root node. If the
+heap is empty, return null or throw an exception.
+</p>
+</div>
+</div>
+
+<div id="orgfc96b68" class="outline-4">
+<h4 id="orgfc96b68"><span class="section-number-4">2.2.7</span> [2] Main API-2: Entry insert(Object k, Object v);</h4>
+<div class="outline-text-4" id="text-2-2-7">
+<p>
+Let x be the new entry (k, v), whose key is k and whose value is v. We place the
+new entry x in the bottom level of the tree, at the first free spot from the
+left. (If the bottom level is full, start a new level with x at the far left.)
+In an array-based implementation, we place x in the first free location in the
+array (excepting index 0).
+</p>
+
+<p>
+Of course, the new entry's key may violate the heap-order property.  We correct
+this by having the entry bubble up the tree until the heap-order property is
+satisfied.  More precisely, we compare x's key with its parent's key.
+While x's key is less, we exchange x with its parent, then repeat the test with
+x's new parent.  Continue until x's key is greater than or equal to its parent,
+or x reaches the root.  For instance, if we insert an entry whose key is 2:
+</p>
+
+<pre class="example">
+        2                  2                  2                  2
+       / \                / \                / \                / \
+      /   \              /   \              /   \              /   \
+     5     3            5     3            5     3            2     3
+    / \   / \    =&gt;    / \   / \    =&gt;    / \   / \    =&gt;    / \   / \
+   9   6 11  4        9   6 11  4        9   2 11  4        9   5 11  4
+  / \ /              / \ / \            / \ / \            / \ / \
+17 10 8            17 10 8  2         17 10 8  6         17 10 8  6
+</pre>
+
+<p>
+As this example illustrates, a heap can contain multiple entries with the same
+key.  (After all, in a typical simulation, we can't very well outlaw multiple
+events happening at the same time.)
+</p>
+</div>
+</div>
+<div id="org01c99d5" class="outline-4">
+<h4 id="org01c99d5"><span class="section-number-4">2.2.8</span> When we finish, is the heap-order property satisfied?</h4>
+<div class="outline-text-4" id="text-2-2-8">
+<pre class="example">
+                                                               p          x
+Yes, if the heap-order property was satisfied before the      / \        / \
+insertion.  Let's look at a typical exchange of x with a     s   x  =&gt;  s   p
+parent p (right) during the insertion operation.  Since     /\   /\    /\   /\
+the heap-order property was satisfied before the insertion,     l  r       l  r
+we know that p &lt;= s (where s is x's sibling), p &lt;= l, and
+p &lt;= r (where l and r are x's children).  We swap only if x &lt; p, which implies
+that x &lt; s; after the swap, x is the parent of s.  After the swap, p is the
+parent of l and r.  All other relationships in the subtree rooted at x are
+unchanged, so after the swap, the tree rooted at x has the heap-order property.
+
+</pre>
+
+<p>
+For maximum speed, don't put x at the bottom of the tree and bubble it up.
+Instead, bubble a hole up the tree, then fill in x.  This modification saves
+the time that would be spent setting a sequence of references to x that are
+going to change anyway.
+</p>
+
+
+<pre class="example">
+这一段是说，以上图为例，他的数组是：
+
+|   | 2 | 5 | 3 | 9 | 6 | 11 | 4 | 17 | 10 | 8 |   |
+                      ^                          ^
+                      |                          |
+                     floor(i/2)                 index=i
+
+
+此时 insert 2，2 暂时不放进去，原数组末尾留空，直接比较 2 和 floor(i/2);
+然后把 6 挪到末尾：
+
+
+|   | 2 | 5 | 3 | 9 |   | 11 | 4 | 17 | 10 | 8 | 6 |
+                      ^                          ^
+                      |                          |
+                     floor(i/2)                 index=i
+
+
+再比较 2 和 floor(floor(i/2) / 2)...
+最后再把 2 填进去
+
+|   | 2 |   | 3 | 9 | 5 | 11 | 4 | 17 | 10 | 8 | 6 |
+          ^
+          |
+          fill in 2
+
+</pre>
+
+<p>
+insert() returns an Entry object representing (k, v).
+</p>
+</div>
+</div>
+
+<div id="orgc4c2f95" class="outline-4">
+<h4 id="orgc4c2f95"><span class="section-number-4">2.2.9</span> [3] Main API-3: Entry removeMin();                                             <a id="org6a187ea"></a></h4>
+<div class="outline-text-4" id="text-2-2-9">
+<ol class="org-ol">
+<li>If the heap is empty, return null or throw an exception.</li>
+<li>Otherwise, begin by removing the entry at the root node and saving it for the return value.</li>
+<li>This leaves a gaping hole at the root.</li>
+<li>We fill the hole with the last entry in the tree (which we call "x"), so that the tree is still complete.</li>
+</ol>
+
+<p>
+It is unlikely that x has the minimum key.  Fortunately, both subtrees rooted
+at the root's children are heaps, and thus the new mimimum key is one of these
+two children.  We bubble x down the heap until the heap-order property is
+satisfied, as follows.
+</p>
+
+<ol class="org-ol">
+<li>We compare x's key with both its children's keys.</li>
+<li>While x has a child whose key is smaller, swap x with the child having the minimum key</li>
+<li>then repeat the test with x's new children.</li>
+<li>Continue until x is less than or equal to its children, or reaches a leaf.</li>
+</ol>
+
+
+
+<pre class="example">
+Consider running removeMin() on our original tree.
+
+          2                  8                  3                  3
+         / \                / \                / \                / \
+        /   \              /   \              /   \              /   \
+       5     3            5     3            5     8            5     4
+      / \   / \    =&gt;    / \   / \    =&gt;    / \   / \    =&gt;    / \   / \
+     9   6 11  4        9   6 11  4        9   6 11  4        9   6 11  8
+    / \ /              / \                / \                / \
+  17 10 8            17 10              17 10              17 10
+
+Above, the entry bubbled all the     1                  4                  2
+way to a leaf.  This is not         / \                / \                / \
+always the case, as the            /   \              /   \              /   \
+example at right shows.           2     3     =&gt;     2     3     =&gt;     4     3
+                                 / \   / \          / \   /            / \   /
+                                9   6 11  4        9   6 11           9   6 11
+</pre>
+
+<p>
+For maximum speed, don't put x at the root and bubble it down. Instead, bubble a
+hole down the tree, then fill in x.
+</p>
+</div>
+</div>
+
+<div id="orgc520e0c" class="outline-4">
+<h4 id="orgc520e0c"><span class="section-number-4">2.2.10</span> [4] Main API-4: void bottomUpHeap();                                     <a id="org36469c7"></a></h4>
+<div class="outline-text-4" id="text-2-2-10">
+<p>
+Bottom-Up Heap Construction
+</p>
+
+<p>
+Suppose we are given a bunch of randomly ordered entries, and want to make a
+heap out of them.  We could insert them one by one in O(n log n) time, but
+there's a faster way.  We define one more heap operation.
+</p>
+
+<p>
+First, we make a complete tree out of the entries, in any order.  (If we're
+using an array representation, we just throw all the entries into an array.)
+Then we work backward from the last internal node (non-leaf node) to the root
+node, in reverse order in the array or the level-order traversal.  When we
+visit a node this way, we bubble its entry down the heap as in
+</p>
+
+<p>
+<code>removeMin() = switch(x, min(x_lchild, x_rchild))</code>.
+</p>
+
+<p>
+Before we bubble an entry down, we know (inductively) that its two child
+subtrees are heaps.  Hence, by bubbling the entry down, we create a larger heap
+rooted at the node where that entry started.
+</p>
+
+<pre class="example">
+                                                                +-+
+        9                  9                  9                 |2|
+       / \                / \                / \                /-\
+      /   \              /   \-+          +-/   \              /   \
+     4     7     =&gt;     4    |2|    =&gt;    |2|    2     =&gt;     4     2
+    / \   / \          / \   /-\          /-\   / \          / \   / \
+   2   8 2   6        2   8 7   6        4   8 7   6        9   8 7   6
+
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---+---+---+---+---+---+---+---|
+|   | 9 | 4 | 7 | 2 | 8 | 2 | 6 | &lt;- floor(7/2) = 3, swap ([3], min([6],[7]))
+|   | 9 | 4 | 2 | 2 | 8 | 7 | 6 | &lt;- floor(5/2) = 2, swap ([2], min([4],[5]))
+|   | 9 | 2 | 2 | 4 | 8 | 7 | 6 | &lt;- floor(3/2) = 1, swap ([1], min([2],[3]))
+|   | 2 | 4 | 2 | 9 | 8 | 7 | 6 |
+
+</pre>
+
+<p>
+The running time of bottomUpHeap is tricky to derive. If each internal node
+bubbles all the way down, then the running time is proportional to the sum of
+the heights of all the nodes in the tree. Page 371 of Goodrich and Tamassia has
+a simple and elegant argument showing that this sum is less than n, where n is
+the number of entries being coalesced into a heap. Hence, the running time is in
+<span class="underline">Theta(n)</span>, which beats inserting n entries into a heap individually.
+</p>
+</div>
+</div>
+
+<div id="org62c9543" class="outline-4">
+<h4 id="org62c9543"><span class="section-number-4">2.2.11</span> Running Times</h4>
+<div class="outline-text-4" id="text-2-2-11">
+<p>
+There are other, less efficient ways we could implement a priority queue than
+using a heap.  For instance, we could use a list or array, sorted or unsorted.
+The following table shows running times for all, with n entries in the queue.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Binary Heap</td>
+<td class="org-left">Sorted List/Array</td>
+<td class="org-left">Unsorted List/Array</td>
+</tr>
+
+<tr>
+<td class="org-left">min()</td>
+<td class="org-left">Theta(1)</td>
+<td class="org-left">Theta(1)</td>
+<td class="org-left">Theta(n)</td>
+</tr>
+
+<tr>
+<td class="org-left">insert()</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">worst-case</td>
+<td class="org-left">Theta(log n) *</td>
+<td class="org-left">Theta(n)</td>
+<td class="org-left">Theta(1) *</td>
+</tr>
+
+<tr>
+<td class="org-left">best-case</td>
+<td class="org-left">Theta(1) *</td>
+<td class="org-left">Theta(1) *</td>
+<td class="org-left">Theta(1) *</td>
+</tr>
+
+<tr>
+<td class="org-left">removeMin()</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">worst-case</td>
+<td class="org-left">Theta(log n)</td>
+<td class="org-left">Theta(1) **</td>
+<td class="org-left">Theta(n)</td>
+</tr>
+
+<tr>
+<td class="org-left">best-case</td>
+<td class="org-left">Theta(1)</td>
+<td class="org-left">Theta(1) **</td>
+<td class="org-left">Theta(n)</td>
+</tr>
+</tbody>
+</table>
+
+<pre class="example">
+*   If you're using an array-based data structure, these running times assume
+    that you don't run out of room.  If you do, it will take Theta(n) time to
+    allocate a larger array and copy the entries into it.  However, if you
+    double the array size each time, the _average_ running time will still be
+    as indicated.
+**  Removing the minimum from a sorted array in constant time is most easily
+    done by keeping the array always sorted from largest to smallest.
+</pre>
+
+<p>
+In a binary heap, min's running time is clearly in Theta(1).
+</p>
+
+<p>
+<code>insert()</code> puts an entry x at the bottom of the tree and bubbles it up.  At each
+level of the tree, it takes O(1) time to compare x with its parent and swap if
+indicated.  An n-node complete binary tree has height floor(log2 n).  In the
+worst case, x will bubble all the way to the top, taking Theta(log n) time.
+</p>
+
+<p>
+Similarly, <code>removeMin()</code> may cause an entry to bubble all the way down the heap,
+taking <code>Theta(log n)</code> worst-case time.
+</p>
+</div>
+</div>
+
+<div id="org5fd1a37" class="outline-4">
+<h4 id="org5fd1a37"><span class="section-number-4">2.2.12</span> Postscript:  Other Types of Heaps (not examinable)</h4>
+<div class="outline-text-4" id="text-2-2-12">
+<p>
+reference: <a href="http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap20.htm">http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap20.htm</a>
+</p>
+
+<p>
+Binary heaps are not the only heaps in town.  Several important variants are
+called "mergeable heaps", because it is relatively fast to combine two
+mergeable heaps together into a single mergeable heap.  We will not describe
+these complicated heaps in CS 61B, but it's worthwhile for you to know they
+exist in case you ever need one.
+</p>
+
+<p>
+The best-known mergeable heaps are called "binomial heaps," "Fibonacci heaps,"
+"skew heaps," and "pairing heaps."  Fibonacci heaps have another remarkable
+property:  if you have a reference to an arbitrary node in a Fibonacci heap,
+you can decrease its key in constant time.  (Pairing heaps are suspected of
+having the same property, but nobody knows for sure.)  This operation is used
+frequently by <span class="underline">Dijkstra's algorithm</span>, an important algorithm for finding the
+shortest path in a graph.  The following running times are all worst-case.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Binary</td>
+<td class="org-left">Binomial</td>
+<td class="org-left">Skew</td>
+<td class="org-left">Pairing</td>
+<td class="org-left">Fibonacci</td>
+</tr>
+
+<tr>
+<td class="org-left">insert()</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(1)</td>
+<td class="org-left">O(log n) *</td>
+<td class="org-left">O(1)</td>
+</tr>
+
+<tr>
+<td class="org-left">removeMin()</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+</tr>
+
+<tr>
+<td class="org-left">merge()</td>
+<td class="org-left">O(n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(1)</td>
+<td class="org-left">O(log n) *</td>
+<td class="org-left">O(1)</td>
+</tr>
+
+<tr>
+<td class="org-left">decreaseKey()</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">O(log n) *</td>
+<td class="org-left">O(1)</td>
+</tr>
+</tbody>
+</table>
+
+<pre class="example">
+*   Conjectured to be O(1), but nobody has proven or disproven it.
+
+</pre>
+
+<p>
+The time bounds given here for skew heaps, pairing heaps, and Fibonacci heaps
+are "amortized" bounds, not worst case bounds.  This means that, if you start
+from an empty heap, any sequence of operations will take no more than the given
+time bound on average, although individual operations may occasionally take
+longer.  We'll discuss amortized analysis near the end of the semester.
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

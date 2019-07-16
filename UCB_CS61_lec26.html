@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 22:11 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十六课 Binary Search Tree</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十六课 Binary Search Tree</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org1c2f421">1. disadvantage of binary search tree</a></li>
+<li><a href="#org0b7b88e">2. Representing Binary Trees</a></li>
+<li><a href="#org85c6da1">3. BINARY SEARCH TREES</a>
+<ul>
+<li><a href="#orga52bb18">3.1. Main api of binary search tree</a>
+<ul>
+<li><a href="#org15ca4c2">3.1.1. [1]  Entry find(Object k);</a></li>
+<li><a href="#orgde38469">3.1.2. [2]  Entry min(); Entry max();</a></li>
+<li><a href="#org14257cd">3.1.3. [3]  Entry insert(Object k, Object v);</a></li>
+<li><a href="#orga7413e3">3.1.4. <span class="todo TODO">TODO</span> [4]  Entry remove(Object k);</a></li>
+</ul>
+</li>
+<li><a href="#orgd2bbd9f">3.2. Running Times of Binary Search Tree Operations</a></li>
+</ul>
+</li>
+<li><a href="#orgfdb5682">4. FootNote</a>
+<ul>
+<li><a href="#org955fbec">4.1. Footnote 1</a></li>
+<li><a href="#orgd2bc685">4.2. Footnote 2</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org1c2f421" class="outline-2">
+<h2 id="org1c2f421"><span class="section-number-2">1</span> disadvantage of binary search tree</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+If you have a <span class="underline">regular binary search tree</span> and you just keep adding stuff to it,
+it really gets thin and scrawny and then when you search, the search is going to
+<span class="underline">take proportional to the number of elements in the tree</span> (all node absolutely
+in one 'line'), <span class="underline">instead of the O(logn)</span> ,the difference between n and logn is
+huge. So, it's true we have all this( <span class="underline">R&amp;B-tree</span> ) overhead and our red black
+tree,but it guarantees us that out <span class="underline">height stays just 2logn</span>, 2logn is really
+small compared to N and what's the <span class="underline">payoff</span>, all we have to do is <span class="underline">fix</span> it
+everytime we do an insertion when you do a regular binary search, it takes
+O(logn) just to find the thing and this fixing(solve the problem trigged by
+insertion and deleteion in R&amp;B-tree) is taking just another <span class="underline">O(logn)</span>, <span class="underline">it's an
+alternative to heap</span>
+</p>
+</blockquote>
+</div>
+</div>
+<div id="org0b7b88e" class="outline-2">
+<h2 id="org0b7b88e"><span class="section-number-2">2</span> Representing Binary Trees</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Recall that a binary tree is a rooted tree wherein no node has more than two
+children. Additionally, every child is either a <span class="underline">left_child</span> or a <span class="underline">right_child</span>
+of its parent, even if it is its parent's only child.
+</p>
+
+<p>
+In the most popular binary tree representation, each tree node has three
+references to neighboring tree nodes: a "parent" reference, and "left" and
+"right" references for the two children. (For some algorithms, the "parent"
+references are unnecessary.) Each node also has an "item" reference.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java" id="org4fcf04e"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">BinaryTreeNode</span> {        |  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> BinaryTree {
+  <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">item</span>;                       |    BinaryTreeNode root;
+  <span style="color: #ce537a; font-weight: bold;">BinaryTreeNode</span> <span style="color: #7590db;">parent</span>;             |    <span style="color: #ce537a; font-weight: bold;">int</span> size;
+  <span style="color: #ce537a; font-weight: bold;">BinaryTreeNode</span> <span style="color: #7590db;">left</span>;               |  }
+  <span style="color: #ce537a; font-weight: bold;">BinaryTreeNode</span> <span style="color: #7590db;">right</span>;              |
+
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> inorder() {
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (left != <span style="color: #a45bad;">null</span>) {
+      left.inorder();
+    }
+    <span style="color: #4f97d7; font-weight: bold;">this</span>.visit();
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (right != <span style="color: #a45bad;">null</span>) {
+      right.inorder();
+    }
+  }
+}
+
+</pre>
+</div>
+
+<pre class="example">
+
+================================================
++ BINARY TREE | -------------------            +
+=============== |---          --- |            +
++               ||.|root  size|7| |            +
++               |-+-          --- |            +
++               --|----------------            +
++                 v  BinaryTree object         +
++               -----                          +
++               | * |                          +
++               -----             ------------ +
++ Root node =&gt;  |add|             |  parent  | +
++               -----             ------------ +
++               |.|.|             |   item   | +
++               /---\             ------------ +
++              /  ^^ \            |left|right| +
++             v  /  \ v           ------------ +
++            ---/-  -\---         structure of +
++            | . |  | . |      BinaryTreeNodes +
++            -----  -----                      +
++            |sub|  |div|                      +
++            -----  -----                      +
++           &gt;|.|.|  |.|.|&lt;                     +
++          / /--|-  -|--\ \                    +
++         / /  ^|    |^  \ \                   +
++        / v   |v    v|   v \                  +
++     --+--  --+--  --+--  --+--               +
++     | . |  | . |  | . |  | . |               +
++     -----  -----  -----  -----               +
++     | 6 |  | 5 |  | 9 |  | 3 |               +
++     -----  -----  -----  -----               +
++     |*|*|  |*|*|  |*|*|  |*|*|               +
++     -----  -----  -----  -----               +
+================================================
+
+</pre>
+</div>
+</div>
+
+<div id="org85c6da1" class="outline-2">
+<h2 id="org85c6da1"><span class="section-number-2">3</span> BINARY SEARCH TREES</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+An <span class="underline">ordered_dictionary</span> is a dictionary in which the keys have a total order,
+just like in a heap. You can insert, find, and remove entries, just as with a
+hash table, for more details, see lec-22 Dictionries-2 and Hash Table.
+</p>
+
+<p>
+But unlike a hash table, you can quickly find the entry with minimum or maximum
+key, or the entry nearest another entry <a id="orgd02b276"></a> in the total order.
+</p>
+
+<p>
+An ordered dictionary does anything a dictionary or binary heap can do and more,
+albeit more slowly.
+</p>
+
+<p>
+五种搜索结果：最大，最小，正好，比正好稍小（大）
+</p>
+
+<p>
+<a href="#orgd02b276">3</a> 的一个很好的例子是 spell 自动纠错，当你忘记某些单词的拼法，就打近似的，这样
+binary search tree 可以帮你定位到相近的系统存储的单词中（the entry nearest
+another entry）;当你处理的 key 是数字时，你可以这样搜索：give me the smallest
+entry that's greater than or equal to 26.
+</p>
+
+<p>
+binary search tree 的功能覆盖了 heap 和 hash table, 而且提供的更多，但是更慢。
+</p>
+<pre class="example">
++L_child &lt;= parent &lt;= R_child+
+This is WRONG, insteaded:
+L_descendent &lt;= parent &lt;= R_descendent
+This is RIGHT!
+
+A simple implementation of an ordered dictionary is a binary search tree,
+                   wherein entries are maintained in a (somewhat) sorted order.
+       18          The _left_subtree_ of a node is the subtree rooted at the
+      /  \         node's left child; the _right_subtree_ is defined similarly.
+    12    25       A binary search tree satisfies the _binary_search_tree_
+   / \    / \      _invariant_:  for any node X, every key in the left subtree
+  4  15  25  30    of X is less than or equal to X's key, and every key in the
+ /  /  \    /      right subtree of X is greater than or equal to X's key.  You
+1  13  17  28      can verify this in the search tree at left:  for instance,
+ \  \       \      the root is 18, its left subtree (rooted at 12) contains
+  3  14      29    numbers from 1 to 17, and its right subtree (rooted at 25)
+                   contains numbers from 25 to 30.
+</pre>
+
+<p>
+When a node has only one child, that child is either a left child or a right
+child, depending on whether its key is smaller or larger than its parent's key.
+(A key equal to the parent's key can go into either subtree.)
+</p>
+</div>
+
+<div id="orga52bb18" class="outline-3">
+<h3 id="orga52bb18"><span class="section-number-3">3.1</span> Main api of binary search tree</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+An inorder traversal of a binary search tree visits the nodes in sorted order.
+In this sense, a search tree maintains a sorted list of entries. However,
+operations on a search tree are usually more efficient than the same operations
+on a sorted linked list.
+</p>
+
+<p>
+Let's replace the "Object item;" declaration in each node with "Entry entry;"
+where each Entry object stores a key and an associated value.
+</p>
+
+<p>
+<span class="underline">The keys implement the Comparable interface</span>, and the key.compareTo() method
+induces a total order on the keys (e.g. alphabetical or numerical order).
+</p>
+</div>
+
+<div id="org15ca4c2" class="outline-4">
+<h4 id="org15ca4c2"><span class="section-number-4">3.1.1</span> [1]  Entry find(Object k);</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<div class="org-src-container">
+<pre class="src src-java" id="org066d816"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">Entry</span> <span style="color: #bc6ec5; font-weight: bold;">find</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">k</span>) {
+  <span style="color: #ce537a; font-weight: bold;">BinaryTreeNode</span> <span style="color: #7590db;">node</span> = root;                   <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Start at the root.</span>
+  <span style="color: #4f97d7; font-weight: bold;">while</span> (node != <span style="color: #a45bad;">null</span>) {
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">comp</span> = ((<span style="color: #ce537a; font-weight: bold;">Comparable</span>) k).compareTo(node.entry.key());
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (comp &lt; <span style="color: #a45bad;">0</span>) {                             <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Repeatedly compare search</span>
+      node = node.left;                         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">key k with current node; if</span>
+    } <span style="color: #4f97d7; font-weight: bold;">else</span> <span style="color: #4f97d7; font-weight: bold;">if</span> (comp &gt; <span style="color: #a45bad;">0</span>) {                      <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">k is smaller, go to the left</span>
+      node = node.right;                        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">child; if k is larger, go to</span>
+    } <span style="color: #4f97d7; font-weight: bold;">else</span> {    <span style="color: #2aa1ae; background-color: #292e34;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">The keys are equal */</span>        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">the right child.  Stop when</span>
+      <span style="color: #4f97d7; font-weight: bold;">return</span> node.entry;                        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">we find a match (success;</span>
+    }                                           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">return the entry) or reach</span>
+  }                                             <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">a null pointer (failure;</span>
+  <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">null</span>;                                  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">return null).</span>
+}
+</pre>
+</div>
+
+<p>
+当你想精确的查找某个 entry，用 hashtable 会更有效率。
+</p>
+
+<p>
+This method only finds exact matches.  What if we want to find the smallest key
+greater than or equal to k, or the largest key less than or equal to k?
+Fortunately, when searching downward through the tree for a key k that is not
+in the tree, we are certain to encounter both
+</p>
+<ul class="org-ul">
+<li>the node containing the smallest key greater than k (if any key is greater)</li>
+<li>the node containing the largest key less than k (if any key is less).</li>
+</ul>
+
+<p>
+See <a href="#org955fbec">Footnote 1</a> for an explanation why.
+</p>
+<pre class="example">
+      +--+         For instance, suppose we search for the key 27 in the tree
+      |18|         at left.  Along the way, we encounter the keys 25 and 28,
+      /--\--+      which are the keys closest to 27 (below and above).
+    12   |25|
+   / \   +/-\--+   Here's how to implement a method smallestKeyNotSmaller(k):
+  4  15  25 |30|   search for the key k in the tree, just like in find().
+ /  /  \  +-/+-+   As you go down the tree, keep track of the smallest key
+1  13  17 |28|     not smaller than k that you've encountered so far.  If you
+ \  \     +-\+     find the key k, you can return it immediately.  If you reach
+  3  14      29    a null pointer, return the best key you found on the path.
+                   You can implement largestKeyNotLarger(k) symmetrically.
+</pre>
+
+<p>
+很明显，如果你查找的 key 不在 binary search tree 中，你的搜索会‘路过’比你大的最小 entry 和比你小的最大 entry这时，你只需要在代码中增加两个变量分别记录‘比你小的最大值’和‘比你大的最小值’即可找到他们。or 你可以通过另一个 trick 找到两个值，就是最近的一次'choose left'和'choose right',以上图为例，最近一次‘向左’是28， 最近的一次向右是 25.通过在代码中记录并随时覆盖，就可以找到他们。（个人认为这种方法更好）
+</p>
+</div>
+</div>
+<div id="orgde38469" class="outline-4">
+<h4 id="orgde38469"><span class="section-number-4">3.1.2</span> [2]  Entry min(); Entry max();</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+<code>min()</code> is very simple. If the tree is empty, return null. Otherwise, start at
+the root. Repeatedly go to the left child until you reach a node with no left
+child. That node has the minimum key.
+</p>
+
+<p>
+<code>max()</code> is the same, except that you repeatedly go to the right child. In the
+tree above, observe the locations of the minimum (1) and maximum (30) keys.
+</p>
+</div>
+</div>
+
+<div id="org14257cd" class="outline-4">
+<h4 id="org14257cd"><span class="section-number-4">3.1.3</span> [3]  Entry insert(Object k, Object v);</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+<code>insert()</code> starts by following the same path through the tree as find(). (find()
+works <span class="underline">because</span> it follows the same path as insert().) When it reaches a null
+reference, replace that null with a reference to a new node storing the entry
+(k, v).
+</p>
+
+<p>
+Duplicate keys are allowed. If insert() finds a node that already has the key k,
+it puts the new entry in the left subtree of the older one. (We could just as
+easily choose the right subtree; it doesn't matter.)
+</p>
+</div>
+</div>
+
+<div id="orga7413e3" class="outline-4">
+<h4 id="orga7413e3"><span class="section-number-4">3.1.4</span> <span class="todo TODO">TODO</span> [4]  Entry remove(Object k);</h4>
+<div class="outline-text-4" id="text-3-1-4">
+<p>
+If the node is a leaf then you just deleted.
+If the node is an internal node, then you find its successor or predeccessor,
+you swap and then you delete the successor or predeccessor. And , this successor(suppose it is)
+cannot have a right child, if it has, then the left child should be the successor.
+So, what we really do about deleting , <span class="underline">we just delete a leaf or a leaf' partent</span>
+</p>
+
+<p>
+删除要分三种情况，待删节点没有孩子，只有一个孩子，有两个孩子有两个孩子就删除其 successor, 其 successor 肯定没有左孩子 or 干脆没孩子，因为如果有左孩子说明排序是这样的，待删&lt;'successor_L'&lt;successor&lt;successor_R因为是直接后继（successor）, 所以 successor 肯定没有左孩子
+</p>
+
+<p>
+If it has 2 children, i went to the successor of that node, I copied the
+content of this successor into that node then, I deleted the successor.
+The actual node I deleted was the successor node and successor node has
+only one or no children
+</p>
+
+<p>
+所以删除带有两个孩子的节点，实际就归结为 ‘有一个孩子的’ or ‘没有孩子的’两个问题。AVL-tree Splay-tree 的所有操作，其实跟这里的 binary search tree
+的操作很相似,不同的是都要 avl 和 splay 都要 rotation
+</p>
+
+<p>
+<code>remove()</code> is the most difficult operation. First, find a node with key k using
+the same algorithm as find(). Return null if k is not in the tree; otherwise,
+let n be the first node with key k.
+</p>
+
+<ol class="org-ol">
+<li>If n has no children, we easily detach it from its parent and throw it away.</li>
+<li>If n has one child, move n's child up to take n's place.  n's parent becomes
+the parent of n's child, and n's child becomes the child of n's parent.Dispose of n.</li>
+<li><p>
+If n has two children, however, we have to be a bit more clever.  Let x be the
+node in n's right subtree with the smallest key.  Remove x; since x has the
+minimum key in the subtree, x has no left child and is easily removed.
+Finally, replace n's entry with x's entry.  x has the key closest to k that
+isn't smaller than k, so the binary search tree invariant still holds.
+</p>
+
+<p>
+这里使用了一种‘步进’的方式，把'two child'问题，转换为'one child'问题：如果待删节点有左右两个子树，那么选择右子树中最小的节点（比待删节点大的节点中最小的）与待删节点互换，互换的方法分两步：
+</p>
+<ol class="org-ol">
+<li>用‘if n has one child’方法删除这个最小的节点，因为这个节点肯定没有左子树；</li>
+<li>用这个节点替换待删节点</li>
+</ol></li>
+</ol>
+
+
+<pre class="example">
+       18                          18                            18
+      /  \                        /  \                          /  \
+    12    25                    12    25                      12    25
+   / \    / \                  / \    / \                    / \    / \
+  4  15  25  30 -insert(2)-&gt;  4  15  25  30 -remove(30)-&gt;   4  15  25  28
+ /  /  \    /                /  /  \    /                  /  /  \      \
+1  13  17  28               1  13  17  28                 1  13  17      29
+ \  \       \                \  \       \                  \  \
+  3  14      29               3  14      29                 3  14
+                             /                             /
+                            2                             2
+
+                          18                   18
+                      +--/  \                 /  \
+                      |12|   25             13    25
+                      /-\+   / \           / \    / \
+     -remove(12)-&gt;   4  15  25  28   -&gt;   4  15  25  28
+                    /+-/+ \      \       /  /  \      \
+                   1 |13| 17      29    1  14  17      29
+                    \+-\+                \
+                     3  14                3
+                    /                    /
+                   2                    2
+</pre>
+
+<p>
+To ensure you understand the binary search tree operations, especially
+remove(), I recommend you inspect Goodrich and Tamassia's code on page 446.
+Be aware that Goodrich and Tamassia use sentinel nodes for the leaves of
+their binary trees; I think these waste an unjustifiably large amount of space.
+</p>
+
+<pre class="example">
+[TODO] 这个 remove()一定要注意：
+    2
+   / --\
+  1    7
+      / \
+     5   8
+    /
+   4
+</pre>
+<p>
+比如这里要删除 root 2, 但是 2 有左右子树，不能直接删除，要删除 nearest higher:4
+先用 4 replace 2, 然后把带有 4 的 node 删除, 问题是，这个 node 是否是字典型 node，包含 value 和 key 的？这里树中的数字明显是 key，那么如果仅仅是“用 key4 去替换
+key2”，那么是不是就改变了原来的 key:value 对了？
+</p>
+</div>
+</div>
+</div>
+<div id="orgd2bbd9f" class="outline-3">
+<h3 id="orgd2bbd9f"><span class="section-number-3">3.2</span> Running Times of Binary Search Tree Operations</h3>
+<div class="outline-text-3" id="text-3-2">
+<pre class="example">
+                                                                    1
+     o       In a perfectly balanced binary tree (left) with         \
+    / \      height h, the number of nodes n is 2^(h+1) - 1.          2
+   o   o     (See Footnote 2.)  Therefore, no node has depth           \
+  /\   /\    greater than log_2 n.  The running times of                3
+ o o   o o   find(), insert(), and remove() are all proportional         \
+/\ /\ /\ /\  to the depth of the last node encountered, so they all run   4
+oo oo oo oo  in _O(log n)_ worst-case time on a perfectly balanced tree.   \
+                                                                            5
+On the other hand, it's easy to form a severely imbalanced tree like         \
+the one at right, wherein these operations will usually take linear time.     6
+That's _O(n)_.
+
+</pre>
+
+<p>
+There's a vast middle ground of binary trees that are reasonably well-balanced,
+albeit certainly not perfectly balanced, for which search tree operations will
+run in O(log n) time.  You may need to resort to experiment to determine
+whether any particular application will use binary search trees in a way that
+tends to generate somewhat balanced trees or not.  If you create a binary
+search trees by inserting keys in a randomly chosen order, or if the keys are
+generated by a random process from the same distribution, then with high
+probability  the tree will have height O(log n), and operations on the tree
+will take O(log n) time.
+</p>
+
+<p>
+Unfortunately, there are occasions where you might fill a tree with entries
+that happen to be already sorted.  In this circumstance, you'll create the
+disastrously imbalanced tree depicted at right.  Technically, all operations on
+binary search trees have Theta(n) worst-case running time.
+</p>
+
+<p>
+For this reason, researchers have developed a variety of algorithms for keeping
+search trees balanced.  Prominent examples include 2-3-4 trees (which we'll
+cover next lecture), splay trees (in one month), and B-trees (in CS 186).
+</p>
+</div>
+</div>
+</div>
+<div id="orgfdb5682" class="outline-2">
+<h2 id="orgfdb5682"><span class="section-number-2">4</span> FootNote</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="org955fbec" class="outline-3">
+<h3 id="org955fbec"><span class="section-number-3">4.1</span> Footnote 1</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+    When we search for a key k not in the binary search tree, why are we
+guaranteed to encounter the two keys that bracket it? Let x be the smallest key
+in the tree greater than k. Because k and x are "adjacent" keys, the result of
+comparing k with any other key y in the tree is the same as comparing x with y.
+Hence, find(k) will follow exactly the same path as find(x) until it reaches x.
+(After that, it may continue downward.) The same argument applies to the largest
+key less than k.
+</p>
+</div>
+</div>
+
+<div id="orgd2bc685" class="outline-3">
+<h3 id="orgd2bc685"><span class="section-number-3">4.2</span> Footnote 2</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+A perfectly balanced binary tree has 2^i nodes at depth i, where
+</p>
+
+<pre class="example">
+                                                   h   i    h+1
+0 &lt;= i &lt;= h.  Hence, the total number of nodes is Sum 2  = 2    - 1.
+                                                  i=0
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

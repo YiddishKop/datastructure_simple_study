@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十四课 排序(三)</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十四课 排序(三)</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org65de558">1. SELECTION</a></li>
+<li><a href="#orgbdf5b5c">2. Quickselect</a></li>
+<li><a href="#org165e803">3. A LOWER BOUND ON COMPARISON-BASED SORTING</a></li>
+<li><a href="#org69d8d92">4. LINEAR-TIME SORTING</a></li>
+<li><a href="#org0940d98">5. Bucket Sort</a>
+<ul>
+<li><a href="#org1037746">5.1. Key number I goes into Queue number I.</a></li>
+<li><a href="#orgef4905f">5.2. Running time of BucketSort</a></li>
+<li><a href="#org08a60a5">5.3. How did we get around the Omega(n log n) lower bound on comparison-based sorting?</a></li>
+<li><a href="#orgc9c1d73">5.4. What is a Stable Sort</a></li>
+<li><a href="#org1c27c1e">5.5. If q is in O(n), then BucketSort; else, RadixSort</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="org65de558" class="outline-2">
+<h2 id="org65de558"><span class="section-number-2">1</span> SELECTION</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Suppose that we want to find the <span class="underline">kth smallest key</span> in a list. In other words,
+we want to know which item has index j if the list is sorted (where <code>j = k -
+1</code>). We could simply sort the list, then look up the item at index j. But if we
+don't actually need to sort the list, is there a faster way? This problem is
+called <span class="underline">selection</span>.
+</p>
+
+<p>
+One example is finding the median of a set of keys. In an array of n items, we
+are looking for the item whose index is <code>j = floor(n / 2)</code> in the sorted list.
+</p>
+</div>
+</div>
+
+<div id="orgbdf5b5c" class="outline-2">
+<h2 id="orgbdf5b5c"><span class="section-number-2">2</span> Quickselect</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+这里如果不用 quickselect，如果我用 heapsort 去做会如何？
+</p>
+<ol class="org-ol">
+<li>heapsort 可以很快的取出最大最小值，so</li>
+<li>如果要求 kth largest item from n elements</li>
+<li>先初始化一个 heap, 耗时 n</li>
+<li>然后取第一个最大值，rebalance heap 耗时 logn</li>
+<li>执行上一步 k 次</li>
+<li>总计 n + klogn</li>
+</ol>
+<pre class="example">
+[扩展] 其实这里可以把最后复杂度变成：n + klogk
+</pre>
+<p>
+The idea here is that somehow you're going to do this method so that your heap
+instead of modifying a heap that has all the elements in it. You're modifying a
+heap that has at most K elements in it, where k is biggest that you're looking
+for.
+</p>
+
+
+
+<pre class="example">
+如果采用 quicksort，先排序呢？
+毫无疑问，更差一些，排序的时间是 nlogn
+</pre>
+
+<p>
+We can modify quicksort to perform selection for us. Observe that when we choose
+a pivot v and use it to partition the list into three lists I1, Iv, and I2, we
+know which of the three lists contains index j, because we know the lengths of
+I1 and I2. Therefore, we only need to search one of the three lists.
+</p>
+
+<p>
+Here's the quickselect algorithm for finding the item at index j - that is,
+having the (j + 1)th smallest key.
+</p>
+
+<pre class="example">
+Start with an unsorted list I of n input items.
+Choose a pivot item v from I.
+Partition I into three unsorted lists I1, Iv, and I2.
+  - I1 contains all items whose keys are smaller than v's key.
+  - I2 contains all items whose keys are larger than v's.
+  - Iv contains the pivot v.
+  - Items with the same key as v can go into any of the three lists.
+    (In list-based quickselect, they go into Iv; in array-based quickselect,
+    they go into I1 and I2, just like in array-based quicksort.)
+if (j &lt; |I1|) {
+  Recursively find the item with index j in I1; return it.
+} else if (j &lt; |I1| + |Iv|) {
+  Return the pivot v.
+} else {   // j &gt;= |I1| + |Iv|.
+  Recursively find the item with index j - |I1| - |Iv| in I2; return it.
+}
+</pre>
+
+<p>
+[Attentation] If using <b>array-based quicksort</b>, and using this source code
+QuickSortOnArray you should change <b>[|I1| with i, |Iv| with 1]</b>, 'i' is
+defined in the src code.
+</p>
+
+<p>
+The advantage of quickselect over quicksort is that we only have to make one
+recursive call, instead of two. Since we make at most <span class="underline">one</span> recursive call at
+<span class="underline">every</span> level of the recursion tree, quickselect is much faster than quicksort.
+I won't analyze quickselect here, but it runs in Theta(n) average time if we
+select pivots randomly.
+</p>
+
+<p>
+We can easily modify the code for quicksort on arrays, presented in Lecture 31,
+to do selection. The partitioning step is done exactly according to the Lecture
+31 pseudocode for array quicksort. Recall that when the partitioning stage
+finishes, the pivot is stored at index "i" (see the variable "i" in the array
+quicksort pseudocode). In the quickselect pseudocode above, just replace <code>|I1|
+with i and |Iv| with 1</code>.
+</p>
+</div>
+</div>
+<div id="org165e803" class="outline-2">
+<h2 id="org165e803"><span class="section-number-2">3</span> A LOWER BOUND ON COMPARISON-BASED SORTING</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Suppose we have a scrambled array of n numbers, with each number from 1&#x2026;n
+occurring once.  How many possible orders can the numbers be in?
+</p>
+
+<pre class="example">
+The answer is n!, where n! = 1 * 2 * 3 * ... * (n-2) * (n-1) * n.
+</pre>
+
+<p>
+Here's why: the first number in the array can be anything from 1&#x2026;n, yielding n
+possibilities. Once the first number is chosen, the second number can be any one
+of the remaining n-1 numbers, so there are n * (n-1) possible choices of the
+first two numbers. The third number can be any one of the remaining n-2 numbers,
+yielding n * (n-1) * (n-2) possibilities for the first three numbers. Continue
+this reasoning to its logical conclusion.
+</p>
+
+<p>
+Each different order is called a <span class="underline">permutation</span> of the numbers, and there are n!
+possible permutations.  (For Homework 9, you are asked to create a random
+permutation of maze walls.)
+</p>
+
+<pre class="example">
+Observe that if n &gt; 0,
+                                                                 n
+  n! = 1 * 2 * ... * (n-1) * n &lt;= n * n * n * ... * n * n * n = n
+
+and (supposing n is even)
+                                  n    n                                n/2
+  n! = 1 * 2 * ... * (n-1) * n &gt;= - * (- + 1) * ... * (n-1) * n &gt;= (n/2)
+                                  2    2
+</pre>
+
+<p>
+so n! is between \((n/2)^{ (n/2) }\) and \(n^n\). Let's look at the logarithms of
+both these numbers: <code>log((n/2)^(n/2)) = (n/2) log (n/2)</code>, which is in Theta(n
+log n), and <code>log(n^n) = n log n</code>. Hence, <code>log(n!)</code> is also in Theta(n log n).
+</p>
+
+<p>
+A <span class="underline">comparison-based_sort</span> is one in which all decisions are based on comparing
+keys (generally done by "if" statements). All actions taken by the sorting
+algorithm are based on the results of a sequence of true/false questions. All of
+the sorting algorithms we have studied are comparison-based.
+</p>
+
+<p>
+Suppose that two computers run the <span class="underline">same</span> sorting algorithm at the same time on
+two <span class="underline">different</span> inputs.  Suppose that every time one computer executes an "if"
+statement and finds it true, the other computer executes the same "if"
+statement and also finds it true; likewise, when one computer executes an "if"
+and finds it false, so does the other.  Then both computers perform exactly the
+same data movements (e.g. swapping the numbers at indices i and j) in exactly
+the same order, so they both permute their inputs in <span class="underline">exactly</span> the same way.
+</p>
+
+<p>
+A correct sorting algorithm must generate a <span class="underline">different</span> sequence of true/false
+answers for each different permutation of 1&#x2026;n, because it takes a different
+sequence of data movements to sort each permutation. There are n! different
+permutations, thus n! different sequences of true/false answers.
+</p>
+
+<p>
+If a sorting algorithm asks d true/false questions, it generates &lt;= 2^d
+different sequences of true/false answers.  If it correctly sorts every
+permutation of 1&#x2026;n, then n! &lt;= 2^d, so log_2 (n!) &lt;= d, and d is in
+Omega(n log n).  The algorithm spends Omega(d) time asking these d questions.
+Hence,
+</p>
+
+<pre class="example">
+==============================================================================
+EVERY comparison-based sorting algorithm takes Omega(n log n) worst-case time.
+==============================================================================
+</pre>
+
+<p>
+This is an amazing claim, because it doesn't just analyze one algorithm. It says
+that of the thousands of comparison-based sorting algorithms that haven't even
+been invented yet, not one of them has any hope of beating O(n log n) time for
+all inputs of length n. 
+</p>
+</div>
+</div>
+<div id="org69d8d92" class="outline-2">
+<h2 id="org69d8d92"><span class="section-number-2">4</span> LINEAR-TIME SORTING</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+However, there are faster sorting algorithms that can make q-way decisions for
+large values of q, instead of true/false (2-way) decisions.  Some of these
+algorithms run in linear time.
+</p>
+
+<p>
+Comparison based algorithms(选/插/堆/快/并), is just '2-way' decisions. 下面介绍的算法都是 'q-way' decisions
+</p>
+</div>
+</div>
+
+<div id="org0940d98" class="outline-2">
+<h2 id="org0940d98"><span class="section-number-2">5</span> Bucket Sort&#xa0;&#xa0;&#xa0;<span class="tag"><span class="QWayDecision">QWayDecision</span>&#xa0;<span class="Stable">Stable</span></span></h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Bucket Sort 适合使用 LinkedList 实现, 而Counting Sort 稍微更适合用 Array
+</p>
+
+<p>
+<span class="underline">Bucket_sort</span> works well when keys are distributed in a small range, e.g. from 0
+to q - 1, and the number of items n is larger than, or nearly as large as q. In
+other words, when q is in O(n).
+</p>
+
+<ul class="org-ul">
+<li>q: maximum key of items;</li>
+<li><p>
+n: number of items
+</p>
+
+<pre class="example">
+BucketSort or Counting Sort 对于键值 key 的最大值 or 范围有很苛刻的要求。
+BucketSort or Counting Sort 更适合处理 items 的 key 的分布范围和 items 数量保持一致的数列。
+比如，min(item.key) = 1; max(item.key)=100; ====&gt; q = 100
+     number(item) = 100;                   ====&gt; n = 100
+     q = O(n) BucketSort or Counting Sort
+如果，min(item.key) = 1000; max(item.key) = 1100; ====&gt; q = 1100
+     number(item) = 100;                         ====&gt; n = 100
+     q &gt;&gt; n +BucketSort or Counting Sort + Redix Sort
+</pre></li>
+</ul>
+</div>
+
+
+<div id="org1037746" class="outline-3">
+<h3 id="org1037746"><span class="section-number-3">5.1</span> Key number I goes into Queue number I.</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+We allocate an array of q queues (or singly-linked lists with tail references,
+which are basically the same thing, but we only need the queue operations),
+numbered from 0 to q - 1.  The queues are called <span class="underline">buckets</span>.  We walk through
+the list of input items, and enqueue each item in the appropriate queue:
+an item with key i goes into queue i.
+</p>
+
+<p>
+Each item illustrated here has a numerical key and an associated value.
+</p>
+
+<pre class="example">
+             -------------------------------------------------------------
+       Input | 6:a | 7:b | 3:c | 0:d | 3:e | 1:f | 5:g | 0:h | 3:i | 7:j |
+             -------------------------------------------------------------
+
+                 0       1       2       3       4       5       6       7
+             -----------------------------------------------------------------
+Queue fronts |   .   |   .   |   *   |   .   |   *   |   .   |   .   |   .   |
+             ----|-------|---------------|---------------|-------|-------|----
+                 v       v               v               v       v       v
+              ------- -------         -------         ------- ------- -------
+              | 0:d | | 1:f |         | 3:c |         | 5:g | | 6:a | | 7:b |
+              |  .  | |     |         |  .  |         |  *  | |  *  | |  .  |
+              ---|--- -------         ---|---         ------- ------- ---|---
+                 v       ^               v               ^       ^       v
+              -------    |            -------            |       |    -------
+              | 0:h |    |            | 3:e |            |       |    | 7:j |
+              |  *  |    |            |  .  |            |       |    |  *  |
+              -------    |            ---|---            |       |    -------
+                 ^       |               v               |       |       ^
+                 |       |            -------            |       |       |
+                 |       |            | 3:i |            |       |       |
+                 |       |            |  *  |            |       |       |
+                 |       |            -------            |       |       |
+                 |       |               ^               |       |       |
+             ----|-------|---------------|---------------|-------|-------|----
+Queue tails  |   .   |   .   |   *   |   .   |   *   |   .   |   .   |   .   |
+             -----------------------------------------------------------------
+
+</pre>
+
+<p>
+When we're done, we concatenate all the queues together in order.
+</p>
+
+<pre class="example">
+                 0       1       2       3       4       5       6       7
+             -----------------------------------------------------------------
+Queue fronts |   .   |   .   |   *   |   .   |   *   |   .   |   .   |   .   |
+             ----|-------|---------------|---------------|-------|-------|----
+                 v       v               v               v       v       v
+              ------- -------         -------         ------- ------- -------
+              | 0:d | | 1:f |         | 3:c |         | 5:g | | 6:a | | 7:b |
+          ...&gt;|  .  | |     |........&gt;|  .  |      ..&gt;|  *  |&gt;|  *  |&gt;|  .  |
+              ---|--- -------         ---|---      :  ------- ------- ---|---
+                 v       ^               v         :                     v
+              -------    :            -------      :                  -------
+              | 0:h |....:            | 3:e |      :                  | 7:j |
+              |  *  |                 |  .  |      :                  |  *  |
+              -------                 ---|---      :                  -------
+                                         v         :
+                                      -------      :
+                                      | 3:i |.......
+                                      |  *  |
+                                      -------
+
+
+Concatenated output:
+------- ------- ------- ------- ------- ------- ------- ------- ------- -------
+| 0:d |&gt;| 0:h |&gt;| 1:f |&gt;| 3:c |&gt;| 3:e |&gt;| 3:i |&gt;| 5:g |&gt;| 6:a |&gt;| 7:b |&gt;| 7:j |
+------- ------- ------- ------- ------- ------- ------- ------- ------- -------
+
+</pre>
+
+
+<p>
+This data structure is <span class="underline">exactly</span> like a hash table (plus tail references), but
+the hash code just maps the key i to bucket i, and there is no compression
+function because there is no need for compression.
+</p>
+
+<p>
+I just write a loop that walks through the buckets one by one and I always maintain
+the tail of the last non-empty queue or the last item in the list so far and if I
+hit an empty bucket I just don't do anything I skip over that bucket and I go on
+to the next bucket and when I hit a bucket that's not empty, I take that queue and
+I concatenate it to the end of the queue so far.
+</p>
+</div>
+</div>
+
+<div id="orgef4905f" class="outline-3">
+<h3 id="orgef4905f"><span class="section-number-3">5.2</span> Running time of BucketSort</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+Bucket sort takes Theta(q + n) time&#x2013;in the best case and in the worst case.
+</p>
+<ul class="org-ul">
+<li>It takes Theta(q) time to initialize the buckets in the beginning and to
+concatenate them together in the end.</li>
+<li>It takes Theta(n) time to put all the items in their buckets.</li>
+</ul>
+
+<p>
+If q is in O(n)&#x2013;that is, the number of possible keys isn't much larger than the
+number of items we're sorting&#x2013;then bucket sort takes Theta(n) time.
+</p>
+</div>
+</div>
+
+<div id="org08a60a5" class="outline-3">
+<h3 id="org08a60a5"><span class="section-number-3">5.3</span> How did we get around the Omega(n log n) lower bound on comparison-based sorting?</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+<span class="underline">Bucket sort is not comparison-based</span>. We are making a <span class="underline">q-way decision</span> every
+time we decide which queue to put an item into, instead of the true/false
+decisions provided by comparisons and "if" statements.
+</p>
+</div>
+</div>
+
+<div id="orgc9c1d73" class="outline-3">
+<h3 id="orgc9c1d73"><span class="section-number-3">5.4</span> What is a Stable Sort</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+Bucket sort (as I've described it here) is said to be <span class="underline">stable</span>.
+</p>
+
+<p>
+A sort is stable if items with equal keys come out in the same order they
+went in.
+</p>
+
+<p>
+For example, observe that 3:c, 3:e, and 3:i appear in the same
+order in the output above as they appeared in the input.
+</p>
+
+<p>
+<span class="underline">Bucket sort</span> is not the only stable sort we have seen;
+<span class="underline">insertion sort</span>, <span class="underline">selection sort</span>, and <span class="underline">mergesort</span> can all be implemented so
+that they are stable. The <span class="underline">linked list version of quicksort</span> we have seen can
+be stable, but the array version is decidedly not. Heapsort is never
+stable. (Actually, we can <span class="underline">make</span> heapsort stable using a simple trick
+called a <span class="underline">secondary_key</span>, which I might describe later in the semester.)
+</p>
+</div>
+</div>
+<div id="org1c27c1e" class="outline-3">
+<h3 id="org1c27c1e"><span class="section-number-3">5.5</span> If q is in O(n), then BucketSort; else, RadixSort</h3>
+<div class="outline-text-3" id="text-5-5">
+<p>
+Take note that bucket sort is ONLY appropriate when keys are distributed in
+a small range; i.e. q is in O(n).  On Monday we'll study a sorting algorithm
+called <span class="underline">radix_sort</span> that will fix that limitation.  The stability of bucket
+sort will be important for radix sort.
+</p>
+
+<p>
+RadixSort use BucketSort as a subroutine and the <span class="underline">stablity</span> of BucketSort is critical
+to the success of RadixSort.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-10 五 00:12 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第八课 Java Public and Private</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第八课 Java Public and Private</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf8d513a">THE "public" AND "private" KEYWORDS</a>
+<ul>
+<li><a href="#orge94ad15">The SList ADT</a></li>
+</ul>
+</li>
+<li><a href="#orge4102b5">DOUBLY-LINKED LISTS</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="orgf8d513a" class="outline-2">
+<h2 id="orgf8d513a">THE "public" AND "private" KEYWORDS</h2>
+<div class="outline-text-2" id="text-orgf8d513a">
+<p>
+Thus far, we've usually declared fields and methods using the "public" keyword.
+However, we can also declare a field or method "private".  A private method
+or field is invisible and inaccessible to other classes, and can be used only
+within the class in which the field or method is declared.
+</p>
+
+<p>
+Why would we want to make a field or method private?
+</p>
+<ol class="org-ol">
+<li>To prevent data within an object from being corrupted by other classes.</li>
+<li>To ensure that you can improve the implementation of a class without
+causing other classes that depend on it to fail.</li>
+</ol>
+
+<p>
+In the following example, EvilTamperer tries to get around the error checking
+code of the Date class by fiddling with the internals of a Date object.
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Date</span> {                  |  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> EvilTamperer {
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">day</span>;                   |    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> tamper() {
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">month</span>;                 |      Date d = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Date</span>(<span style="color: #a45bad;">1</span>, <span style="color: #a45bad;">1</span>, <span style="color: #a45bad;">2006</span>);
+                                     |
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">void</span> setMonth(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">m</span>) {     |      d.day = <span style="color: #a45bad;">100</span>;    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Foiled!!</span>
+    month = m;                       |      d.setMonth(<span style="color: #a45bad;">0</span>);  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Foiled again!!</span>
+  }                                  |    }
+                                     |  }
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">Date</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">month</span>, <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">day</span>) {  |
+    [Implementation with             |
+     error-checking code here.]      |
+  }
+}
+</pre>
+</div>
+
+
+<p>
+However, javac won't compile <code>EvilTamperer</code>, because the Date class has declared
+its vulnerable parts "private". setMonth is an internal helper method used
+within the Date class, whereas the Date constructor is a public part of the
+interface of the Date class. Error-checking code in the constructor ensures that
+invalid Dates are not constructed.
+</p>
+
+<p>
+Here are some important definitions.
+</p>
+
+<p>
+The <span class="underline">interface</span> of a class is a set of prototypes for public methods (and
+sometimes public fields), plus descriptions of the methods' behaviors.
+</p>
+
+<p>
+An <span class="underline">Abstract_Data_Type</span> (ADT) is a class that has a well-defined interface, but
+its implementation details are firmly hidden from other classes.  That way, you
+can change the implementation of a class without jeopardizing the programs that
+depend on it.  The Date class is an ADT.  We'll implement lots of ADTs this
+semester.
+</p>
+
+<p>
+An <span class="underline">invariant</span> is a fact about a data structure that is always true (assuming
+the code is bug-free), no matter what methods are called by external classes.
+For example, the Date ADT enforces the invariant that a Date object always
+represents a valid date.  An invariant is enforced by allowing access to
+certain fields only through method calls.
+</p>
+
+<p>
+An ADT is often a good thing to aspire to.  In most of your classes, you should
+declare all fields private, as well as helper functions meant only for internal
+use, so that you can maintain sensible invariants on your data structures.
+</p>
+
+<p>
+However, not all classes are ADTs!  Some classes are nothing more than data
+storage units, and do not need to enforce any invariants.  In such classes, all
+fields may be declared public.
+</p>
+</div>
+
+<div id="orge94ad15" class="outline-3">
+<h3 id="orge94ad15">The SList ADT</h3>
+<div class="outline-text-3" id="text-orge94ad15">
+<p>
+Last lecture, I created an SList class to solve the problems of representing
+empty lists and inserting items at the beginning of a list.  Today, I want to
+introduce another advantage of the SList class.
+</p>
+
+<p>
+We want the SList ADT to enforce two invariants:
+</p>
+<ol class="org-ol">
+<li>An SList's "size" variable is always correct.</li>
+<li>A list is never circularly linked; there is always a tail node whose
+"next" reference is null.</li>
+</ol>
+
+<p>
+Both these goals are accomplished by making sure that <span class="underline">only</span> the methods of the
+SList class can change the lists' internal data structures.  SList ensures this
+by two means:
+</p>
+<ol class="org-ol">
+<li>The fields of the SList class (head and size) are declared "private".</li>
+<li>No method of SList returns an SListNode.</li>
+</ol>
+
+<p>
+The first rule is necessary so that the evil tamperer can't change the fields
+and corrupt the SList or violate invariant (1).  The second rule prevents the
+evil tamperer from changing list items, truncating a list, or creating a cycle
+in a list, thereby violating invariant (2).
+
+</p>
+</div>
+</div>
+</div>
+<div id="orge4102b5" class="outline-2">
+<h2 id="orge4102b5">DOUBLY-LINKED LISTS</h2>
+<div class="outline-text-2" id="text-orge4102b5">
+<p>
+As we saw last class, inserting an item at the front of a linked list is easy.
+Deleting from the front of a list is also easy.  However, inserting or deleting
+an item at the end of a list entails a search through the entire list, which
+might take a long time.  (Inserting at the end is easy if you have a `tail'
+pointer, as you will learn in Lab 3, but deleting is still hard.)
+</p>
+
+<p>
+A doubly-linked list is a list in which each node has a reference to the
+previous node, as well as the next node.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">DListNode</span> {                    |  <span style="color: #4f97d7; font-weight: bold;">class</span> DList {
+  <span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">item</span>;                       |    <span style="color: #4f97d7; font-weight: bold;">private</span> DListNode head;
+  <span style="color: #ce537a; font-weight: bold;">DListNode</span> <span style="color: #7590db;">next</span>;                    |    <span style="color: #4f97d7; font-weight: bold;">private</span> DListNode tail;
+  <span style="color: #ce537a; font-weight: bold;">DListNode</span> <span style="color: #7590db;">prev</span>;                    |  }
+}                                    |
+</pre>
+</div>
+
+<pre class="example">
+       -------------      -------------      -------------
+       |       item|      |       item|      |       item|
+head   |      -----|      |      -----|      |      -----|   tail
+-----  |----- | 4 ||      |----- | 1 ||      |----- | 8 ||  -----
+| . +-&gt;|| X | -----|&lt;-----++-. | -----|&lt;-----++-. | -----|&lt;-+-. |
+-----  |----- -----|      |----- -----|      |----- -----|  -----
+       |prev  | .-++-----&gt;|prev  | .-++-----&gt;|prev  | X ||
+       |      -----|      |      -----|      |      -----|
+       |       next|      |       next|      |       next|
+       -------------      -------------      -------------
+</pre>
+
+<p>
+DLists make it possible to insert and delete items at both ends of the list,
+taking constant running time per insertion and deletion.  The following code
+removes the tail node (in constant time) if there are at least two items in the
+DList.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">tail.prev.next = <span style="color: #a45bad;">null</span>;
+tail = tail.prev;
+</pre>
+</div>
+
+<p>
+You'll need a special case for a DList with no items.  You'll also need a
+special case for a DList with one item, because tail.prev.next does not exist.
+(Instead, head needs to be changed.)
+</p>
+
+<p>
+Let's look at a clever trick for reducing the number of special cases, thereby
+simplifying our DList code.  We designate one DListNode as a <span class="underline">sentinel</span>, a
+special node that does not represent an item.  Our list representation will be
+circularly linked, and the sentinel will represent both the head and the tail
+of the list.  Our DList class no longer needs a tail pointer, and the head
+pointer points to the sentinel.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">DList</span> {
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">DListNode</span> <span style="color: #7590db;">head</span>;
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">size</span>;
+}
+</pre>
+</div>
+
+<pre class="example">
+                   sentinel
+                   -------------    -----
+                   |       item|&lt;---+-. |
+   ---------------&gt;|      -----|    -----
+   |               |prev  | X ||     head
+   |               |----- -----|
+   |               || .-+------+-----------------
+   |               |----- -----|                |
+   |      ---------+------+-. ||                |
+   |      |        |  next-----|&lt;---------------+-----
+   |      |        -------------                |    |
+   |      v                                     v    |
+---+---------      -------------      -------------  |
+|  |    item|      |       item|      |       item|  |
+|  |   -----|      |      -----|      |      -----|  |
+|--+-- | 4 ||      |----- | 1 ||      |----- | 8 ||  |
+|| . | -----|&lt;-----++-. | -----|&lt;-----++-. | -----|  |
+|----- -----|      |----- -----|      |----- -----|  |
+|prev  | .-++-----&gt;|prev  | .-++-----&gt;|prev  | .-++---
+|      -----|      |      -----|      |      -----|
+|       next|      |       next|      |       next|
+-------------      -------------      -------------
+</pre>
+
+<p>
+The invariants of the DList ADT are more complicated than the SList invariants.
+The following invariants apply to the DList with a sentinel.
+</p>
+<ol class="org-ol">
+<li>For any DList d, d.head != null.  (There's always a sentinel.)</li>
+<li>For any DListNode x, <code>x.next != null</code>.</li>
+<li>For any DListNode x, <code>x.prev != null</code>.</li>
+<li>For any DListNode x, if <code>x.next == y, then y.prev == x</code>.</li>
+<li>For any DListNode x, if <code>x.prev == y, then y.next == x</code>.</li>
+<li>A DList's "size" variable is the number of DListNodes, NOT COUNTING the
+sentinel (denoted by "head"), that can be accessed from the sentinel by
+a sequence of "next" references.</li>
+</ol>
+
+<p>
+An empty DList is represented by having the sentinel's prev and next fields
+point to itself.
+</p>
+
+<p>
+Here's an example of a method that removes the last item from a DList.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">removeBack</span>() {
+  <span style="color: #4f97d7; font-weight: bold;">if</span> (head.prev != head) {        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Do nothing if the DList is empty.</span>
+    head.prev = head.prev.prev;   <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Sentinel now points to second-last item.</span>
+    head.prev.next = head;        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Second-last item now points to sentinel.</span>
+    size--;
+  }
+}
+</pre>
+</div>
+
+<p>
+In Lab 4 and Homework 4, you'll implement more methods for this DList class.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

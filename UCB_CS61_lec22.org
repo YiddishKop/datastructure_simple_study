@@ -1,0 +1,340 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第二十二课 Dictionay-2, Hash Table
+#+PROPERTY: header-args:ipython :session 第二十二课 Dictionay-2, Hash Table
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第二十二课 Dictionay-2, Hash Table
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+* DICTIONARIES (continued)
+
+** Hash Codes
+Since hash codes often need to be designed specially for each new object, you're
+left to your own wits. Here is an example of a good hash code for Strings.
+#+BEGIN_SRC java
+  private static int hashCode(String key) {
+    int hashVal = 0;
+    for (int i = 0; i < key.length(); i++) {
+      hashVal = (127 * hashVal + key.charAt(i)) % 16908799;
+    }
+    return hashVal;
+  }
+#+END_SRC
+
+By multiplying the hash code by 127 before adding in each new character, we make
+sure that each character has a different effect on the final result. The "%"
+operator with a prime number tends to "mix up the bits" of the hash code. The
+prime is chosen to be large, but not so large that 127 * hashVal + key.charAt(i)
+will ever exceed the maximum possible value of an int.
+
+The best way to understand good hash codes is to understand why bad hash codes
+are bad.  Here are some examples of bad hash codes on Words.
+
+  1)  Sum up the ASCII values of the characters. Unfortunately, the sum will
+     rarely exceed 500 or so, and most of the entries will be bunched up in a
+     few hundred buckets. Moreover, anagrams like "pat," "tap," and "apt" will
+     collide.
+  2)  Use the first three letters of a word, in a table with 26^3 buckets.
+     Unfortunately, words beginning with "pre" are much more common than words
+     beginning with "xzq", and the former will be bunched up in one long list.
+     This does not approach our uniformly distributed ideal.
+  3)  Consider the "good" hashCode() function written out above. Suppose the
+     prime modulus is 127 instead of 16908799. Then the return value is just the
+     last character of the word, because ~(127 * hashVal) % 127 = 0~. That's why
+     127 and 16908799 were chosen to have no common factors.
+
+*Why is the ~hashCode()~ function presented above good?*  Because we can find no
+obvious flaws, and it seems to work well in practice.  (A black art indeed.)
+
+
+总结起来，散列
+1. 模取余，可以让太大的数字减小；
+2. 模的大小决定了散布的范围；所以模一定要大一些；
+3. 若数<<模，模了之后没有变化，还是原来的数；
+4. 若模<<数，模了之后，所有数字都会挤在一起；
+5. 所以数和模都要同时大。
+
+
+
+** Resizing Hash Tables
+   Sometimes we can't predict in advance how many entries we'll need to store. If
+the load factor n/N (entries per bucket) gets too large, we are in danger of
+losing constant-time performance.
+
+One option is to enlarge the hash table when the load factor becomes too large
+(typically larger than 0.75). Allocate a new array (typically at least twice as
+long as the old), then walk through all the entries in the old array and
+_rehash_ them into the new.
+
+Take note:  you CANNOT just copy the linked lists to the same buckets in the
+new array, because the compression functions of the two arrays will certainly
+be incompatible.  You have to rehash each entry individually.
+
+You can also shrink hash tables (e.g., when n/N < 0.25) to free memory, if you
+think the memory will benefit something else. (In practice, it's only sometimes
+worth the effort.)
+
+Obviously, an operation that causes a hash table to resize itself takes more
+than O(1) time; nevertheless, the _average_ over the long run is still O(1) time
+per operation.
+
+** Transposition Tables:  Using a Dictionary to Speed Game Trees
+An inefficiency of unadorned game tree search is that some grids can be reached
+through many different sequences of moves, and so the same grid might be
+evaluated many times. To reduce this expense, maintain a hash table that records
+previously encountered grids. This dictionary is called a _transposition_table_.
+Each time you compute a grid's score, insert into the dictionary an entry whose
+key is the grid and whose value is the grid's score. Each time the minimax
+algorithm considers a grid, it should first check whether the grid is in the
+transposition table; if so, its score is returned immediately. Otherwise, its
+score is evaluated recursively and stored in the transposition table.
+
+Transposition tables will only help you with your project if you can search to
+a depth of at least three ply (within the five second time limit).  It takes
+three ply to reach the same grid two different ways.
+
+After each move is taken, the transposition table should be emptied, because
+you will want to search grids to a greater depth than you did during the
+previous move.
+
+* STACKS
+A _stack_ is a crippled list.  You may manipulate only the item at the top of
+the stack.  The main operations: you may "push" a new item onto the top of the
+stack; you may "pop" the top item off the stack; you may examine the "top" item
+of the stack.  A stack can grow arbitrarily large.
+
+#+BEGIN_EXAMPLE
+ | |          | |            | | -size()-> 2 |d| -top()-> d     | |
+ |b| -pop()-> | | -push(c)-> |c|             |c|                | | -top()--
+ |a|    |     |a|            |a| -push(d)--> |a| --pop() x 3--> | |        |
+ ---    v     ---            ---             ---                ---        v
+        b                                                                 null
+#+END_EXAMPLE
+
+#+BEGIN_SRC java
+public interface Stack {
+  public int size();
+  public boolean isEmpty();
+  public void push(Object item);
+  public Object pop();
+  public Object top();
+}
+#+END_SRC
+
+In any reasonable implementation, all these methods run in O(1) time. A stack is
+easily implemented as a singly-linked list, using just the ~front()~,
+~insertFront()~, and ~removeFront()~ methods.
+
+Why talk about Stacks when we already have Lists?  Mainly so you can carry on
+discussions with other computer programmers.  If somebody tells you that
+an algorithm uses a stack, the limitations of a stack give you a hint how
+the algorithm works.
+
+Sample application: *Verifying matched parentheses* in a String like
+"~{[(){[]}]()}~". Scan through the String, character by character.
+  -  When you encounter a lefty--'{', '[', or '('--push it onto the stack.
+  -  When you encounter a righty, pop its counterpart from atop the stack, and
+     check that they match.
+If there's a mismatch or null returned, or if the stack is not empty when you
+reach the end of the string, the parentheses are not properly matched.
+** Expression Parsing
+
+   - Infix  : 3 + 4 * 7
+   - Prefix : + 3 * 4 7 (scheme)
+   - Postfix: 3 4 7 * +
+
+   *postfix* write operator after its operands, each operand can be postfix
+    expression
+    #+BEGIN_EXAMPLE
+1  2  +  3  4  +  *  =  3  7  *  =  21
+--^----  -----^-
+  |           |
+  +--operand--+
+
+    #+END_EXAMPLE
+*** Evaluated by a stack of numbers
+     #+NAME: ParsePostfix
+     #+BEGIN_QUOTE
+     1. Read expression left to right
+        1. Number: push it onto the stack.
+        2. Operator: pop top 2 numbers of stack;
+                     perfor operation(first number popped as second operand));
+                     push result on stack
+     #+END_QUOTE
+
+     #+NAME: ParsePostfix
+     #+BEGIN_SRC java
+public static void operate(Stack numStack, char operator)
+    throws StackEmptyException{
+    int operand2 = ((Integer) numStackpop()).intValue();
+    int operand1 = ((Integer) numStackpop()).intValue();
+    System.out.print(operator + " ");
+
+    switch(operator){
+    case '+':
+        numStack.push(new Integer(operand1 + operand2));
+        break;
+    case '-':
+        numStack.push(new Integer(operand1 - operand2));
+        break;
+    case '*':
+        numStack.push(new Integer(operand1 * operand2));
+        break;
+    case '/':
+        numStack.push(new Integer(operand1 / operand2));
+        break;
+    }
+
+}
+
+// Reads a postfix expr, evaluated & prints it.
+// java ParsePostfix '73*2+'
+// output: 7 3 * 2 +  result: 23
+public static void main(String[] args)
+    throws StackEmptyException{
+    LinkedStack numStack = new LinkedStack();
+
+    for(int i = 0; i < args[0].length(); i++){
+        char c = args[0].charAt(i);
+        if(Character.isDigit(c)){                                       // if Digit?
+            System.out.print(c + " ");                                  // push
+            numStack.push(new Integer(Character.digit(c, 36)))              //
+        }else if((c == '+') || (c == '-')|| (c == '*')||(c == '/')){    // else
+            operate(numStack, c);                                       // operate
+        }
+    }
+}
+     #+END_SRC
+
+     #+NAME: stackOfParse
+     #+BEGIN_SRC ditaa
+|    |    |    |    |    |    |    |    |    |    |    |
+|    |    |    |    |    |    | 5  |    |    |    |    |
+|    |--->|    |--->| 7  |--->| 7  |--->| 2  |--->|    |
+|    | 2  | 2  | 7  | 2  | 5  | 2  | -  | 2  | *  | 4  |
++----+    +----+    +----+    +----+    +----+    +----+
+
+    |    |    |    |    |    |    |    |
+    |    |    | 5  |    |    |    |    |
+--->| 8  |--->| 8  |--->| 3  |--->|    |
+ 8  | 4  | 5  | 4  | -  | 4  | *  | 12 |
+    +----+    +----+    +----+    +----+
+     #+END_SRC
+*** Converting Infix to Postfix
+    #+BEGIN_EXAMPLE
+    Precedence rules: Exponentiation(^) >
+                      multiply(*),divide(/) >
+                      add(+),subtract(-)
+
+    Associated rules: + - * / left-associative,  2-3-5 = (2-3)-5
+                            ^ right-associative, 2^3^4 != 2^12; 2^3^4 = 2^81
+    #+END_EXAMPLE
+
+    #+NAME: ConverPostfix2Infix
+    #+BEGIN_EXAMPLE
+    Read expr. left -> right
+     1. Number:      print it out.
+     2. Operator:    put it on stack until an operator
+                     with lower or equal precedence appears(for exponentiation, strictly lower), where upon we pop it & print it.
+     3. String ends: pop & print each item on stack
+    #+END_EXAMPLE
+
+*** Why does this work
+    #+BEGIN_EXAMPLE
+    1. '3 * 2' ---> "3 2 *"
+    2. Newest operator has lower precedence;
+       1. "3 * 2 +" ---> "3 2 *",
+       2. push the "+" & continue.
+    3. "3 * 2 ^" ---> "3 2", |^| on stack.
+                             |*|
+                             ---
+       "*" stays on stack until 2nd operand done
+    #+END_EXAMPLE
+*** Example of infix
+     #+NAME: stackOfConvertInfix2PostFix
+     #+BEGIN_EXAMPLE
+infix "3*5+4^5^6
+
+|    |    |    |    |    |    |    |    |    |    |    |
+|    |    |    |    |    |    |    |    |    |    |    |
+|    |--->|    |--->|    |--->|    |--->|    |--->|    |
+|    | 3  |    | *  | *  | 5  | *  | +  | +  | 4  | +  |
++----+    +----+    +----+    +----+    +----+    +----+
+Output:3                   5         *         4
+
+    |    |    |    |    |    |    |    |
+    |    |    |    |    | ^  |    | ^  |    End, and
+--->| ^  |--->| ^  |--->| ^  |--->| ^  |--->pop all items
+ ^  | +  | 5  | +  | ^  | +  | 6  | +  |    in stack
+    +----+    +----+    +----+    +----+
+Output:    5                   6            ^ ^ +
+
+postfix: 3 5 * 4 5 6 ^ ^ +
+
+     #+END_EXAMPLE
+
+* QUEUES
+A _queue_ is also a crippled list.  You may read or remove only the item at the
+front of the queue, and you may add an item only to the back of the queue.  The
+main operations:  you may "enqueue" an item at the back of the queue; you may
+"dequeue" the item at the front; you may examine the "front" item.  Don't be
+fooled by the diagram; a queue can grow arbitrarily long.
+
+#+BEGIN_EXAMPLE
+ ===              ===               ===               === -front()-> b
+ ab. -dequeue()-> b.. -enqueue(c)-> bc. -enqueue(d)-> bcd
+ ===     |        ===               ===               === -dequeue() x 3--> ===
+         v                                                                  ...
+         a                                                 null <-front()-- ===
+#+END_EXAMPLE
+
+Sample Application:  Printer queues.  When you submit a job to be printed at
+a selected printer, your job goes into a queue.  When the printer finishes
+printing a job, it dequeues the next job and prints it.
+
+#+BEGIN_SRC java
+public interface Queue {
+  public int size();
+  public boolean isEmpty();
+  public void enqueue(Object item);
+  public Object dequeue();
+  public Object front();
+}
+#+END_SRC
+
+In any reasonable implementation, all these methods run in O(1) time.  A queue
+is easily implemented as a singly-linked list with a tail pointer.
+
+* DEQUES
+A _deque_ (pronounced "deck") is a Double-Ended QUEue. You can insert and remove
+items at both ends. You can easily build a fast deque using a doubly-linked
+list. You just have to add removeFront() and removeBack() methods, and deny
+applications direct access to listnodes. Obviously, deques are less powerful
+than lists whose listnodes are accessible. 
+** Postscript:  A Faster Hash Code (not examinable)
+Here's another hash code for Strings, attributed to one P. J. Weinberger, which
+has been thoroughly tested and performs well in practice.  It is faster than
+the one above, because it relies on bit operations (which are very fast) rather
+than the % operator (which is slow by comparison).  You will learn about bit
+operations in CS 61C.  Please don't ask me to explain them to you.
+
+#+BEGIN_SRC java
+static int hashCode(String key) {
+  int code = 0;
+
+  for (int i = 0; i < key.length(); i++) {
+    code = (code << 4) + key.charAt(i);
+    code = (code & 0x0fffffff) ^ ((code & 0xf0000000) >> 24);
+  }
+
+  return code;
+}
+#+END_SRC

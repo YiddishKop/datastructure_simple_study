@@ -1,0 +1,380 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第三十六课 Splay Tree
+#+PROPERTY: header-args:ipython :session 第三十六课 Splay Tree
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第三十六课 Splay Tree
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+* Splay trees
+  #+BEGIN_QUOTE
+  A splay tree is a type of _balanced binary search tree_, Binary Search Tree
+  #+END_QUOTE
+splaytree 并不是一颗一直保持 balanced 的二叉树，而是 in a long term, it will
+more and more balance, 他是在演进（每一步 api 操作都会演进）的过程中不断把访问过
+的 node 调整到根节点位置， _这样下次访问该 node 时，cost O(1)_.
+
+Structurally, it is identical to an ordinary binary search tree; the only
+difference is in the algorithms for finding, inserting, and deleting entries.
+
+All splay tree operations run in O(log n) time _on_average_, where n is the
+number of entries in the tree. Any single operation can take Theta(n) time in
+the worst case. But any sequence of k splay tree operations, with the tree
+initially empty and never exceeding n items, takes O(k log n) worst-case time.
+
+论单个的 operation（API 里的那几个），splay tree 都只有线性时间 theta(n), 这并不
+是很快，但是 splay tree 是一棵岁操作而优化的树，节点被访问的越多越靠近树根，而且
+每一个 api 里的 operation都会做 rotation 操作，去重新 balance 这颗树。所以长久来
+看一系列的操作平均复杂度是 O(log n),n是树的节点数量。
+
+Although 2-3-4 trees make a stronger guarantee (_every_ operation on a 2-3-4
+tree takes O(log n) time), splay trees have several advantages.  Splay trees
+are simpler and easier to program.  Because of their simplicity, splay tree
+insertions and deletions are typically faster in practice (sometimes by a
+constant factor, sometimes asymptotically).  Find operations can be faster or
+slower, depending on circumstances.
+
+Splay trees are designed to give especially fast access to entries that have
+been accessed recently, so they really excel in applications where a small
+fraction of the entries are the targets of most of the find operations.
+
+Splay trees have become the most widely used basic data structure invented in
+the last 30 years, because they're the fastest type of balanced search tree for
+many applications.
+
+** Tree Rotations
+rotation 是唯一一个可以使树的高度减一的操作。这给树的 rebalance 带来很好的启发。
+#+NAME: anotherRotationInterpretation
+#+BEGIN_EXAMPLE
+                              +----+
+                              | w  |
+                              +----+--
+                            -/        \---
+                          -/             /\
+                  +----+-/              /  \
+                  | u  |               /    \
+                  +/---+-             /      \
+                 -/      \-          /---------
+               -/          \-
+             -/              X
+            /\              / \
+           /  \            /   \
+          /    \          /     \
+         /      \        /       \
+        /---------      /----------
+
+First, just forget the links, then rotate
+
+
+                              +----+                                     +----+
+                              | w  |                                     | u  |
+                              +----+                                     +----+
+
+                                         /\
+                  +----+                /  \                                         +----+
+                  | u  |               /    \                      X                 | w  |
+                  + ---+              /      \                    / \                +----+
+                                     /---------    ======>       /   \
+                                                                /     \
+                             X                                 /--------        /\              /\
+            /\              / \                                                /  \            /  \
+           /  \            /   \                                              /    \          /    \
+          /    \          /     \                                            /      \        /      \
+         /      \        /       \                                          /---------      /---------
+        /---------      /----------
+
+#+END_EXAMPLE
+
+
+从上图可以得出：
+- rotation(u, w) : u-l,w-r unchanged; u-r-old is w-l; u-r-new is w;
+同理(从右往左看上图)：
+- rotation(u, w) : w-r,u-l unchanged; w-l-old is u-r; w-l-new is u;
+
+
+#+BEGIN_EXAMPLE
+Like many types of balanced search         Y       <<tree rotation>>     X
+trees, splay trees are kept balanced      / \        rotate left        / \
+with the help of structural changes      X   ^      <------------      ^   Y
+called _rotations_.  There are two      / \ /C\                       /A\ / \
+types--a left rotation and a right     ^  ^         ------------>         ^  ^
+rotation--and each is the other's     /A\/B\         rotate right        /B\/C\
+reverse.  Suppose that X and Y are
+binary tree nodes, and A, B, and C are subtrees.  A rotation transforms either
+of the configurations illustrated above to the other.  Observe that the binary
+search tree invariant is preserved:  keys in A are less than or equal to X;
+keys in C are greater than or equal to Y; and keys in B are >= X and <= Y.
+#+END_EXAMPLE
+
+_Rotations are also used in AVL trees and red-black trees_, which are discussed
+by Goodrich and Tamassia, but are not covered in this course.
+
+树的 rotation:
+- X 向右 rotation，就相当于拎着 X，这时候 Y 自动向下来到右边，右子树太重所以没拎
+  动，来到 Y 这了。
+- X 向左 rotation，。。。。。。X，。。。Y。。。。。。左边，左。。。。。。。。。，
+  来到 Y 这了。
+
+Unlike 2-3-4 trees, splay trees are not kept perfectly balanced, but they tend
+to stay reasonably well-balanced most of the time, thereby averaging O(log n)
+time per operation in the worst case (and sometimes achieving O(1) average
+running time in special cases).
+*** zig and zag
+- zig step rotate to left;
+- zag step rotate to right
+
+|          | l of l        | l of r        | l      |
+|          | r of r        | r of l        | r      |
+| rotation | Parent,Me     | Me,parent     |  me    |
+|          | zi(a)g zi(a)g | zi(a)g za(i)g | zi(a)g |
+
+zi(a)g zi(a)g rule 的主要作用就是 balance the tree.
+防止遇到，unbalanced tree
+
+*** See up two(one) levels: G and P, every time
+1. 先看
+   1. 首先记录自己是父亲的左 or 右孩子，eg l
+   2. 再看父亲是祖父的左 or 右孩子,    eg r
+2. 看完，按照 l r 找对应操作： 对应 zag zig, 对应 右转 左传
+3. 开始转
+   1. 先从以自己的父亲为跟节点的子树开始转，按照 zag zig 顺序，这里是 zag 右转;
+   2. 再按照自己的祖父为根节点的子树开始转，按照 zag zig 顺序，这里是 zig 左转;
+4. 自己来到新的位置,有了新的父亲和祖父，从 1 开始重复
+
+采用层层递‘上’的策略：
+
+每次向前看两代 Grandparent and parent, 确定自己是 lofl(rofr),lofr(rofl),l(r)然后，
+rotation 2 times according to lr. 这样之后自己上升了两层，然后， 再向前看两代，
+然后在 rotation, 又前进两层。。。。当父亲节点就是跟节点 root 时，就只要 rotation
+一次即可。
+
+ #+BEGIN_EXAMPLE
+   +-------+
+   V       |
+ 检视 ---> 旋转  ===> near root
+ #+END_EXAMPLE
+
+** Main api of Splay Tree
+_所有的操作都和 BinarySearchTree 一样， 不一样的就是每种操作之后都要加上 Splay it to root._
+*** [1]  Entry find(Object k);
+
+The find() operation in a splay tree begins just like the find() operation in
+an ordinary binary search tree:  we walk down the tree until we find the entry
+with key k, or reach a dead end (a node from which the next logical step leads
+to a null pointer).
+
+
+
+However, a splay tree isn't finished its job.  Let X be the node where the
+search ended, whether it contains the key k or not.  We _splay_ X up the tree
+through a sequence of rotations, so that X becomes the root of the tree.  Why?
+One reason is so that recently accessed entries are near the root of the tree,
+and if we access the same few entries repeatedly, accesses will be very fast.
+Another reason is because if X lies deeply down an unbalanced branch of the
+tree, the splay operation will improve the balance along that branch.
+
+When we splay a node to the root of the tree, there are three cases that
+determine the rotations we use.
+
+#+BEGIN_EXAMPLE
+1.      X is the right child of a left      G               G               X
+   child (or the left child of a right     / \             / \             / \
+   child):  let P be the parent of X,     P   ^           X   ^           P   G
+   and let G be the grandparent of X.    / \ /D\  ==>    / \ /D\  ==>    / \ / \
+   We first rotate X and P left,        ^  X            P  ^            ^  ^ ^  ^
+   and then rotate X and G right, as   /A\/ \          / \/C\          /A\/BVC\/D\
+   illustrated at right.                  ^  ^        ^  ^
+                                         /B\/C\      /A\/B\     Zig-Zag
+   The mirror image of this case--
+   where X is a left child and P is a right child--uses the same rotations in
+   mirror image:  rotate X and P right, then X and G left.  Both the case
+   illustrated above and its mirror image are called the "zig-zag" case.
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+2.      X is the left child of a left     G               P               X
+   child (or the right child of a right  / \             / \             / \
+   child):  the ORDER of the rotations  P   ^           X   G           ^   P
+   is REVERSED from case 1.  We        / \ /D\  ==>    / \ / \    ==>  /A\ / \
+   start with the grandparent,        X  ^            ^  ^ ^  ^            ^  G
+   and rotate G and P right.         / \/C\          /A\/BVC\/D\          /B\/ \
+   Then, we rotate P and X right.   ^  ^                                     ^  ^
+                                   /A\/B\                       Zig-Zig     /C\/D\
+   The mirror image of this case--
+   where X and P are both right children--uses the same rotations in mirror image:
+   rotate G and P left, then P and X left.  Both the case illustrated above and
+   its mirror image are called the "zig-zig" case.
+
+   We repeatedly apply zig-zag and zig-zig rotations to X; each pair of rotations
+   raises X two levels higher in the tree.  Eventually, either X will reach the
+   root (and we're done), or X will become the child of
+   the root.  One more case handles the latter
+   circumstance.
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+                                                              P             X
+                                                             / \           / \
+                                                            X   ^         ^   P
+3.      X's parent P is the root:  we rotate X and P       / \ /C\  ==>  /A\ / \
+   so that X becomes the root.  This is called the        ^  ^               ^  ^
+   "zig" case.                                           /A\/B\     Zig     /B\/C\
+
+Here's an example of "find(7)".  Note how the tree's balance improves.
+
+    11                     11                      11                  [7]
+   /  \                   /  \                    /  \                 / \
+  1    12                1    12                [7]   12              1   11
+ / \                    / \                     / \                  /\   / \
+0   9                  0   9                   1   9                0 5   9  12
+   / \                    / \                 / \ / \                / \ / \
+  3   10  =zig-zig=>    [7]  10  =zig-zag=>  0  5 8  10   =zig=>    3  6 8  10
+ / \                    / \                    / \                 / \
+2   5                  5   8                  3   6               2   4
+   / \                / \                    / \
+  4  [7]             3   6                  2   4
+     / \            / \
+    6   8          2   4
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+By inspecting each of the three cases (zig-zig, zig-zag, and zig), you can
+observe a few interesting facts.  _First_, in none of these three cases does the
+depth of a subtree increase by more than
+two.  Second, every time X takes two                       9
+steps toward the root (zig-zig or zig-zag),               / \
+every node in the subtree rooted at X moves              8   10
+at least one step closer to the root.                   /                         <<unbalanced tree>>
+As more and more nodes enter X's subtree,              7
+more of them get pulled closer to the root.           /
+                                                     6           1
+A node that initially lies at depth d on            /           / \
+the access path from the root to X moves           5           0   8
+to a final depth no greater than 3 + d/2.         /               / \
+In other words, all the nodes deep               4               6   9
+down the search path have their                 /               / \   \
+depths roughly halved.  This tendency          3  ==========>  4   7   10
+of nodes on the access path to move           /     find(1)   / \
+toward the root prevents a splay tree        2               2   5
+from staying unbalanced for long            /                 \
+(as the example at right illustrates).     1                   3
+                                          /
+                                         0
+#+END_EXAMPLE
+
+*** [2]  Entry min(); Entry max(); 
+
+These methods begin by finding the entry with minimum or maximum key, just like
+in an ordinary binary search tree.  Then, they splay the node containing the
+minimum or maximum key to the root.
+
+*** [3]  Entry insert(Object k, Object v);
+
+insert() begins by inserting the new entry (k, v), just like in an ordinary
+binary search tree.  Then, it splays the new node to the root.
+
+*** [4]  Entry remove(Object k);
+
+An entry having key k is removed from the tree, just as with ordinary binary
+search trees.  Recall that the node containing k is removed if it has zero or
+one children.  If it has two children, the node with the next higher key is
+removed instead.  In either case, let X be the node removed from the tree.
+After X is removed, splay X's parent to the root.  Here's a sequence
+illustrating the operation remove(2).
+
+#+BEGIN_EXAMPLE
+                      2             4               5
+                     / \           / \             / \
+                    1   7         1   7           4   7
+                       / \   ==>     / \   ==>   /     \
+                      5   8         5   8       1       8
+                     /
+                    4
+#+END_EXAMPLE
+
+In this example, the key 4 moves up to replace the key 2 at the root.  After
+the node containing 4 is removed, its parent (containing 5) splays to the root.
+
+If the key k is not in the tree, splay the node where the search ended to the
+root, just like in a find() operation.
+
+对于 remove() 当有一个 key 没有找到时，你仍需要返回一些东西,为什么呢？因为，当你
+找的时候，也许他位于很深的位置，如果这次找你不做点什么，那么下次你再找同一个 key
+的时候他仍然花费这么多时间，所以为了符合 splaytree 的核心特色（不断优化的树），
+即便什么都找不到，你仍然要做 splay，仍然要继续 balance 这颗树。这时就 splay the
+node last visited(where the search ended) to the root.
+
+* Postscript:  Babble about Splay Trees (not examinable, but good for you)
+It may improve your understanding to watch the splay tree animation at
+http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/SplayTree-Example.html .
+
+Splay trees can be rigorously shown to run in O(log n) average time per
+operation, over any sequence of operations (assuming we start from an empty
+tree), where n is the largest size the tree grows to.  However, the proof is
+quite elaborate.  It relies on an interesting algorithm analysis technique
+called _amortized_analysis_, which uses a _potential_function_ to account for
+the time saved by operations that execute more quickly than expected.  This
+"saved-up time" can later be spent on the rare operations that take longer than
+O(log n) time to execute.  By proving that the potential function is never
+negative (that is, our "bank account" full of saved-up time never goes into the
+red), we prove that the operations take O(log n) time on average.
+
+The proof is given in Goodrich & Tamassia Section 10.3.3 and in the brilliant
+original paper in the Journal of the Association for Computing Machinery,
+volume 32, number 3, pages 652-686, July 1985.  Unfortunately, there's not much
+intuition for why the proof works.  You crunch the equations and the result
+comes out.
+
+In 2000, Danny Sleator and Robert Tarjan won the ACM Kanellakis Theory and
+Practice Award for their papers on splay trees and amortized analysis.
+
+
+#+BEGIN_EXAMPLE
+Splay trees are used in Windows NT (in the virtual memory, networking, and file
+system code), the gcc compiler and GNU C++ library, the sed string editor, Fore
+Systems network routers, the most popular implementation of Unix malloc, Linux
+loadable kernel modules, and in much other software.                          .
+                                                                             .
+                                                                            .
+When do operations occur that take more than O(log n) time?                /
+Consider inserting a long sequence of numbers in order:  1, 2, 3,         4
+etc.  The splay tree will become a long chain of left children (as       /
+illustrated at right).  Now, find(1) will take Theta(n) time.           3
+However, each of the n insert() operations before the find took O(1)   /
+time, so the average for this example is O(1) time per operation.     2
+                                                                     /
+                                                                    1
+#+END_EXAMPLE
+
+The fastest implementations of splay trees don't use the bottom-up splaying
+strategy discussed here. Splay trees, like 2-3-4 trees, come in bottom-up and
+top-down versions. Instead of doing one pass down the tree and another pass up,
+top-down splay trees do just one pass down. This saves a constant factor in the
+running time.
+
+There is an interesting conjecture about splay trees called the _dynamic_
+_optimality_conjecture_: that splay trees are as asymptotically fast on _any_
+sequence of operations as _any_ other type of search tree with rotations. What
+does this mean? Any sequence of splay tree operations takes amortized O(log n)
+time per operation, but sometimes there are sequences of operations that can be
+processed faster by a sufficiently smart data structure. One example is
+accessing the same ten keys over and over again (which a splay tree can do in
+amortized O(1) time per access). The dynamic optimality conjecture guesses that
+if _any_ search tree can exploit the structure of a sequence of accesses to
+achieve asymptotically faster running time, so can splay trees.
+
+The conjecture has never been proven, but it's not clear whether it's been
+disproven, either.
+
+One special case that has been proven is that if you perform the find operation
+on each key in a splay tree in order from the smallest key to the largest key,
+the total time for all n operations is O(n), and not O(n log n) as you might
+expect.

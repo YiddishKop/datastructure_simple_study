@@ -1,0 +1,349 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session Amortized Analysis
+#+PROPERTY: header-args:ipython :session Amortized Analysis
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第三十七课: Amortized Analysis
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+- Randomized analysis， 要求的是广度;
+- Amortized  analysis， 要求的是深度;
+
+广度的意思是说，我希望样本的分布更均匀，像 quicksort(pivot)，hashtable(hashcode)，
+有依赖随机的属性。这个属性会影响算法结果。深度的意思是说，我的结果依赖于我之前执
+行的次数，执行的越多越好，有点像循环进化的意思，比如 disjoint set(path
+compression), splaytree
+* AMORTIZED ANALYSIS in hash table api
+首先必须明确，Amortized analysis 给我们的是一个算法的 upper-bound(big O) running time.
+
+We've seen several data structures for which I claimed that the average time
+for certain operations is always better than the worst-case time:  hash tables,
+tree-based disjoint sets, and splay trees.
+
+The mathematics that proves these claims is called _amortized_analysis_.
+Amortized analysis is a way of proving that even if an operation is
+occasionally expensive, its cost is made up for by earlier, cheaper operations.
+
+there are two different ways in which an alogrithm can be better than its worst case time:
+
+| Amortized analysis                              | Randomized  analysis                     |
+|-------------------------------------------------+------------------------------------------|
+| occasional operation that's very slow           | uses randomization to make itself faster |
+|-------------------------------------------------+------------------------------------------|
+| hash table, disjoint sets, splay tree           | hash table, quickSort, quickSelect       |
+|-------------------------------------------------+------------------------------------------|
+| one is occasional operation that's very slow    | uses randomization to make itself faster |
+| but most of the operations are much faster when | depend on the probilistic distribution   |
+| you do a bunch of operations                    |                                          |
+
+** The Averaging Method
+
+Most hash table operations take O(1) time, but sometimes an operation forces a
+hash table to resize itself, at great expense.
+
+: What is the average time to insert an item into a hash table with resizing?
+
+Assume that the chains never grow longer than O(1), so any operation that
+doesn't resize the table takes O(1) time--more precisely, suppose it takes at
+most one second.
+
+Let n be the number of items in the hash table, and N the number of buckets.
+Suppose it takes one second for the insert operation to insert the new item,
+increment n, and then check if n = N. If so, it doubles the size of the table
+from N to 2N, taking 2N additional seconds. This resizing scheme ensures that
+the load factor n/N is always less than one.
+
+虽然我们是想考察‘由于插入引起 hashtable 扩容数组’所引起的时间消耗，但我们不是直接分析这步操作，
+我们要分析 average running time, 所以我们从一个‘空’的数据结构开始，这也是所有 Amortized
+analysis 的前提，假设一切从头开始从‘空’开始一步步生成 hashtable。
+
+Suppose every newly constructed hash table is empty and has just one bucket--
+that is, initially n = 0 and N = 1.  After i insert operations, n = i.  The
+number of buckets N must be a power of two, and we never allow it to be less
+than or equal to n; so N is the smallest power of two > n, which is <= 2n.
+这里好像是假设，数组扩容一个单位耗费 1 妙，往数组中写入一个值也耗费 1 妙。
+
+The total time in seconds for _all_ the table resizing operations is
+
+#+BEGIN_EXAMPLE
+    2 + 4 + 8 + ... + N/4 + N/2 + N = 2N - 2.
+#+END_EXAMPLE
+
+So the cost of i insert operations is at most ~i + 2N - 2~ seconds. Because ~N
+<= 2n = 2i~, the i insert operations take ~<= 5i - 2~ seconds. Therefore, the
+_average_ running time of an insertion operation is
+
+#+BEGIN_EXAMPLE
+(5i - 2)/i = 5 - 2/i
+    O(i)/i = O(1)
+#+END_EXAMPLE
+
+seconds, which is in O(1) time.
+
+: We say that the _amortized_running_time_ of insertion is in O(1), even though the worst-case running time is in Theta(n).
+
+For almost any application, the amortized running time is more important than
+the worst-case running time, because the amortized running time determines the
+total running time of the application.  The main exceptions are some
+applications that require fast interaction (like video games), for which one
+really slow operation might cause a noticeable glitch in response time.
+*** Disadvantage of average method
+虽然 average method 很方便的衡量了 insert()操作的平均时间，但 average method 没
+法处理和估计 delete() 的时间，因为你通过 insert()增加元素，通过 delete()减少元素，
+两者可以有无数种组合，没法把他们都加起来然后平均。
+** The Accounting Method
+
+Consider hash tables that resize in both directions:  not only do they expand
+as the number of items increases, but they also shrink as the number of items
+decreases.  You can't analyze them with the averaging method, because you don't
+know what sequence of insert and remove operations an application might
+perform.
+
+Let's try a more sophisticated method.  In the _accounting_method_, we "charge"
+each operation a certain amount of time.  Usually we overcharge.  When we
+charge more time than the operation actually takes, we can save the excess time
+in a bank to spend on later operations.
+
+Before we start, let's stop using seconds as our unit of running time.  We
+don't actually know how many seconds any computation takes, because it varies
+from computer to computer.  However, everything a computer does can be broken
+down into a sequence of constant-time computations.  Let a _dollar_ be a unit
+of time that's long enough to execute the slowest constant-time computation
+that comes up in the algorithm we're analyzing.  A dollar is a real unit of
+time, but it's different for different computers.
+
+Each hash table operation has
+- an _amortized_cost_, which is the number of dollars that we "charge" to do
+  that operation, and
+- an _actual_cost_, which is the actual number of constant-time computations
+  the operation performs.
+
+  #+BEGIN_EXAMPLE
+if amortized cost > actual cost,
+   比如 amortize 估计每几步操作就会产生 resize hashtable，
+   但实际上，代码中并不考虑快满了就 resize hashtable 的情况。
+   extra dollars saved in an imaginary bank to be spend in later operations
+
+if actual cost > amortized cost,
+   比如 amortize 估计没几步操作就会产生 resize hashtable,
+   但实际上，代码中每进行一次操作，都会 resize hashtable。
+   that means you have to withdraw money from the bank to pay for you overcharge
+  #+END_EXAMPLE
+
+
+The amortized cost is usually a fixed function of n (e.g. $5 for insertion into
+a hash table, or $2 log n for insertion into a splay tree), but the actual cost
+may vary wildly from operation to operation.  For example, insertion into a
+hash table takes a long, long time when the table is resized.
+
+When an operation's amortized cost exceeds its actual cost, the extra dollars
+are saved in the bank to be spent on later operations.  When an operation's
+actual cost exceeds its amortized cost, dollars are withdrawn from the bank to
+pay for an unusually expensive operation.
+
+If the bank balance goes into surplus, it means that the actual total running
+time is even faster than the total amortized costs imply.
+
+THE BANK BALANCE MUST NEVER FALL BELOW ZERO.  If it does, you are spending more
+total dollars than your budget claims, and you have failed to prove anything
+about the amortized running time of the algorithm.
+
+Think of amortized costs as an allowance.  If your dad gives you $500 a month
+allowance, and you only spend $100 of it each month, you can save up the
+difference and eventually buy a car.  The car may cost $30,000, but if you
+saved that money and don't go into debt, your _average_ spending obviously
+wasn't more than $500 a month.
+
+** Accounting of Hash Tables
+*** Identify when amortize and actual difference
+Suppose every operation (insert, find, remove) takes one dollar of actual
+running time unless the hash table is resized.  We resize the table in two
+circumstances.
+- An insert operation doubles the table size if n = N AFTER the new item is
+  inserted and n is incremented, taking 2N additional dollars of time for
+  resizing to 2N buckets. Thus, the load factor is always less than one.
+- The remove operation halves the table size if n = N/4 AFTER the item is
+  deleted and n is decremented, taking N additional dollars of time for
+  resizing to N/2 buckets.  Thus, the load factor is always greater than 0.25
+  (except when n = 0, i.e. the table is empty).
+
+Either way, a hash table that has _just_ been resized has n = N/2.
+A newly constructed hash table has n = 0 items and N = 1 buckets.
+*** By trial and error, we give a guess about cost of api
+By trial and error, I came up with the following amortized costs.
+
+#+BEGIN_EXAMPLE
+    insert:  5 dollars
+    remove:  5 dollars
+    find:    1 dollar
+    为什么 find cost 很少，因为他永远不会 resize hashtable
+#+END_EXAMPLE
+*** Varify whether our guess is right or wrong
+*value of n and N when start accouting*
+
+     #+BEGIN_EXAMPLE
+    下面的事情就是来验证，我们对 api()消耗所做出的猜测是否正确
+    假设 n 和 N 是当 hashtable 为空或者刚刚 resize 后的值
+             这里的假设就和 average method 不一样，average method 是假设一切从零开始，hashtable
+             一开始也是空的，慢慢插入;
+             accounting method 假设是 empty or just resized，空或者刚刚被 resize 过。
+
+    这样假设之后，n 在每一次开始时（empty or just resized）
+    都处在[N/2 - 1, N/2 + 1]之间, 注意这里的 N 是经过 resize 之后的 hashtable 大小。
+             比如，一开始 N = 8, n = 8
+             insert(), ==> N = 8*2 = 16, n = 8 + 1 = 9
+                       ==> n = 16/2 + 1 = _N/2 + 1_;
+             比如，一开始 N = 8, n = 2
+             delete(), ==> N = 8/2 =4,   n = 2 - 1 = 1
+                       ==> n = 4/2 -1   = _N/2 - 1_;
+     #+END_EXAMPLE
+
+*our target*
+
+     最重要的是通过这个公式，我们不用知道之前操作的时间消耗([[*Disadvantage of average method][combination of
+     series of operations]])，我们可以直接通过现在的 n 和 N 估算出目前银行里存有多
+     少 dollars。只要我们可以估算出，in a long term, 银行里的前不会小于 0（实际
+     时间消耗 < 估算时间消耗）,即可。
+
+*** how to analyse the dollars in bank by insert()
+     We charge an amortized $5 for an insert or remove operation.  Every insert or
+     remove operation costs one actual dollar (not counting resizing) and puts the
+     remaining $4 in the bank to pay for resizing.  For every step n takes away from
+     N/2, we accumulate another $4.
+
+     So, when encount a 'resize', there must be at least 4*|n - N/2| dollars
+     saved (or 4n dollars for a never-resized one-bucket hash table).
+
+     An insert operation only resizes the table if the number of items n reaches
+     N. According to the formula 4|n - N/2|, there are at least 2N dollars in
+     the bank.
+
+     Resizing the hash table from N to 2N buckets costs 2N dollars, so we can
+     afford it.
+
+     After we resize, the bank balance might be zero again, but it isn't negative.
+
+             比如，一开始 N = 9, n = 16
+             #+BEGIN_EXAMPLE
+                 |------------------------------+-------------------+-----+----|----\
+                 | insert(), ==> n = 10, N = 16 | actual_cost = 1$  |     |    |    |
+                 |                              | amortized   = 5$  |   4 |  4 |    |
+                 |------------------------------+-------------------+-----+----|    |
+                 | insert(), ==> n = 11, N = 16 | actual_cost = 1$  |     |    |    |
+                 |                              | amortized   = 5$  |   4 |  8 |    |
+                 |------------------------------+-------------------+-----+----|    |
+                 | insert(), ==> n = 12, N = 16 | actual_cost = 1$  |     |    |    |
+                 |                              | amortized   = 5$  |   4 | 12 |    |> <<store dollars>>   |
+                 |------------------------------+-------------------+-----+----|    |                      |
+                 | insert(), ==> n = 13, N = 16 | actual_cost = 1$  |     |    |    |                      |
+                 |                              | amortized   = 5$  |   4 | 16 |    |                      |
+                 |------------------------------+-------------------+-----+----|    |                      |
+                 | insert(), ==> n = 14, N = 16 | actual_cost = 1$  |     |    |    |                      |
+                 |                              | amortized   = 5$  |   4 | 20 |    |                      |> 一轮一轮的看,整体 dollars 总是>0
+                 |------------------------------+-------------------+-----+----|    |                      |
+                 | insert(), ==> n = 15, N = 16 | actual_cost = 1$  |     |    |    |                      |
+                 |                              | amortized   = 5$  |   4 | 24 |    |                      |
+                 |------------------------------+-------------------+-----+----|    |                      |
+                 | insert(), ==> n = 16, N = 16 | actual_cost = 1$  |     |    |    |                      |
+                 |                              | amortized   = 5$  |   4 | 28 |----/                      |
+                 |------------------------------+-------------------+-----+----|                           |
+                 | insert(), ==> n = 17, N = 32 | actual_cost = 32$ | -27 |  1 |----> <<withdraw dollars>> |
+                 |                              | amortized   = 5$  |     |    |
+             #+END_EXAMPLE
+
+
+             #+BEGIN_EXAMPLE
+     4|n - N/2| 这里的 n 是指在 N/2+1 ~ N 之间游走时，会一直[[store dollars]]。
+     当 n = N+1 的时候开始 [[withdraw dollars]]
+
+
+     当 n = N+1, 会导致 N-->2N, 这里重新分配一个 2N 大小的数组，消耗 2N dollars 时间。
+     但我总体来看，一轮一轮的看，银行里的 dollars 不会小于 0,所以 amortized 估计总是大于 actual
+     所以：
+            insert:  5 dollars
+            remove:  5 dollars
+            find:    1 dollar
+     是合理的。
+             #+END_EXAMPLE
+*** advantage by using formula n and N
+     IMPORTANT:  Note that 4|n - N/2| is a function of the data structure, and does
+     NOT depend on the history of hash table operations performed.
+
+     The crucial insight is that at any time, we can look at a hash table and know a
+     lower bound for how many dollars are in the bank from the values of n and N.
+
+     In general, the accounting method only works if you can tell how much
+     money is in the bank (or, more commonly, a minimum bound on that bank
+     balance) just by looking at the current state of the data
+     structure--without knowing how the data structure reached that state.
+
+     We know that the last time the hash table was resized, the number of items n
+     was exactly N/2.  So if n != N/2, there have been subsequent insert/remove
+     operations, and these have put money in the bank.
+
+*** the same with delete()
+      A remove operation only resizes the table if the number of items n drops to
+      N/4.  According to the formula 4|n - N/2|, there are at least N dollars in the
+      bank.  Resizing the hash table from N to N/2 buckets costs N dollars, so we can
+      afford it.
+
+      The bank balance never drops below zero, so my amortized costs above are valid.
+      Therefore, the amortized cost of all three operations is in O(1).
+
+      Observe that if we alternate between inserting and deleting the same item over
+      and over, the hash table is never resized, so we save up a lot of money in the
+      bank.  This isn't a problem; it just means the algorithm is faster (spends
+      fewer dollars) than my amortized costs indicate.
+
+* Why Does Amortized Analysis Work?
+Why does this metaphor about putting money in the bank tell us anything about
+the actual running time of an algorithm?
+
+Suppose our accountant keeps a ledger with two columns:  the total amortized
+cost of all operations so far, and the total actual cost of all operations so
+far.  Our bank balance is the sum of all the amortized costs in the left
+column, minus the sum of all the actual costs in the right column.  If the bank
+balance never drops below zero, the total actual cost is less than or equal to
+the total amortized cost.
+
+#+BEGIN_EXAMPLE
+          Total amortized cost  |  Total actual cost
+          ------------------------------------------
+                   $5           |          $1
+                   $1           |          $1
+                   $5           |          $3
+                    .           |           .
+                    .           |           .
+                    .           |           .
+                   $5           |          $1
+                   $5           |      $2,049
+                   $1           |          $1
+          ------------------------------------------
+              $12,327           >=    $10,333
+#+END_EXAMPLE
+
+Therefore, the total running time of all the actual operations is never longer
+than the total amortized cost of all the operations.
+
+Amortized analysis (as presented here) only tells us an _upper bound (big-Oh)_
+on the actual running time, and not a lower bound (big-Omega) . It might happen
+that we accumulate a big bank balance and never spend it, and the total actual
+running time might be much less than the amortized cost.
+
+For example, splay tree operations take amortized O(log n) time, where n is the
+number of items in the tree, but if your only operation is to find the same
+item n times in a row, the actual average running time is in O(1).
+
+If you want to see the amortized analysis of splay trees, Goodrich and Tamassia
+have it. If you take CS 170, you'll see an amortized analysis of disjoint sets.
+I am saddened to report that both analyses are too complicated to provide much
+intuition about their running times. (Especially the inverse Ackermann
+function, which is ridiculously nonintuitive, though cool nonetheless.)

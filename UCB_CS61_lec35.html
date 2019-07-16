@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:46 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十五课 排序(四)</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十五课 排序(四)</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org88d9779">1. Counting Sort</a>
+<ul>
+<li><a href="#orgc074d60">1.1. Item without value</a></li>
+<li><a href="#orgf598ade">1.2. Item include value</a>
+<ul>
+<li><a href="#org8837aaa">1.2.1. Counting Sort with Complete Items</a></li>
+</ul>
+</li>
+<li><a href="#org2085b00">1.3. Scan of counts array</a></li>
+<li><a href="#org8ca71c6">1.4. Get output array from scanned counts</a></li>
+<li><a href="#org4a742f7">1.5. 整体来看</a></li>
+<li><a href="#org33a94e2">1.6. BucketSort and CountingSort</a></li>
+<li><a href="#org4c239e8">1.7. Running Time of CountingSort</a></li>
+</ul>
+</li>
+<li><a href="#orgaffafaf">2. Radix Sort</a>
+<ul>
+<li><a href="#org0b48a37">2.1. Sorting one <b>DIGIT</b> at a time</a></li>
+<li><a href="#orgf6ca4ba">2.2. Sorting two <b>DIGITS</b> at a time</a></li>
+<li><a href="#org565421c">2.3. Running time of RadixSort</a>
+<ul>
+<li><a href="#org3793a40">2.3.1. How many passes must we perform?</a></li>
+<li><a href="#org34cbaec">2.3.2. How should we choose the number of queues q?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org7d59d24">3. Postscript:  Radix Sort Rocks (not examinable)</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="org88d9779" class="outline-2">
+<h2 id="org88d9779"><span class="section-number-2">1</span> Counting Sort</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Counting Sort 更适合 Array 相比 LinkedList
+</p>
+</div>
+<div id="orgc074d60" class="outline-3">
+<h3 id="orgc074d60"><span class="section-number-3">1.1</span> Item without value</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+If the items we sort are naked keys, with <span class="underline">no associated values</span>, bucket sort
+can be simplified to become <span class="underline">counting_sort</span>.
+</p>
+
+<p>
+这句是否意味着 CountingSort 也遵循Bucket Sort 对待排数列的要求：Q 个 Bucket，排序 1～Q 数字
+</p>
+
+<p>
+In counting sort, we use no queues at all; we need merely <span class="underline">keep a count of how
+many copies of each key</span> we have encountered.
+</p>
+
+<pre class="example">
+Suppose we sort 6 7 3 0 3 1 5 0 3 7:
+
+               0       1       2       3       4       5       6       7
+           -----------------------------------------------------------------
+    counts |   2   |   1   |   0   |   3   |   0   |   1   |   1   |   2   |
+           -----------------------------------------------------------------
+
+When we are finished counting, it is straightforward to reconstruct the sorted
+keys from the counts:  0 0 1 3 3 3 5 6 7 7.
+</pre>
+</div>
+</div>
+
+
+
+<div id="orgf598ade" class="outline-3">
+<h3 id="orgf598ade"><span class="section-number-3">1.2</span> Item include value</h3>
+<div class="outline-text-3" id="text-1-2">
+</div>
+<div id="org8837aaa" class="outline-4">
+<h4 id="org8837aaa"><span class="section-number-4">1.2.1</span> Counting Sort with Complete Items</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<p>
+Now let's go back to the case where we have complete items (key plus associated
+value).  We can use a more elaborate version of counting sort.  The trick is to
+use the counts to find the right index to move each item to.
+</p>
+
+<p>
+Let x be an input array of objects with keys (and perhaps other information).
+</p>
+
+<pre class="example">
+      0      1      2      3      4      5      6      7      8      9
+  -----------------------------------------------------------------------
+x |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |
+  ----|------|------|------|------|------|------|------|------|------|---
+      v      v      v      v      v      v      v      v      v      v
+    -----  -----  -----  -----  -----  -----  -----  -----  -----  -----
+    | 6 |  | 7 |  | 3 |  | 0 |  | 3 |  | 1 |  | 5 |  | 0 |  | 3 |  | 7 |
+    -----  -----  -----  -----  -----  -----  -----  -----  -----  -----
+</pre>
+
+<p>
+Begin by counting the keys in x.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java" id="orgaa3adaa"><span style="color: #4f97d7; font-weight: bold;">for</span> (i = <span style="color: #a45bad;">0</span>; i &lt; x.<span style="color: #ce537a; font-weight: bold;">length</span>; i++) {
+  counts[x[i].key]++;       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#19968;&#20010;&#25968;&#32452;&#30340;&#20869;&#23481;&#24688;&#22909;&#26159;&#21478;&#19968;&#20010;&#25968;&#32452;&#30340;&#19979;&#26631;</span>
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="org2085b00" class="outline-3">
+<h3 id="org2085b00"><span class="section-number-3">1.3</span> Scan of counts array</h3>
+<div class="outline-text-3" id="text-1-3">
+<pre class="example">
+对于只有 key 的情况： 直接从 数列 ---------&gt; counts array
+                            num:index
+
+                                                                        ________scan 累计获取位置
+                                                                        V       |
+对于(key,value):        数列 ---------&gt; input array,x ----------&gt; counts array -----------&gt; output array,y
+                            按顺序挂到                 提供 index              (i,c[i])=(key,value)
+</pre>
+
+
+<p>
+Next, do a <span class="underline">scan</span> of the "counts" array so that counts[i] contains the number
+of keys <span class="underline">less_than</span> i.
+</p>
+
+<pre class="example">
+           0       1       2       3       4       5       6       7
+       -----------------------------------------------------------------
+counts |   2   |   1   |   0   |   3   |   0   |   1   |   1   |   2   |
+       -----------------------------------------------------------------
+
+                                  |
+                                  | scan
+                                  V
+
+           0       1       2       3       4       5       6       7
+       -----------------------------------------------------------------
+counts |   0   |   2   |   3   |   3   |   6   |   6   |   7   |   8   |
+       -----------------------------------------------------------------
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-java" id="org70a5819">total = <span style="color: #a45bad;">0</span>;
+<span style="color: #4f97d7; font-weight: bold;">for</span> (j = <span style="color: #a45bad;">0</span>; j &lt; counts.<span style="color: #ce537a; font-weight: bold;">length</span>; j++) {
+  c = counts[j];
+  counts[j] = total;
+  total = total + c;
+}
+</pre>
+</div>
+
+<p>
+Let y be the output array, where we will put the sorted objects. counts[i] tells
+us the first index of y where we should put items with key i. Walk through the
+array x and copy each item to its final position in y. When you copy an item
+with key k, you must increment counts[k] to make sure that the next item with
+key k goes into the next slot.
+</p>
+</div>
+</div>
+<div id="org8ca71c6" class="outline-3">
+<h3 id="org8ca71c6"><span class="section-number-3">1.4</span> Get output array from scanned counts</h3>
+<div class="outline-text-3" id="text-1-4">
+<div class="org-src-container">
+<pre class="src src-java" id="org0d412a3"><span style="color: #4f97d7; font-weight: bold;">for</span> (i = <span style="color: #a45bad;">0</span>; i &lt; x.<span style="color: #ce537a; font-weight: bold;">length</span>; i++) {
+  y[counts[x[i].key]] = x[i];    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x[i]&#23384;&#25918;&#30340;&#26159; ref2item</span>
+  counts[x[i].key]++;            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#36890;&#36807; x[i]&#26816;&#32034; counts&#65292;</span>
+}
+</pre>
+</div>
+
+<pre class="example">
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 3 | 6 | 6 | 8 | 8 |
+      ---------------|-----           ---------------------------------
+                     v
+                     6
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 3 | 6 | 6 | 8 | 9 |
+      ---------------|-|---           ---------------------------------
+                     v v
+                     6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 4 | 6 | 6 | 8 | 9 |
+      -------|-------|-|---           ---------------------------------
+             v       v v
+             3       6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 2 | 3 | 4 | 6 | 6 | 8 | 9 |
+      -|-----|-------|-|---           ---------------------------------
+       v     v       v v
+       0     3       6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 2 | 3 | 5 | 6 | 6 | 8 | 9 |
+      -|-----|-|-----|-|---           ---------------------------------
+       v     v v     v v
+       0     3 3     6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 3 | 3 | 5 | 6 | 6 | 8 | 9 |
+      -|---|-|-|-----|-|---           ---------------------------------
+       v   v v v     v v
+       0   1 3 3     6 7
+
+...
+
+      ---------------------           ----------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 2 | 3 | 3 | 6 | 6 | 7 | 8 | 10 |
+      -|-|-|-|-|-|-|-|-|-|-           ----------------------------------
+       v v v v v v v v v v
+       0 0 1 3 3 3 5 6 7 7
+
+</pre>
+</div>
+</div>
+
+<div id="org4a742f7" class="outline-3">
+<h3 id="org4a742f7"><span class="section-number-3">1.5</span> 整体来看</h3>
+<div class="outline-text-3" id="text-1-5">
+<pre class="example">
+input -&gt;按顺序挂在数组上-&gt; array:x
+                              -&gt;x[i].key 作为 index;key 出现次数作为内容-&gt; array:counts
+                                                                                -&gt;从后往前 sum-&gt; scan:counts -&gt;
+
+当 scan：counts 形成之后，x[i]问，我应该在哪，那我就去 counts 查一下就找到自己的位置了。
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-java">i = <span style="color: #a45bad;">0</span> -&gt; len(x):
+  j = x[i].key; <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">x &#20013;&#23384;&#30340;&#26159; counts &#30340; index</span>
+  h = counts[j];<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">counts &#20013;&#23384;&#30340;&#26159; y &#30340; index</span>
+  y[h] = x[i];  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">y &#20013;&#23384;&#30340;&#26159; &#25490;&#24207;&#21518;&#30340; x</span>
+  counts[j]++;  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">counts &#34987;&#35775;&#38382;&#19968;&#27425;&#23601;&#33258;&#21160;&#21152; 1,&#22240;&#20026; counts &#23384;&#30340;&#26159; y &#30340; index&#65292;&#25152;&#20197;&#19979;&#19968;&#27425;&#35775;&#38382;&#24212;&#35813;&#33258;&#21160;&#24448;&#21518;&#25490;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="org33a94e2" class="outline-3">
+<h3 id="org33a94e2"><span class="section-number-3">1.6</span> BucketSort and CountingSort</h3>
+<div class="outline-text-3" id="text-1-6">
+<ul class="org-ul">
+<li>q: maximum key of items; 对应 bucket(or queue)</li>
+<li>n: number of items</li>
+
+<li>Bucket Sort or Counting Sort 对于键值 key 的最大值 or 范围有很苛刻的要求。</li>
+<li>Bucket Sort or Counting Sort 更适合处理 items 的 key 的分布范围和 items 数量保持一致的数列。</li>
+</ul>
+<pre class="example">
+比如，min(item.key) = 1; max(item.key)=100; ====&gt; q = 100
+     number(item) = 100;                   ====&gt; n = 100
+     q = O(n) BucketSort or [[*Counting Sort][Counting Sort]]
+如果，min(item.key) = 1000; max(item.key) = 1100; ====&gt; q = 1100
+     number(item) = 100;                         ====&gt; n = 100
+     q &gt;&gt; n +BucketSort or [[*Counting Sort][Counting Sort]]+ [[*Radix Sort][Radix Sort]]
+</pre>
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">BucketSort 的核心是</td>
+<td class="org-left">item with key I goes into queue(key) I;    如果 key 值过大，queue 要有多少个？</td>
+</tr>
+
+<tr>
+<td class="org-left">CountingSort 的核心是</td>
+<td class="org-left">借助以 key 值为 index 的数组 counts 进行排序; 如果 key 值过大，那 counts 数组要申请很大。</td>
+</tr>
+
+<tr>
+<td class="org-left">RadixSort 的核心是</td>
+<td class="org-left">进行 ceiling(b/ log_2 q) 轮 BucketSort or CountingSort</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="org4c239e8" class="outline-3">
+<h3 id="org4c239e8"><span class="section-number-3">1.7</span> Running Time of CountingSort</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+Bucket sort and counting sort both take O(q + n) time.
+</p>
+<ul class="org-ul">
+<li>q is the number of different possible keys;</li>
+<li>n is the number of items were soring</li>
+</ul>
+<pre class="example">
+- If q is in O(n),
+  then they take O(n) LINEAR time.
+- If you're sorting an array,
+  counting sort is slightly faster and takes less memory
+  than [Bucket Sort], though it's a little harder to understand.
+- If you're sorting a linked list,
+  [Bucket Sort] is more natural, because you've already got listnodes
+  ready to put into the buckets.
+</pre>
+
+<p>
+However, if q is not in O(n)&#x2013;there are many more <span class="underline">possible_values</span> for keys
+than keys&#x2013;we need a more aggressive method to get linear-time performance. What
+do we do if q &gt;&gt; n?
+</p>
+</div>
+</div>
+</div>
+<div id="orgaffafaf" class="outline-2">
+<h2 id="orgaffafaf"><span class="section-number-2">2</span> Radix Sort</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Suppose we want to sort 1,000 items in the range from 0 to <a id="org5d0adbf"></a>. If we
+use bucket sort, we'll spend so much time initializing and concatenating empty
+queues we'll wish we'd used selection sort instead.
+</p>
+</div>
+<div id="org0b48a37" class="outline-3">
+<h3 id="org0b48a37"><span class="section-number-3">2.1</span> Sorting one <b>DIGIT</b> at a time</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Instead of providing 100 million buckets, let's provide q = 10 buckets and sort
+on the first digit only.  (A number less than 10 million is said to have a
+first digit of zero.)  We use bucket sort or counting sort, treating each item
+as if its key is the first digit of its true key.
+</p>
+
+<pre class="example">
+        0      1      2      3      4      5      6      7      8      9
+    -----------------------------------------------------------------------
+    |   .  |   .  |   *  |   .  |   *  |   .  |   .  |   .  |   *  |   .  |
+    ----|------|-------------|-------------|------|------|-------------|---
+        v      v             v             v      v      v             v
+     ------ ------        ------        ------ ------ ------        ------
+     | 342| |1390|        |3950|        |5384| |6395| |7394|        |9362|
+     |9583| |5849|        |8883|        |2356| |1200| |2039|        |9193|
+     ---|-- ------        ---|--        ------ ------ ---|--        ---|--
+        v                    v                           v             v
+     ------               ------                      ------        ------
+     |  59|               |3693|                      |7104|        |9993|
+     |2178|               |7834|                      |2114|        |3949|
+     ------               ------                      ------        ------
+不满 8 位数的，首位按 0 算
+
+</pre>
+
+<p>
+Once we've dealt all 1,000 items into ten queues, we could sort each queue
+recursively on the second digit; then sort the resulting queues on the third
+digit, and so on.  Unfortunately, this tends to break the set of input items
+into smaller and smaller subsets, each of which will be sorted relatively
+inefficiently.
+</p>
+
+<p>
+Instead, we use a clever but counterintuitive idea:  we'll keep all the numbers
+together in one big pile throughout the sort; but we'll sort on the <span class="underline">last</span>
+digit first, then the next-to-last, and so on up to the most significant digit.
+</p>
+
+<p>
+The reason this idea works is because bucket sort and counting sort are stable.
+Hence, once we've sorted on the last digit, the numbers 55,555,552 and
+55,555,558 will remain ever after in sorted order, because their other digits
+will be sorted stably. Consider an example with three-digit numbers:
+</p>
+
+<p>
+stable 的意思是如果 key 相同，两个数输入时的顺序和排序完输出时的顺序保持一致;
+因为这里是一轮一轮进行的，所以上一轮的输出就是下一轮的输入，某一轮对末尾 digit 进行排序，把 55,555,552 排在 55,555,558 之前，之后由于两个数字全部一样，那么两个数字顺序保持不变。
+</p>
+
+<p>
+这一点非常重要，由于下一轮不会打破上一轮的排序，所以才允许层层进行排序。
+</p>
+
+<pre class="example">
+Sort on 1s:    771 721 822 955 405   5 925 825 777  28 829
+Sort on 10s:   405   5 721 822 925 825  28 829 955 771 777
+Sort on 100s:    5  28 405 721 771 777 822 825 829 925 955
+</pre>
+
+<p>
+After we sort on the middle digit, observe that the numbers are sorted by their
+last two digits.  After we sort on the most significant digit, the numbers are
+completely sorted.
+</p>
+</div>
+</div>
+
+<div id="orgf6ca4ba" class="outline-3">
+<h3 id="orgf6ca4ba"><span class="section-number-3">2.2</span> Sorting two <b>DIGITS</b> at a time</h3>
+<div class="outline-text-3" id="text-2-2">
+<pre class="example">
+当我们每次只排一位，一轮轮的排序，每一轮都是 0～9,共 10 个 bucket(queue), radix=10;
+当。。。。。。二位，。。。。。。，每一轮都是 0～99,共 100 个 bucket(queue), radix=100;
+所以，q, key，bucket，queue, radix 这四个概念是相关的。甚至可以说是一样的。
+</pre>
+
+<p>
+Returning to our <a href="#org5d0adbf">eight-digit</a> example, we can do better than sorting on one
+decimal digit at a time. With 1,000 keys, sorting would likely be faster if we
+sort on <span class="underline">two digits</span> at a time (using a base, or <span class="underline">radix</span>, of q = 100) or even
+three (using a radix of q = 1,000). Furthermore, there's no need to use decimal
+digits at all; on computers, it's more natural to choose a <span class="underline">power-of-two</span>
+<span class="underline">radix</span> like q = 256. Base-256 digits are easier to extract from a key, because
+we can quickly pull out the eight bits that we need by using <span class="underline">bit operators</span>
+(which you'll study in detail in CS 61C).
+</p>
+
+<p>
+Note that q is both the number of buckets we're using to sort, and the radix of
+the digit we use as a sort key during one pass of bucket or counting sort.
+"Radix" is a synonym for the base of a number, hence the name "radix sort."
+</p>
+</div>
+</div>
+<div id="org565421c" class="outline-3">
+<h3 id="org565421c"><span class="section-number-3">2.3</span> Running time of RadixSort</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="org3793a40" class="outline-4">
+<h4 id="org3793a40"><span class="section-number-4">2.3.1</span> How many passes must we perform?</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<pre class="example">
+Each pass inspects _(log_2 q)_ bits of each key.
+10 进制：这个很好理解，如果是每次比较 1 位，那么需要 0～9  共 10 个 bucket，(log_10 10)=1
+ 2 进制：。。。。。。，。。。。。。。1 位，。。。。0～1  共  2 个 bucket，(log_2   2)=1
+       。。。。。。，。。。。。。。8 位，。。。。0～255 共 256 个 bucket，(log_2 256)=8
+
+If all the keys can be represented in b bits,
+以 64bit 系统为例，每一轮(each pass)搞定 8 bits，那么共需要 8 轮来排定一个 64bit 数字。
+而 64bit 数字可以表示正整数的范围是：0~9,223,372,036,854,775,807
+这里，b=64, q=256, ceiling(b / log_2 q) = ceiling(64 / log_2 256) = 8
+
+the number of passes is _ceiling(b / log2 q)_.
+So the running time of radix sort is in
+|                         b
+|  O( (n + q) ceiling( ------ ) ).
+|                      log  q
+|                         2
+
+因为 RadixSort 相当于进行多轮 BucketSort or CountingSort，共 ceiling(b / log_2 q),
+而每一轮都都耗时(Running time of [[*Running time of BucketSort][B]] and [[*Running Time of CountingSort][C]]) O(q+n):
+- q: 需要初始化 q 个 queue;
+- n: 需要把 n 个 items 放在相应的 queue 上;
+所以结果是：O(n+q)*ceiling(b/log_2 q)
+</pre>
+</div>
+</div>
+
+
+<div id="org34cbaec" class="outline-4">
+<h4 id="org34cbaec"><span class="section-number-4">2.3.2</span> How should we choose the number of queues q?</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<pre class="example">
+|                         b
+|  O( (n + _q_) ceiling( ------ ) ).
+|                      log  _q_
+|                         2
+q occur two times in this formula:
+1. if q is too large:
+   - will cost more time one pass: '(n+q)'
+   - will have less number of passes: '(b/log2 q)'
+2. vice and versa
+
+</pre>
+
+
+<p>
+Advices:
+Let's choose q to be in O(n), so each pass of bucket sort or counting sort takes
+O(n) time. However, we want q to be large enough to keep the number of passes
+small.
+</p>
+
+<pre class="example">
+1. _q = approximately n_, RadixSort takes Linear-Time.
+   With this choice, the
+   number of passes is in O(1 + b / log2 n), and radix sort takes
+
+   |          b
+   |  O(n + ----- n) time.
+   |        log n
+
+   For many kinds of keys we might sort (like ints), b is technically a constant,
+   and radix sort takes linear time.  Even if the key length b tends to grow
+   logarithmically with n (a reasonable model in many applications), radix sort
+   runs in time linear in the total number of bits in all the keys together.
+
+2. _q = sqrt(n)_, far smaller memory
+   If we want to keep _memory use low_, however, we can make q equal to sqrt(n),
+   rounded to the nearest power of two.
+
+   |    O((n+sqrt(n)) *     (b/log2 sqrt(n)))
+   |  = O((n+sqrt(n)) * 2 * (b/log2 n))
+
+   这样需要进行的轮数仅仅是翻倍，但使用的 queue 却指数级减少，占用 memory 显著减少
+   With this choice, the number of buckets is far smaller, but we only
+   double the number of passes.make q equal to n rounded down to the next
+   power of two.
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="org7d59d24" class="outline-2">
+<h2 id="org7d59d24"><span class="section-number-2">3</span> Postscript:  Radix Sort Rocks (not examinable)</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Linear-time sorts tend to get less attention than comparison-based sorts in
+most computer science classes and textbooks.  Perhaps this is because the
+theory behind linear-time sorts isn't as interesting as for other algorithms.
+Nevertheless, the library sort routines for machines like Crays use radix sort,
+because it kicks major ass in the speed department.
+</p>
+
+<p>
+Radix sort can be used not only with integers, but with almost any data that
+can be compared bitwise, like strings.  The IEEE standard for floating-point
+numbers is designed to work with radix sort combined with a simple prepass and
+postpass (to flip the bits, except the sign bit, of each negative number).
+</p>
+
+<p>
+Strings of different lengths can be sorted in time proportional to the total
+length of the strings.
+</p>
+
+<ol class="org-ol">
+<li>A first stage sorts the strings by their lengths.</li>
+<li>A second stage sorts the strings character by character (or several
+characters at a time), starting with the last character of the longest string
+and working backward to the first character of every string.</li>
+</ol>
+
+<p>
+We don't sort every string during every pass of the second stage; instead, a
+string is included in a pass only if it has a character in the appropriate
+place.
+</p>
+
+<p>
+For instance, suppose we're sorting the strings CC, BA, CCAAA, BAACA, and
+BAABA.  After we sort them by length, the next three passes sort only the last
+three strings by their last three characters, yielding CCAAA BAABA BAACA.  The
+fifth pass is on the second character of each string, so we prepend the
+two-character strings to our list, yielding CC BA CCAAA BAABA BAACA.  After
+sorting on the second and first characters, we end with
+</p>
+
+<pre class="example">
+BA BAABA BAACA CC CCAAA.
+</pre>
+
+<p>
+Observe that BA precedes BAABA and CC precedes CCAAA because of the stability of
+the sort. That's why we put the two-character strings before the five- character
+strings when we began the fifth pass.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

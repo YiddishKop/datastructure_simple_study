@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:06 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十三课 Asymtotic analysis-2</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十三课 Asymtotic analysis-2</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb29264f">Asymptotic analysis, more formula</a></li>
+<li><a href="#org30fdfba">ALGORITHM ANALYSIS</a>
+<ul>
+<li><a href="#org56aa7ac">Functions of Several Variables</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="orgb29264f" class="outline-2">
+<h2 id="orgb29264f">Asymptotic analysis, more formula</h2>
+<div class="outline-text-2" id="text-orgb29264f">
+<pre class="example">
+|-----------------------------------------------------------------------------|
+| Omega(f(n)) is the set of all functions T(n) that satisfy:                  |
+|                                                                             |
+|   There exist positive constants d and N such that, for all n &gt;= N,         |
+|                              T(n) &gt;= d f(n)                                 |
+|-----------------------------------------------------------------------------|
+^^^^^^^^^^  Compare with the definition of Big-Oh:  T(n) &lt;= c f(n). ^^^^^^^^^^^
+
+</pre>
+
+<p>
+Omega is the reverse of Big-Oh.  If T(n) is in O(f(n)), f(n) is in Omega(T(n)).
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">2n   is in Omega(n)</td>
+<td class="org-left">BECAUSE    n                is in O(2n).</td>
+</tr>
+
+<tr>
+<td class="org-left">n^2  is in Omega(n)</td>
+<td class="org-left">BECAUSE    n                is in O(n^2).</td>
+</tr>
+
+<tr>
+<td class="org-left">n^2  is in Omega(3 n^2 + n log n)</td>
+<td class="org-left">BECAUSE    3 n^2 + n log n  is in O(n^2).</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>Big-Omega</b> gives us a <code>*LOWER BOUND*</code> on a function, just as <b>Big-Oh</b> gives us
+an <code>*UPPER BOUND*</code> . Big-Oh says, "Your algorithm is at least this good."
+Big-Omega says, "Your algorithm is at least this bad."
+</p>
+
+<p>
+Recall that Big-Oh notation can be misleading because, for instance,
+n is in O(n^8).  If we know both a lower bound and an upper bound for
+a function, and they're both the same bound asymptotically (i.e. they differ
+only by a constant factor), we can use Big-Theta notation to precisely specify
+the function's asymptotic behavior.
+</p>
+
+<pre class="example">
+|-----------------------------------------------------------------------------|
+| Theta(f(n)) is the set of all functions that are in both of                 |
+|                                                                             |
+|                         O(f(n)) and Omega(f(n)).                            |
+|-----------------------------------------------------------------------------|
+
+</pre>
+
+<p>
+But how can a function be sandwiched between f(n) and f(n)?
+Easy:  we choose different constants (c and d) for the upper bound and lower
+bound.  For instance, here is a function T(n) in Theta(n):
+</p>
+
+<pre class="example">
+          c f(n) = 10 n
+^                /
+|               /                T(n)
+|              /               **
+|             /               *  *
+|            /   ***          *   **
+|           /   *   *         *
+|   ***    /   *     *       *
+| **   ** /    *     *       *
+|*       **   *       *      *
+*       /  *  *        **   *
+|      /    **           ***     ~~~
+|     /                     ~~~~~
+|    /                 ~~~~~
+|   /             ~~~~~
+|  /         ~~~~~     d f(n) = 2 n
+| /     ~~~~~
+|/ ~~~~~
+O~~------------------------------&gt; n
+</pre>
+
+<p>
+If we extend this graph infinitely far to the right, and find that T(n) remains
+always sandwiched between 2n and 10n, then T(n) is in Theta(n). If T(n) is an
+algorithm's worst-case running time, the algorithm will never exhibit worse than
+linear performance, but it can't be counted on to exhibit better than linear
+performance, either.
+</p>
+
+<p>
+Theta is symmetric:  if f(n) is in Theta(g(n)), then g(n) is in Theta(f(n)).
+For instance, n^3 is in Theta(3 n^3 - n^2), and 3 n^3 - n^2 is in Theta(n^3).
+n^3 is not in Theta(n), and n is not in Theta(n^3).
+</p>
+
+<p>
+Big-Theta notation isn't potentially misleading in the way Big-Oh notation
+can be:  n is NOT in Omega(n^8).  If your algorithm's running time is in
+Theta(n^8), it IS slow.
+</p>
+
+<p>
+However, some functions are not in "Theta" of anything simple. For example, the
+function <code>f(n) = n (1 + sin n)</code> is in <code>O(n)</code> and <code>Omega(0)</code>, but it's not in
+Theta(n) nor Theta(0). f(n) keeps oscillating back and forth between zero and
+ever-larger numbers. We could say that f(n) is in <code>Theta(2n (1 + sin n))</code>, but
+that's not a simplification.
+</p>
+
+<p>
+Remember that the choice of O, Omega, or Theta is <span class="underline">independent</span> of whether
+we're talking about worst-case running time, best-case running time,
+average-case running time, memory use, annual beer consumption as a function of
+population, or some other function.  The function has to be specified.
+"Big-Oh" is NOT a synonym for "worst-case running time," and Omega is not a
+synonym for "best-case running time."
+</p>
+</div>
+</div>
+<div id="org30fdfba" class="outline-2">
+<h2 id="org30fdfba">ALGORITHM ANALYSIS</h2>
+<div class="outline-text-2" id="text-org30fdfba">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem #1:</td>
+<td class="org-left">Given a set of p points, find the pair closest to each other.</td>
+</tr>
+
+<tr>
+<td class="org-left">Algorithm #1:</td>
+<td class="org-left">Calculate the distance between each pair; return the minimum.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+There are p (p - 1) / 2 pairs, and each pair takes constant time to examine.
+Therefore, worst- and best-case running times are in Theta(p^2).
+</p>
+
+<p>
+Often, you can figure out the running time of an algorithm just by looking at
+the loops&#x2013;their loop bounds and how they are nested.  For example, in the
+closest pair code below, the outer loop iterates p times, and the inner loop
+iterates an average of roughly p / 2 times, which multiply to Theta(p^2)
+time.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">double</span> <span style="color: #7590db;">minDistance</span> = point[<span style="color: #a45bad;">0</span>].distance(point[<span style="color: #a45bad;">1</span>]);
+
+<span style="color: #2aa1ae; background-color: #292e34;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">Visit a pair (i, j) of points. */</span>
+<span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">0</span>; i &lt; <span style="color: #ce537a; font-weight: bold;">numPoints</span>; i++) {
+  <span style="color: #2aa1ae; background-color: #292e34;">/* </span><span style="color: #2aa1ae; background-color: #292e34;">We require that j &gt; i so that each pair is visited only once. */</span>
+  <span style="color: #4f97d7; font-weight: bold;">for</span> (<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">j</span> = i + <span style="color: #a45bad;">1</span>; j &lt; <span style="color: #ce537a; font-weight: bold;">numPoints</span>; j++) {
+    <span style="color: #ce537a; font-weight: bold;">double</span> <span style="color: #7590db;">thisDistance</span> = point[i].distance(point[j]);
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (thisDistance &lt; <span style="color: #ce537a; font-weight: bold;">minDistance</span>) {
+      minDistance = thisDistance;
+    }
+  }
+}
+</pre>
+</div>
+
+<p>
+But doubly-nested loops don't always mean quadratic running time!  The next
+example has the same loop structure, but runs in linear time.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem #2:</td>
+<td class="org-left">Smooshing an array called "ints" to remove consecutive duplicates, from Homework 3.</td>
+</tr>
+
+<tr>
+<td class="org-left">Algorithm #2:</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span> = <span style="color: #a45bad;">0</span>, <span style="color: #7590db;">j</span> = <span style="color: #a45bad;">0</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">while</span> (i &lt; ints.<span style="color: #ce537a; font-weight: bold;">length</span>) {
+  ints[j] = ints[i];
+  <span style="color: #4f97d7; font-weight: bold;">do</span> {
+    i++;
+  } <span style="color: #4f97d7; font-weight: bold;">while</span> ((i &lt; ints.<span style="color: #ce537a; font-weight: bold;">length</span>) &amp;&amp; (ints[i] == ints[j]));
+  j++;
+}
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Code to fill in -1's at end of array omitted.</span>
+</pre>
+</div>
+
+<p>
+The outer loop can iterate up to ints.length times, and so can the inner loop.
+But the index "i" advances on <span class="underline">every</span> iteration of the inner loop.  It can't
+advance more than ints.length times before both loops end.  So the worst-case
+running time of this algorithm is in Theta(ints.length).  (So is the best-case
+time.)
+</p>
+
+<p>
+Unfortunately, I can't give you a foolproof formula for determining the running
+time of any algorithm.  You have to think!  In fact, the problem of determining
+an algorithm's running time is, in general, as hard as proving <span class="underline">any</span>
+mathematical theorem.  For instance, I could give you an algorithm whose
+running time depends on whether the Riemann Hypothesis (one of the greatest
+unsolved questions in mathematics) is true or false.
+
+</p>
+</div>
+<div id="org56aa7ac" class="outline-3">
+<h3 id="org56aa7ac">Functions of Several Variables</h3>
+<div class="outline-text-3" id="text-org56aa7ac">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem #3:</td>
+<td class="org-left">Write a matchmaking program for w women and m men.</td>
+</tr>
+
+<tr>
+<td class="org-left">Algorithm #3:</td>
+<td class="org-left">Compare each woman with each man.  Decide if they're compatible.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+If each comparison takes constant time then the running time, T(w, m),
+is in Theta(wm).
+</p>
+
+<p>
+This means that there exist constants c, d, W, and M, such that
+d wm &lt;= T(w, m) &lt;= c wm  for every w &gt;= W and m &gt;= M.
+</p>
+
+<p>
+T is NOT in O(w^2), nor in O(m^2), nor in Omega(w^2), nor in Omega(m^2).
+Every one of these possibilities is eliminated either by choosing
+w &gt;&gt; m or m &gt;&gt; w.  Conversely, w^2 is in neither O(wm) nor Omega(wm).
+You cannot asymptotically compare the functions wm, w^2, and m^2.
+</p>
+
+<p>
+If we expand our service to help form women's volleyball teams as well,
+the running time is in Theta(w^6 + wm).
+</p>
+
+<p>
+This expression cannot be simplified; neither term dominates the other.
+You cannot asymptotically compare the functions w^6 and wm.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Problem #4:</th>
+<th scope="col" class="org-left">Suppose you have an array containing n music albums, sorted by</th>
+</tr>
+
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">title.  You request a list of all albums whose titles begin with</th>
+</tr>
+
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">"The Best of"; suppose there are k such albums.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Algorithm #4:</td>
+<td class="org-left">Search for one matching album with binary search.</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Walk (in both directions) to find the other matching albums.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Binary search takes at most log n steps to find a matching album (if one
+exists).  Next, the complete list of k matching albums is found, each in
+constant time.  Thus, the worst-case running time is in
+</p>
+
+<p>
+<code>Theta(log n + k)</code>.
+</p>
+
+<p>
+Because k can be as large as n, it is not dominated by the log n term.
+Because k can be as small as zero, it does not dominate the log n term.
+Hence, there is no simpler expression for the worst-case running time.
+</p>
+
+<p>
+Algorithms like this are called <span class="underline">output-sensitive</span>, because their performance
+depends partly on the size k of the output, which can vary greatly.
+</p>
+
+<p>
+Because binary search sometimes gets lucky and finds a match right away, the
+BEST-case running time is in
+</p>
+
+<p>
+<code>Theta(k)</code>.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Problem #5:</td>
+<td class="org-left">Find the k-th item in an n-node doubly-linked list.</td>
+</tr>
+
+<tr>
+<td class="org-left">Algorithm #5:</td>
+<td class="org-left">If k &lt; 1 or k &gt; n, report an error and return.</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Otherwise, compare k with n - k.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+If k &lt;= n - k, start at the front of the list and walk forward
+k - 1 nodes.
+</p>
+
+<p>
+Otherwise, start at the back of the list and walk backward
+n - k nodes.
+</p>
+
+<p>
+If 1 &lt;= k &lt;= n, this algorithm takes Theta(min{k, n - k}) time (in all cases)
+This expression cannot be simplified:  without knowing k and n, we cannot say
+that k dominates n - k or that n - k dominates k.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

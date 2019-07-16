@@ -1,0 +1,422 @@
+# -*- org-export-babel-evaluate: nil -*-
+#+PROPERTY: header-args :eval never-export
+#+PROPERTY: header-args:python :session 第三十五课 排序(4)
+#+PROPERTY: header-args:ipython :session 第三十五课 排序(4)
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+#+HTML_HEAD: <script src="https://hypothes.is/embed.js" async></script>
+#+HTML_HEAD: <script type="application/json" class="js-hypothesis-config">
+#+HTML_HEAD: <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:t
+#+OPTIONS: H:3 num:t ^:nil _:nil tags:not-in-toc
+#+TITLE: 第三十五课 排序(四)
+#+AUTHOR: yiddishkop
+#+EMAIL: [[mailto:yiddishkop@163.com][yiddi's email]]
+#+TAGS: {PKGIMPT(i) DATAVIEW(v) DATAPREP(p) GRAPHBUILD(b) GRAPHCOMPT(c)} LINAGAPI(a) PROBAPI(b) MATHFORM(f) MLALGO(m)
+
+
+* Counting Sort
+Counting Sort 更适合 Array 相比 LinkedList
+** Item without value
+If the items we sort are naked keys, with _no associated values_, bucket sort
+can be simplified to become _counting_sort_.
+
+这句是否意味着 CountingSort 也遵循Bucket Sort 对待排数列的要求：Q 个 Bucket，排
+序 1～Q 数字
+
+In counting sort, we use no queues at all; we need merely _keep a count of how
+many copies of each key_ we have encountered.
+
+#+BEGIN_EXAMPLE
+Suppose we sort 6 7 3 0 3 1 5 0 3 7:
+
+               0       1       2       3       4       5       6       7
+           -----------------------------------------------------------------
+    counts |   2   |   1   |   0   |   3   |   0   |   1   |   1   |   2   |
+           -----------------------------------------------------------------
+
+When we are finished counting, it is straightforward to reconstruct the sorted
+keys from the counts:  0 0 1 3 3 3 5 6 7 7.
+#+END_EXAMPLE
+
+
+
+** Item include value
+*** Counting Sort with Complete Items
+Now let's go back to the case where we have complete items (key plus associated
+value).  We can use a more elaborate version of counting sort.  The trick is to
+use the counts to find the right index to move each item to.
+
+Let x be an input array of objects with keys (and perhaps other information).
+
+#+BEGIN_EXAMPLE
+        0      1      2      3      4      5      6      7      8      9
+    -----------------------------------------------------------------------
+  x |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |   .  |
+    ----|------|------|------|------|------|------|------|------|------|---
+        v      v      v      v      v      v      v      v      v      v
+      -----  -----  -----  -----  -----  -----  -----  -----  -----  -----
+      | 6 |  | 7 |  | 3 |  | 0 |  | 3 |  | 1 |  | 5 |  | 0 |  | 3 |  | 7 |
+      -----  -----  -----  -----  -----  -----  -----  -----  -----  -----
+#+END_EXAMPLE
+
+Begin by counting the keys in x.
+
+#+NAME: x2counts
+#+BEGIN_SRC java
+  for (i = 0; i < x.length; i++) {
+    counts[x[i].key]++;       // 一个数组的内容恰好是另一个数组的下标
+  }
+#+END_SRC
+
+** Scan of counts array
+   #+BEGIN_EXAMPLE
+对于只有 key 的情况： 直接从 数列 ---------> counts array
+                            num:index
+
+                                                                        ________scan 累计获取位置
+                                                                        V       |
+对于(key,value):        数列 ---------> input array,x ----------> counts array -----------> output array,y
+                            按顺序挂到                 提供 index              (i,c[i])=(key,value)
+   #+END_EXAMPLE
+
+
+Next, do a _scan_ of the "counts" array so that counts[i] contains the number
+of keys _less_than_ i.
+
+#+BEGIN_EXAMPLE
+               0       1       2       3       4       5       6       7
+           -----------------------------------------------------------------
+    counts |   2   |   1   |   0   |   3   |   0   |   1   |   1   |   2   |
+           -----------------------------------------------------------------
+
+                                      |
+                                      | scan
+                                      V
+
+               0       1       2       3       4       5       6       7
+           -----------------------------------------------------------------
+    counts |   0   |   2   |   3   |   3   |   6   |   6   |   7   |   8   |
+           -----------------------------------------------------------------
+#+END_EXAMPLE
+
+
+#+NAME: counts2scan
+#+BEGIN_SRC java
+  total = 0;
+  for (j = 0; j < counts.length; j++) {
+    c = counts[j];
+    counts[j] = total;
+    total = total + c;
+  }
+#+END_SRC
+
+Let y be the output array, where we will put the sorted objects. counts[i] tells
+us the first index of y where we should put items with key i. Walk through the
+array x and copy each item to its final position in y. When you copy an item
+with key k, you must increment counts[k] to make sure that the next item with
+key k goes into the next slot.
+** Get output array from scanned counts
+#+NAME: scan2y
+#+BEGIN_SRC java
+  for (i = 0; i < x.length; i++) {
+    y[counts[x[i].key]] = x[i];    // x[i]存放的是 ref2item
+    counts[x[i].key]++;            // 通过 x[i]检索 counts，
+  }
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 3 | 6 | 6 | 8 | 8 |
+      ---------------|-----           ---------------------------------
+                     v
+                     6
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 3 | 6 | 6 | 8 | 9 |
+      ---------------|-|---           ---------------------------------
+                     v v
+                     6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 0 | 2 | 3 | 4 | 6 | 6 | 8 | 9 |
+      -------|-------|-|---           ---------------------------------
+             v       v v
+             3       6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 2 | 3 | 4 | 6 | 6 | 8 | 9 |
+      -|-----|-------|-|---           ---------------------------------
+       v     v       v v
+       0     3       6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 2 | 3 | 5 | 6 | 6 | 8 | 9 |
+      -|-----|-|-----|-|---           ---------------------------------
+       v     v v     v v
+       0     3 3     6 7
+
+      ---------------------           ---------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 1 | 3 | 3 | 5 | 6 | 6 | 8 | 9 |
+      -|---|-|-|-----|-|---           ---------------------------------
+       v   v v v     v v
+       0   1 3 3     6 7
+
+...
+
+      ---------------------           ----------------------------------
+    y |.|.|.|.|.|.|.|.|.|.|    counts | 2 | 3 | 3 | 6 | 6 | 7 | 8 | 10 |
+      -|-|-|-|-|-|-|-|-|-|-           ----------------------------------
+       v v v v v v v v v v
+       0 0 1 3 3 3 5 6 7 7
+
+#+END_EXAMPLE
+
+** 整体来看
+   #+BEGIN_EXAMPLE
+input ->按顺序挂在数组上-> array:x
+                              ->x[i].key 作为 index;key 出现次数作为内容-> array:counts
+                                                                                ->从后往前 sum-> scan:counts ->
+
+当 scan：counts 形成之后，x[i]问，我应该在哪，那我就去 counts 查一下就找到自己的位置了。
+   #+END_EXAMPLE
+
+#+BEGIN_SRC java
+i = 0 -> len(x):
+  j = x[i].key; // x 中存的是 counts 的 index
+  h = counts[j];// counts 中存的是 y 的 index
+  y[h] = x[i];  // y 中存的是 排序后的 x
+  counts[j]++;  // counts 被访问一次就自动加 1,因为 counts 存的是 y 的 index，所以下一次访问应该自动往后排
+#+END_SRC
+** BucketSort and CountingSort
+
+- q: maximum key of items; 对应 bucket(or queue)
+- n: number of items
+
+- Bucket Sort or Counting Sort 对于键值 key 的最大值 or 范围有很苛刻的要求。
+- Bucket Sort or Counting Sort 更适合处理 items 的 key 的分布范围和 items 数量保持一致的数列。
+#+BEGIN_EXAMPLE
+比如，min(item.key) = 1; max(item.key)=100; ====> q = 100
+     number(item) = 100;                   ====> n = 100
+     q = O(n) BucketSort or [[*Counting Sort][Counting Sort]]
+如果，min(item.key) = 1000; max(item.key) = 1100; ====> q = 1100
+     number(item) = 100;                         ====> n = 100
+     q >> n +BucketSort or [[*Counting Sort][Counting Sort]]+ [[*Radix Sort][Radix Sort]]
+#+END_EXAMPLE
+
+
+| BucketSort 的核心是   | item with key I goes into queue(key) I;    如果 key 值过大，queue 要有多少个？            |
+| CountingSort 的核心是 | 借助以 key 值为 index 的数组 counts 进行排序; 如果 key 值过大，那 counts 数组要申请很大。 |
+| RadixSort 的核心是    | 进行 ceiling(b/ log_2 q) 轮 BucketSort or CountingSort                                    |
+
+** Running Time of CountingSort
+Bucket sort and counting sort both take O(q + n) time.
+- q is the number of different possible keys;
+- n is the number of items were soring
+#+BEGIN_EXAMPLE
+- If q is in O(n),
+  then they take O(n) LINEAR time.
+- If you're sorting an array,
+  counting sort is slightly faster and takes less memory
+  than [Bucket Sort], though it's a little harder to understand.
+- If you're sorting a linked list,
+  [Bucket Sort] is more natural, because you've already got listnodes
+  ready to put into the buckets.
+#+END_EXAMPLE
+
+However, if q is not in O(n)--there are many more _possible_values_ for keys
+than keys--we need a more aggressive method to get linear-time performance. What
+do we do if q >> n?
+* Radix Sort
+Suppose we want to sort 1,000 items in the range from 0 to <<99,999,999>>. If we
+use bucket sort, we'll spend so much time initializing and concatenating empty
+queues we'll wish we'd used selection sort instead.
+** Sorting one *DIGIT* at a time
+Instead of providing 100 million buckets, let's provide q = 10 buckets and sort
+on the first digit only.  (A number less than 10 million is said to have a
+first digit of zero.)  We use bucket sort or counting sort, treating each item
+as if its key is the first digit of its true key.
+
+#+BEGIN_EXAMPLE
+        0      1      2      3      4      5      6      7      8      9
+    -----------------------------------------------------------------------
+    |   .  |   .  |   *  |   .  |   *  |   .  |   .  |   .  |   *  |   .  |
+    ----|------|-------------|-------------|------|------|-------------|---
+        v      v             v             v      v      v             v
+     ------ ------        ------        ------ ------ ------        ------
+     | 342| |1390|        |3950|        |5384| |6395| |7394|        |9362|
+     |9583| |5849|        |8883|        |2356| |1200| |2039|        |9193|
+     ---|-- ------        ---|--        ------ ------ ---|--        ---|--
+        v                    v                           v             v
+     ------               ------                      ------        ------
+     |  59|               |3693|                      |7104|        |9993|
+     |2178|               |7834|                      |2114|        |3949|
+     ------               ------                      ------        ------
+不满 8 位数的，首位按 0 算
+
+#+END_EXAMPLE
+
+Once we've dealt all 1,000 items into ten queues, we could sort each queue
+recursively on the second digit; then sort the resulting queues on the third
+digit, and so on.  Unfortunately, this tends to break the set of input items
+into smaller and smaller subsets, each of which will be sorted relatively
+inefficiently.
+
+Instead, we use a clever but counterintuitive idea:  we'll keep all the numbers
+together in one big pile throughout the sort; but we'll sort on the _last_
+digit first, then the next-to-last, and so on up to the most significant digit.
+
+The reason this idea works is because bucket sort and counting sort are stable.
+Hence, once we've sorted on the last digit, the numbers 55,555,552 and
+55,555,558 will remain ever after in sorted order, because their other digits
+will be sorted stably. Consider an example with three-digit numbers:
+
+stable 的意思是如果 key 相同，两个数输入时的顺序和排序完输出时的顺序保持一致;
+因为这里是一轮一轮进行的，所以上一轮的输出就是下一轮的输入，某一轮对末尾 digit 进行排序，
+把 55,555,552 排在 55,555,558 之前，之后由于两个数字全部一样，那么两个数字顺序保持不变。
+
+这一点非常重要，由于下一轮不会打破上一轮的排序，所以才允许层层进行排序。
+
+#+BEGIN_EXAMPLE
+Sort on 1s:    771 721 822 955 405   5 925 825 777  28 829
+Sort on 10s:   405   5 721 822 925 825  28 829 955 771 777
+Sort on 100s:    5  28 405 721 771 777 822 825 829 925 955
+#+END_EXAMPLE
+
+After we sort on the middle digit, observe that the numbers are sorted by their
+last two digits.  After we sort on the most significant digit, the numbers are
+completely sorted.
+
+** Sorting two *DIGITS* at a time
+   #+BEGIN_EXAMPLE
+当我们每次只排一位，一轮轮的排序，每一轮都是 0～9,共 10 个 bucket(queue), radix=10;
+当。。。。。。二位，。。。。。。，每一轮都是 0～99,共 100 个 bucket(queue), radix=100;
+所以，q, key，bucket，queue, radix 这四个概念是相关的。甚至可以说是一样的。
+   #+END_EXAMPLE
+
+Returning to our [[99,999,999][eight-digit]] example, we can do better than sorting on one
+decimal digit at a time. With 1,000 keys, sorting would likely be faster if we
+sort on _two digits_ at a time (using a base, or _radix_, of q = 100) or even
+three (using a radix of q = 1,000). Furthermore, there's no need to use decimal
+digits at all; on computers, it's more natural to choose a _power-of-two_
+_radix_ like q = 256. Base-256 digits are easier to extract from a key, because
+we can quickly pull out the eight bits that we need by using _bit operators_
+(which you'll study in detail in CS 61C).
+
+Note that q is both the number of buckets we're using to sort, and the radix of
+the digit we use as a sort key during one pass of bucket or counting sort.
+"Radix" is a synonym for the base of a number, hence the name "radix sort."
+** Running time of RadixSort
+*** How many passes must we perform?
+
+    #+BEGIN_EXAMPLE
+    Each pass inspects _(log_2 q)_ bits of each key.
+    10 进制：这个很好理解，如果是每次比较 1 位，那么需要 0～9  共 10 个 bucket，(log_10 10)=1
+     2 进制：。。。。。。，。。。。。。。1 位，。。。。0～1  共  2 个 bucket，(log_2   2)=1
+           。。。。。。，。。。。。。。8 位，。。。。0～255 共 256 个 bucket，(log_2 256)=8
+
+    If all the keys can be represented in b bits,
+    以 64bit 系统为例，每一轮(each pass)搞定 8 bits，那么共需要 8 轮来排定一个 64bit 数字。
+    而 64bit 数字可以表示正整数的范围是：0~9,223,372,036,854,775,807
+    这里，b=64, q=256, ceiling(b / log_2 q) = ceiling(64 / log_2 256) = 8
+
+    the number of passes is _ceiling(b / log2 q)_.
+    So the running time of radix sort is in
+    |                         b
+    |  O( (n + q) ceiling( ------ ) ).
+    |                      log  q
+    |                         2
+
+    因为 RadixSort 相当于进行多轮 BucketSort or CountingSort，共 ceiling(b / log_2 q),
+    而每一轮都都耗时(Running time of [[*Running time of BucketSort][B]] and [[*Running Time of CountingSort][C]]) O(q+n):
+    - q: 需要初始化 q 个 queue;
+    - n: 需要把 n 个 items 放在相应的 queue 上;
+    所以结果是：O(n+q)*ceiling(b/log_2 q)
+    #+END_EXAMPLE
+
+
+*** How should we choose the number of queues q?
+    #+BEGIN_EXAMPLE
+    |                         b
+    |  O( (n + _q_) ceiling( ------ ) ).
+    |                      log  _q_
+    |                         2
+    q occur two times in this formula:
+    1. if q is too large:
+       - will cost more time one pass: '(n+q)'
+       - will have less number of passes: '(b/log2 q)'
+    2. vice and versa
+
+    #+END_EXAMPLE
+
+
+    Advices:
+    Let's choose q to be in O(n), so each pass of bucket sort or counting sort takes
+    O(n) time. However, we want q to be large enough to keep the number of passes
+    small.
+
+    #+BEGIN_EXAMPLE
+    1. _q = approximately n_, RadixSort takes Linear-Time.
+       With this choice, the
+       number of passes is in O(1 + b / log2 n), and radix sort takes
+
+       |          b
+       |  O(n + ----- n) time.
+       |        log n
+
+       For many kinds of keys we might sort (like ints), b is technically a constant,
+       and radix sort takes linear time.  Even if the key length b tends to grow
+       logarithmically with n (a reasonable model in many applications), radix sort
+       runs in time linear in the total number of bits in all the keys together.
+
+    2. _q = sqrt(n)_, far smaller memory
+       If we want to keep _memory use low_, however, we can make q equal to sqrt(n),
+       rounded to the nearest power of two.
+
+       |    O((n+sqrt(n)) *     (b/log2 sqrt(n)))
+       |  = O((n+sqrt(n)) * 2 * (b/log2 n))
+
+       这样需要进行的轮数仅仅是翻倍，但使用的 queue 却指数级减少，占用 memory 显著减少
+       With this choice, the number of buckets is far smaller, but we only
+       double the number of passes.make q equal to n rounded down to the next
+       power of two.
+
+    #+END_EXAMPLE
+
+* Postscript:  Radix Sort Rocks (not examinable)
+Linear-time sorts tend to get less attention than comparison-based sorts in
+most computer science classes and textbooks.  Perhaps this is because the
+theory behind linear-time sorts isn't as interesting as for other algorithms.
+Nevertheless, the library sort routines for machines like Crays use radix sort,
+because it kicks major ass in the speed department.
+
+Radix sort can be used not only with integers, but with almost any data that
+can be compared bitwise, like strings.  The IEEE standard for floating-point
+numbers is designed to work with radix sort combined with a simple prepass and
+postpass (to flip the bits, except the sign bit, of each negative number).
+
+Strings of different lengths can be sorted in time proportional to the total
+length of the strings.
+
+1. A first stage sorts the strings by their lengths.
+2. A second stage sorts the strings character by character (or several
+   characters at a time), starting with the last character of the longest string
+   and working backward to the first character of every string.
+
+We don't sort every string during every pass of the second stage; instead, a
+string is included in a pass only if it has a character in the appropriate
+place.
+
+For instance, suppose we're sorting the strings CC, BA, CCAAA, BAACA, and
+BAABA.  After we sort them by length, the next three passes sort only the last
+three strings by their last three characters, yielding CCAAA BAABA BAACA.  The
+fifth pass is on the second character of each string, so we prepend the
+two-character strings to our list, yielding CC BA CCAAA BAABA BAACA.  After
+sorting on the second and first characters, we end with
+
+#+BEGIN_EXAMPLE
+  BA BAABA BAACA CC CCAAA.
+#+END_EXAMPLE
+
+Observe that BA precedes BAABA and CC precedes CCAAA because of the stability of
+the sort. That's why we put the two-character strings before the five- character
+strings when we began the fifth pass.

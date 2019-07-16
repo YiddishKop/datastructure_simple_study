@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 22:03 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十七课 四种 Balanced Search Tree</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十七课 四种 Balanced Search Tree</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org1cf2b57">2-3-4 TREES</a>
+<ul>
+<li><a href="#orgf0737e4">Main api of 234-tree</a>
+<ul>
+<li><a href="#orgaf25218">[1]  Entry find(Object k);</a></li>
+<li><a href="#orga63e38b">[2]  Entry insert(Object k, Object e);</a></li>
+<li><a href="#org9e19393">[3]  Entry remove(Object k);</a></li>
+</ul>
+</li>
+<li><a href="#org31c74a7">Running Times of 234-tree</a></li>
+<li><a href="#org4521845">Another Approach to Duplicate Keys</a></li>
+</ul>
+</li>
+<li><a href="#org90e268f">AVL TREE</a></li>
+<li><a href="#org1f63dfe">Red-Black Tree-1</a></li>
+<li><a href="#org1f5029b">Red-Black Tree-2</a></li>
+<li><a href="#org3e22b54">summary:lec25 to lec27</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="org1cf2b57" class="outline-2">
+<h2 id="org1cf2b57">2-3-4 TREES</h2>
+<div class="outline-text-2" id="text-org1cf2b57">
+<p>
+Balaced tree(Not all are binary):
+</p>
+<ol class="org-ol">
+<li><code>234</code> tree(a kind of B tree): ordered perfectly balance tree</li>
+<li><code>splay tree</code> (BST)</li>
+<li><code>AVL tree</code> (BST)(height-balanced)</li>
+<li><code>Black-Red tree</code> (BST)(convert from/to 234-tree)(black-height)</li>
+</ol>
+
+<p>
+Last lecture, we learned about the Ordered Dictionary ADT, and we learned one
+data structure for implementing it: <code>*binary search trees*</code>. Today we learn a
+faster one.
+</p>
+
+<p>
+A <code>2-3-4</code> tree is a <span class="underline">perfectly balanced tree</span>. It has a big advantage over
+regular binary search trees: because the tree is perfectly balanced, find,
+insert, and remove operations take <span class="underline">O(log n)</span> time, <span class="underline">all of the leaves have the
+same depth</span>, even in the worst case.
+</p>
+
+<p>
+2-3-4 trees are thus named because every node has <span class="underline">2, 3, or 4 children</span>, except
+leaves, which are all at the bottom level of the tree.  Each node stores
+<span class="underline">1, 2, or 3 entries</span>, which determine how other entries are distributed among its
+children's subtrees.
+</p>
+
+<p>
+<b>Number of childern = keys + 1</b>
+</p>
+
+<pre class="example">
+2 keys node has 3 children
+
+                | key1 |  key2 |
+                /     |        \
+             /--      |         ---\
+| []&lt; key1 |   | key1 &lt;[]&lt; key2 |   | [] &gt; key2 |
+
+</pre>
+
+
+<p>
+Each internal (non-leaf) node has one more child than entries.  For example,
+a node with keys [20, 40, 50] has four children.
+</p>
+<ul class="org-ul">
+<li>Eack key k in the subtree rooted at the first child satisfies k &lt;= 20;</li>
+<li>at the second child, 20 &lt;= k &lt;= 40;</li>
+<li>at the third child, 40 &lt;= k &lt;= 50;</li>
+<li>and at the fourth child, k &gt;= 50.</li>
+</ul>
+<p>
+like this <a href="#org2555173">1</a>
+</p>
+
+<p>
+234-tree 也是 order 的,因为 binarytree 就是 ordered
+</p>
+</div>
+
+<div id="orgf0737e4" class="outline-3">
+<h3 id="orgf0737e4">Main api of 234-tree</h3>
+<div class="outline-text-3" id="text-orgf0737e4">
+<p>
+WARNING:  The algorithms for insertion and deletion I'll discuss today are
+different from those discussed by Goodrich and Tamassia.  The text presents
+"bottom-up" 2-3-4 trees, so named because the effects of node splits at the
+bottom of the tree can work their way back up toward the root.  I'll discuss
+"top-down" 2-3-4 trees, in which insertion and deletion finish at the leaves.
+Top-down 2-3-4 trees are usually faster than bottom-up ones, because both trees
+search down from the root to the leaves, but only the bottom-up trees sometimes
+go back up to the root.  Goodrich and Tamassia call 2-3-4 trees "(2, 4) trees".
+</p>
+
+<p>
+2-3-4 trees are a type of B-tree, which you may learn about someday in
+connection with fast disk access for database systems.  B-trees on disks
+usually use the top-down insertion/deletion algorithms, because accessing
+a disk track is slow, so you'd rather not revisit it multiple times.
+</p>
+</div>
+
+<div id="orgaf25218" class="outline-4">
+<h4 id="orgaf25218">[1]  Entry find(Object k);</h4>
+<div class="outline-text-4" id="text-orgaf25218">
+<pre class="example" id="lec27-pic1">
+Finding an entry is straightforward.        ==========
+Start at the root.  At each node,           +20 40 50+
+check for the key k; if it's not         /--==========------\
+present, move down to the           /---/      /  \          \-----\
+appropriate child chosen by     ----      ----      ----            =======
+comparing k against the keys.   |14|      |32|      |43|            +70 79+
+Continue until k is found,      ----      ----      ----            =======
+or k is not found at a          /  \      /  \      /  \            /  |  \            &lt;&lt;lec27-pic1&gt;&gt;
+leaf node.  For example,     ---- ---- ---- ---- ---- ---- ---------- ==== ----
+find(74) visits the          |10| |18| |25| |33| |42| |47| |57 62 66| +74+ |81|
+double-lined boxes at right. ---- ---- ---- ---- ---- ---- ---------- ==== ----
+</pre>
+
+<p>
+Incidentally, you can define an inorder traversal on 2-3-4 trees analogous to
+that on binary trees, and it visits the keys in sorted order.
+</p>
+</div>
+</div>
+<div id="orga63e38b" class="outline-4">
+<h4 id="orga63e38b">[2]  Entry insert(Object k, Object e);</h4>
+<div class="outline-text-4" id="text-orga63e38b">
+<p>
+insert(), like find(), walks down the tree in search of the key k. If it finds
+an entry with key k, it proceeds to that entry's <span class="underline">"left child"</span> and continues.
+</p>
+
+<p>
+这里 left child 是针对某个 key 的，不是针对整个 node，比如 node = [20,40,80], 80
+的 left-child就是 40~80 的这个 child。
+</p>
+
+<p>
+一般我们会限制每个 node 能存储的最多 keys，比如这里 max(# of keys)=3 insert() 最大的问题是如何在插入之后仍然保持整棵树的平衡，解决方法就是 <span class="underline">检测分割提升法</span>:在插入之前按照 find()方法从 root 开始找位置，不同的是在找的过程中一旦 <span class="underline">检测</span> 到达到存储上线的 node就对其 <span class="underline">分割</span> 并 <span class="underline">提升</span> 中间节点为父节点。最后再在叶子 node 中的适当位置插入。这个方法只在叶子 node 进行添加，不会在某个父节点进行，父节点的改变主要是满载时改变 or 子节点满载上呈给父节点。
+</p>
+
+<pre class="example">
+Unlike find(), insert() sometimes modifies             ----         -------
+nodes of the tree as it walks down.                    |20|         |11 20|
+Specifically, whenever insert() encounters             ----         -------
+a 3-key node, the middle key is ejected,               /  \   =&gt;    /  |  \
+and is placed in the parent node instead.     ========== ----    ---- ---- ----
+Since the parent was previously treated the   +10 11 12+ |30|    |10| |12| |30|
+same way, the parent has at most two keys,    ========== ----    ---- ---- ----
+and always has room for a third.  The other
+two keys in the 3-key node are split into two separate 1-key nodes, which are
+divided underneath the old middle key (as the figure illustrates).
+
+</pre>
+
+<pre class="example">
+For example, suppose we                      ----
+insert 60 into the tree                      |40|                                  &lt;&lt;lec27-pic2&gt;&gt;
+depicted in [1].  The                      /------\
+first node visited is                 /---/        \----\
+the root, which has three          ----                  ----
+keys; so we kick the               |20|                  |50|
+middle key (40) upstairs.          ----                /------\
+Since the root node has           /    \              /        \
+no parent, a new node         ----      ----      ----          ----------
+is created to hold 40         |14|      |32|      |43|          |62 70 79|
+and becomes the root.         ----      ----      ----          ----------
+Similarly, 62 is kicked       /  \      /  \      /  \          /  |  |   \
+upstairs when insert()     ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+finds the node containing  |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|
+it.  This ensures us that  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+when we arrive at the leaf
+(labeled 57 in this example), there's room to add the new key 60.
+</pre>
+
+<p>
+Observe that along the way, we created a new 3-key node "62 70 79".  We do not
+kick its middle key upstairs until the next time it is visited.
+</p>
+
+<p>
+Again, the reasons why we split every 3-key node we encounter (and move its
+middle key up one level) are
+</p>
+<ol class="org-ol">
+<li>to make sure there's room for the new key in the leaf node, and</li>
+<li>to make sure that above the leaves, there's room for any key that gets kicked upstairs.</li>
+</ol>
+<p>
+Sometimes, an insertion operation <span class="underline">increases the height</span> of the tree by one by
+creating a new root.
+</p>
+</div>
+</div>
+<div id="org9e19393" class="outline-4">
+<h4 id="org9e19393">[3]  Entry remove(Object k);</h4>
+<div class="outline-text-4" id="text-org9e19393">
+<p>
+2-3-4 tree remove() is similar to remove() on binary search trees: you find the
+entry you want to remove (having key k).
+</p>
+<ul class="org-ul">
+<li>If it's in a leaf, you remove it.</li>
+<li>If it's in an internal node, you replace it with the entry with the next
+higher key. ( <del>似乎这个也可以实现类似 binary search tree 的 spell 自动纠错功能</del> ),前面这个想法是错的。这里的意思是说，一旦找到这个 key，就用右子树中最小的
+(smallest higher)代替这个 key 的位置.</li>
+</ul>
+
+<p>
+That entry is always in a leaf(原因同 insert()，因为在实际插入/删除之前都要进行‘检测 分割/合并 上升/下降 法’). 意思是，在找这个节点的过程中(directily leaf or
+changging internal with smallest higher),要对只有一个 entry 的节点进行处理。目的是不让删除节点造成 234-树整体的不平衡. In either case, you remove an entry from
+a leaf in the end.
+</p>
+
+<p>
+Like insert(), remove() changes nodes of the tree as it walks down.  Whereas
+insert() <span class="underline">eliminates 3-key nodes</span> (moving keys up the tree) to make room for new
+keys, remove() <span class="underline">eliminates 1-key nodes</span> (pulling keys down the tree) so that a
+key can be removed from a leaf without leaving it empty.  There are three ways
+1-key nodes (except the root) are eliminated.
+</p>
+
+<pre class="example">
+1)  When remove() encounters a 1-key  -------                  -------
+node (except the root), it tries       |20 40|                  |20 50|
+to steal a key from an adjacent        -------                  -------
+sibling.  But we can't just steal      /  |  \          =&gt;     /   |   \
+the sibling's key without          ---- ==== ----------    ---- ------- -------
+violating the search tree          |10| +30+ |50 51 52|    |10| |30 40| |51 52|
+invariant.  This figure shows      ---- ==== ----------    ---- ------- -------
+remove's action, called a           /\   /\   / |  | \      /\   / | \   / | \
+"rotation", when it reaches "30".            S                        S
+We move a
+key _from the sibling to the parent_, and we move a key _from the parent to the 1-key node_.  We also move
+a subtree S from the sibling to the 1-key node (now a 2-key node).
+</pre>
+
+<p>
+Goodrich &amp; Tamassia call rotations "transfer" operations.
+Note that we CAN'T steal a key from a <span class="underline">non-adjacent sibling</span>.
+</p>
+
+<p>
+当相邻的兄弟有多于一个 entry, 用旋转，兄传父，父传我
+</p>
+
+<pre class="example">
+2)  If no adjacent sibling has more than one     -------               ----
+key, a rotation can't be used.  In this case,     |20 40|               |40|
+the _1-key node steals a key from its parent_.    -------               ----
+Since the parent was previously treated the       /  |  \    =&gt;         /  \
+same way (unless it's the root), it has at    ==== ---- ----    ---------- ----
+least two keys, and can spare one.  The       +10+ |30| |50|    |10 20 30| |50|
+sibling is also absorbed, and the 1-key node  ==== ---- ----    ---------- ----
+becomes a 3-key node.  The figure illustrates
+remove's action when it reaches "10".  This is called a "fusion" operation.
+
+</pre>
+
+
+<p>
+当相邻的兄弟只有一个 entry 且父节点不止一个节点，用融合,偷父合兄
+</p>
+
+<pre class="example">
+3)  If the parent is the root and contains only one key, and the sibling
+contains only one key, then the current 1-key node, its 1-key sibling, and the
+1-key root are fused into one 3-key node that serves as the new root.  The
+height of the tree decreases by one.
+</pre>
+
+<p>
+当父节点是根节点且只有一个 entry，兄弟节点也只有一个 entry， 和三为一，树深度减一；
+</p>
+
+<p>
+Eventually we reach a leaf.  After we process the leaf, it has at least two
+keys (if there are at least two keys in the tree), so we can delete the key
+and still have one key in the leaf.
+</p>
+
+<pre class="example">
+For example, suppose we                  ----------
+remove 40 from the large                 |20 xx 50|
+tree depicted in  . The               /-----------------\
+root node contains 40,            /--/      /   \        \-----\
+which we mark "xx" to         ----      ----      ----          ----------
+remind us that we plan to     |14|      |32|      |43|          |62 70 79|
+replace it with the           ----      ----      ----          ----------
+smallest key in the root      /  \      /  \      /  \          /  |  |   \
+node's right subtree.  To  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+find that key, we move on  |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|
+to the 1-key node labeled  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+50.  Following our rules
+for 1-key nodes, we fuse 50 with its sibling and parent to create a new 3-key
+root labeled "20 xx 50".
+</pre>
+
+<p>
+有没有可能父节点不是根节点，且也只有一个 entry 的情况？
+</p>
+
+<p>
+不可能，因为我是从上往下检查的，如果父节点只有一个，那肯定在检查到他时就已经处理了。
+</p>
+
+<pre class="example">
+Next, we visit the node                     ----------
+labeled 43.  Again                          |20 xx 62|
+following our rules for                 /--------------------\
+1-key nodes, we rotate            /----/    /       \         \-----\
+62 from a sibling to the      ----      ----      -------            -------
+root, and move 50 from        |14|      |32|      |43 50|            |70 79|
+the root to the node          ----      ----      -------            -------
+containing 43.                /  \      /  \     /   |   \           /  |  \
+                           ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+                           |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|
+                           ---- ---- ---- ---- ---- ---- ------- ---- ---- ----
+
+</pre>
+
+<pre class="example">
+Finally, we move down to                    ----------
+the node labeled 42.  A                     |20 xx 62|
+different rule for 1-key               /--------------------\
+nodes requires us to             /----/        /  \          \-----\
+fuse the nodes labeled       ----      -------/    \------          -------
+42 and 47 into a 3-key       |14|      |32|           |50|          |70 79|
+node, stealing 43 from       ----      ----           ----          -------
+the parent node.             /  \      /  \           /  \          /  |  \
+                          ---- ---- ---- ---- ---------- ------- ---- ---- ----
+                          |10| |18| |25| |33| |42 43 47| |57 60| |66| |74| |81|
+                          ---- ---- ---- ---- ---------- ------- ---- ---- ----
+
+</pre>
+
+<p>
+The last step is to remove 42 from the leaf and replace "xx" with 42.
+</p>
+
+<p>
+总结
+</p>
+<pre class="example">
+                                                                 |                        /--&gt; yes ====&gt; 1+1+1 = 3
+                                                                 | parent is 1-key root ? |
+      /-&gt;leaf    ----&gt;|                                     /---&gt;|                        \--&gt; No  ====&gt; 偷父合兄
+      |               |                              /-&gt; yes
+target|               | adjecent sibling 1-key node ?
+      |               |                              \-&gt; No
+      \-&gt;internal----&gt;|                                     \===&gt; 兄-&gt;父-&gt;我
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="org31c74a7" class="outline-3">
+<h3 id="org31c74a7">Running Times of 234-tree</h3>
+<div class="outline-text-3" id="text-org31c74a7">
+<p>
+A 2-3-4 tree with height h has between 2^h and 4^h leaves.  If n is the total
+number of entries (including entries in internal nodes), then n &gt;= 2^(h+1) - 1.
+By taking the logarithm of both sides, we find that h is in O(log n).
+</p>
+
+<p>
+The time spent visiting a 2-3-4 node is typically longer than in a binary
+search tree (because the nodes and the rotation and fusion operations are
+complicated), but the time per node is still in O(1).
+</p>
+
+<p>
+The number of nodes visited is proportional to the height of the tree.  Hence,
+the running times of the find(), insert(), and remove() operations are in O(h)
+and hence in <span class="underline">O(log n)</span>, even in the worst case.
+</p>
+
+<p>
+Compare this with the Theta(n) worst-case time of ordinary binary search trees.
+</p>
+</div>
+</div>
+
+<div id="org4521845" class="outline-3">
+<h3 id="org4521845">Another Approach to Duplicate Keys</h3>
+<div class="outline-text-3" id="text-org4521845">
+<p>
+Rather than have a separate node for each entry, we might wish to <span class="underline">collect all
+the entries that share a common key in one node</span>. <span class="underline">In this case, each node's
+entry becomes a list of entries</span>.
+</p>
+
+<p>
+This simplifies the implementation of findAll(), which finds all the entries
+with a specified key. It also speeds up other operations by leaving fewer nodes
+in the tree data structure. Obviously, this is a change in the implementation,
+but not a change in the dictionary ADT.
+</p>
+
+<pre class="example" id="hashTable with this improvement">
+______________________
+|  |  |  |  |  |  |  |
+----|-----------------
+    V
+    ---   ---   ---
+    |3|--&gt;| |--&gt;| |--&gt;...  this is the entries with key = 3
+    ---   ---   ---
+    |
+    v
+    ---   ---   ---
+    |7|--&gt;| |--&gt;| |--&gt;...  this is the entries with key = 7
+    ---   ---   ---
+
+</pre>
+
+<p>
+This idea can be used with hash tables, binary search trees, and 2-3-4 trees.
+</p>
+</div>
+</div>
+</div>
+
+<div id="org90e268f" class="outline-2">
+<h2 id="org90e268f">AVL TREE</h2>
+<div class="outline-text-2" id="text-org90e268f">
+<p>
+AVL tree is a height-balanced BST
+</p>
+<ol class="org-ol">
+<li>找到 avl-tree 深度的上界，并且不断 sharp 上界
+<ol class="org-ol">
+<li>开始用递归估算法，然后用给假设演绎证明法</li>
+</ol></li>
+<li>找出 avl-tree 的三个 structure features</li>
+<li>通过 3 个 features 找到与深度有关的更多 features</li>
+<li>insert(),need v,x,y,z(1st unbalanced when find from inserted node:v, y is z's child, x is y's child, in this line) rotation,
+<ol class="org-ol">
+<li>要求是 middle key endedup being at thetop</li>
+<li>ll or rr -&gt; rotate once; rotate(y,z)</li>
+<li>lr or rl -&gt; rotate twice; rotate(x,y), rotate(x,z)</li>
+<li>所有的 rotate 操作都只需要 constant time，O(1),因为只需要改变几个链接就行，有大量的保持不变</li>
+</ol></li>
+<li>delete(),很麻烦，-1 的效果有可能一直上传，而不仅仅是 xyz 三者，所以找到 z（fist unbalance node）,rotate to balance this subtree, then if this balance tree's height -1, then go up to next unbalance
+node, which influenced by the rebalanced tree whose height reduce 1.</li>
+</ol>
+</div>
+</div>
+
+<div id="org1f63dfe" class="outline-2">
+<h2 id="org1f63dfe">Red-Black Tree-1</h2>
+<div class="outline-text-2" id="text-org1f63dfe">
+<p>
+what we want is using R&amp;B tree as BST, but not losing its red and black property
+</p>
+
+<p>
+R&amp;B-tree 如何保持平衡的呢，如果他只衡量黑 node 的个数作为高度？
+</p>
+
+<p>
+最高（所有点都算）是 2*|黑点| 最矮的情况是 1*|黑点|保证通往某个点的每一条路线上经过的黑点数量一致所以 rotate 或 recolor 之后，仍需要保证两点：所有的父辈的路线高度原来是多少，处理之后还是多少。
+</p>
+
+<p>
+Red-Black tree is a kind of BST
+case (1),just throw problem up 2 levels, (2)(3) really solver the problem.
+</p>
+
+<p>
+so case(1) will throw problem to his grandpa, grandpa go on checking and
+throwing up, until encount (2) (3).
+</p>
+
+<p>
+case (2) is bad orientation, (3) is a good orientation.
+</p>
+
+<p>
+case (2) must rotate to get to case (3)
+</p>
+
+<p>
+insert, we can ONLY insert red, because black will change the black-height:
+Key point is check uncle is Red or Black
+</p>
+<pre class="example">
+1) insert a red ~left of right~ whose ~[father, uncle] -&gt; Red~ , ~grandfather -&gt; Black~.
+   recolor(~[fater,uncle,grandfather] -&gt; opposite~), then goto (1)or (2)or (3)
+2) insert a red, R(L) of L(R), whose ~father -&gt; Red~, ~[uncle, grandfater] -&gt; Black~
+   [zigzag or zagzig]: rotate to (3)
+3) insert a red, R(L) of R(L), whose ~father -&gt; Red~, ~[uncle, grandfater] -&gt; Black~
+   [zigzig or zagzag]: recolor(~[father,grandfather] -&gt; opposite~) rotate
+</pre>
+</div>
+</div>
+
+<div id="org1f5029b" class="outline-2">
+<h2 id="org1f5029b">Red-Black Tree-2</h2>
+<div class="outline-text-2" id="text-org1f5029b">
+<p>
+不但每一个 external 节点的 black height 一样，每一个子树的 black height 也一样。跟 AVL 树一样，都要统计某种高度，这里就是 black-height, avl 是统计 balance
+height.
+</p>
+<ul class="org-ul">
+<li>balance height 的统计方法是，每个 node 都算 1, avl 树要求，每个节点的左右子树 balance height 相差最多为 1</li>
+<li>black   height 的统计方法时，上面有几个 black-node,  r&amp;b 树要求所有 external node 的 black height 都一样</li>
+</ul>
+<p>
+delete() 跟 BST 一样的概念，就是你删除的实际是：leaf(can be Red or Black) or a
+leaf' parent(by analysis, it ONLY has one situtation: parent is Black and
+childern is Red),如果某个节点只有左孩子或右孩子，
+</p>
+
+<p>
+[注意] 这里的 delete 只是删除 r or b 节点，不是指删除 external node。 在 RB 树中，external node 并不算做节点，节点只有两种：R and B 只有这三种情况，对于最后一种，可以分析 BB，RR，RB，BR 四种组合，最后发现删除操作只会出现在这种组合 BR
+中
+</p>
+
+<p>
+[注意] 删除一个 rorb 节点，就用一个 external node 代替这个节点。比如图 1
+</p>
+<pre class="example" id="3SitutationsWhenDelete">
+
+
+   (1)            (2)                     (3)
+  -----          -----                   -----
+ (  R  )        (  B  )                 ( B:19)
+  --X--          --X--                   --X--
+   / \            / \                     / \
+  /   \          /   \                   /   \
+ /     \        /     \                 /     \
++-+    +-+     +-+    +-+            +-+     -----
++-+    +-+     +-+    +-+            +-+    ( R:17)
+                                             --X--
+    |             |                           / \
+    |             |                          /   \
+    |             |                         /     \
+    |             |                        +-+    +-+
+    |             |                        +-+    +-+
+    |             |
+    |             |                       |
+    |             |                       |
+    |             |                       |
+    |             |                       V
+    |             |                     (2)
+    |             |                    -----
+    V             V                   (  B  )
+                                       --X--
+   +-+            ??                    / \
+   +-+                                 /   \
+                                      /     \
+                                     +-+    +-+
+                                     +-+    +-+
+</pre>
+
+<p>
+(1)(3) 情况都好处理，就是(2)会造成 external 的 black height 减少一，所以怎么办，依旧是 rotation。red black 的所有操作都可以和 234tree 对比。基本相互呼应。red
+black 的删除 delete() 操作对于图（2）的情况，哪个父亲的 black-node 被删除了，就以这个父亲为考虑起点，往下分析，功能分析出六种情况。
+</p>
+</div>
+</div>
+<div id="org3e22b54" class="outline-2">
+<h2 id="org3e22b54">summary:lec25 to lec27</h2>
+<div class="outline-text-2" id="text-org3e22b54">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Datastructure</th>
+<th scope="col" class="org-left">logical</th>
+<th scope="col" class="org-left">physical</th>
+<th scope="col" class="org-left">feature</th>
+<th scope="col" class="org-left">running time</th>
+<th scope="col" class="org-left">application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Priority Queue</td>
+<td class="org-left">Dictionary: - I/O: queue - order by value: Ordered(level-orderd: parent_value &lt; children_value) keys indicate by indices of array Complete(except leaves of bottom level) Binary Tree</td>
+<td class="org-left">Array or LinkedList</td>
+<td class="org-left">find min fast</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">event queue,  'key' is time the evet will take place,     'value' is the event</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">Hash Table</td>
+<td class="org-left">Dictionary:</td>
+<td class="org-left">Array + LinkedList, array for storing keys, linkedList for entry with, same keys(conflict occur)</td>
+<td class="org-left">farst for find</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">Binary Search  Tree</td>
+<td class="org-left">Dictionary: - order by key: Ordered(key: l &lt; parent &lt; r) Binary Tree</td>
+<td class="org-left">LinkedList</td>
+<td class="org-left">find min/max;find nearst</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">auto modification for miss spelling( by binary search tree can find nearst around target)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">Balanced Search Tree (234-tree)</td>
+<td class="org-left">Dictionary: - order by key: - Orderd Complete Binary Tree - one node has 1/2/3 entry - one node has 2/3/4 children</td>
+<td class="org-left">LinkedList</td>
+<td class="org-left">find min/max it's a little complex to keep balance when insert() or remove()</td>
+<td class="org-left">O(log n)</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>

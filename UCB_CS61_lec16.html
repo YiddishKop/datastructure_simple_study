@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:42 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第十六课 Exception and More Java</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第十六课 Exception and More Java</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga2ef333">EXCEPTIONS (continued)</a>
+<ul>
+<li><a href="#orgfbfb4c5">The "finally" keyword</a></li>
+<li><a href="#orgb160df3">Exception constructors</a></li>
+</ul>
+</li>
+<li><a href="#org857ada0">GENERICS</a></li>
+<li><a href="#orgfd9dcc0">FIELD SHADOWING</a></li>
+<li><a href="#org0dbf24e">"final" METHODS AND CLASSES</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="orga2ef333" class="outline-2">
+<h2 id="orga2ef333">EXCEPTIONS (continued)</h2>
+<div class="outline-text-2" id="text-orga2ef333">
+</div>
+<div id="orgfbfb4c5" class="outline-3">
+<h3 id="orgfbfb4c5">The "finally" keyword</h3>
+<div class="outline-text-3" id="text-orgfbfb4c5">
+<p>
+A finally clause can also be added to a "try."
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">FileInputStream</span> <span style="color: #7590db;">f</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">FileInputStream</span>(<span style="color: #2d9574;">"filename"</span>);
+<span style="color: #4f97d7; font-weight: bold;">try</span> {
+  statementX;
+  <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">1</span>;
+} <span style="color: #4f97d7; font-weight: bold;">catch</span> (<span style="color: #ce537a; font-weight: bold;">IOException</span> <span style="color: #7590db;">e</span>) {
+  e.printStackTrace();
+  <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">2</span>;
+} <span style="color: #4f97d7; font-weight: bold;">finally</span> {
+  f.close();
+}
+</pre>
+</div>
+
+<p>
+If the "<code>try</code>" statement begins to execute, the "<code>finally</code>" clause will be
+executed at the end, no matter what happens. "finally" clauses are used to do
+things that need to be done in both normal and exceptional circumstances. In
+this example, it is used to close a file.
+</p>
+
+<p>
+If statementX causes no exception, then the "<code>finally</code>" clause is executed, and
+1 is returned.
+</p>
+
+<p>
+If statementX causes a IOException, the exception is caught, the "<code>catch</code>"
+clause is executed, and then the "<code>finally</code>" clause is executed.  After the
+"<code>finally</code>" clause is done, 2 is returned.
+</p>
+
+<p>
+If statementX causes some other class of exception, the "<code>finally</code>" clause is
+executed immediately, then the exception continues to propagate down the stack.
+</p>
+
+<p>
+In the example above, we've invoked the method "<code>printStackTrace</code>" on the
+exception we caught.  When an exception is constructed, it takes a snapshot of
+the stack, which can be printed later.
+</p>
+
+<p>
+It is possible for an exception to occur in a "<code>catch</code>" or "<code>finally</code>" clause.
+An exception thrown in a "catch" clause will terminate the "<code>catch</code>" clause, but
+the "<code>finally</code>" clause will still get executed before the exception goes on. An
+exception thrown in a "<code>finally</code>" clause replaces the old exception, and
+terminates the "<code>finally</code>" clause and the method immediately.
+</p>
+
+<p>
+However&#x2026;you can nest a "<code>try</code>" clause inside a "<code>catch</code>" or "<code>finally</code>"
+clause, thereby catching those exceptions as well.
+</p>
+</div>
+</div>
+
+<div id="orgb160df3" class="outline-3">
+<h3 id="orgb160df3">Exception constructors</h3>
+<div class="outline-text-3" id="text-orgb160df3">
+<p>
+By convention, most Throwables (including Exceptions) have two constructors.
+One takes no parameters, and one takes an error message in the form of a
+String.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">MyException</span> <span style="color: #4f97d7; font-weight: bold;">extends</span> <span style="color: #ce537a; font-weight: bold;">Exception</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">MyException</span>() { <span style="color: #4f97d7; font-weight: bold;">super</span>(); }
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">MyException</span>(<span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">s</span>) { <span style="color: #4f97d7; font-weight: bold;">super</span>(s); }
+}
+</pre>
+</div>
+
+<p>
+The error message will be printed if it propagates out of main(), and it can be
+read by the Throwable.getMessage() method.  The constructors usually call the
+superclass constructors, which are defined in Throwable.
+</p>
+</div>
+</div>
+</div>
+
+<div id="org857ada0" class="outline-2">
+<h2 id="org857ada0">GENERICS</h2>
+<div class="outline-text-2" id="text-org857ada0">
+<p>
+Suppose you're using a list of Objects to store Strings. When you fetch a String
+from the list, you have to cast it back to type "String" before you can call the
+methods exclusive to Strings. If somehow an object that's not a String got into
+your list, the cast will throw an exception. It would be nice to have the
+compiler enforce the restriction that nothing but Strings can ever get into your
+list in the first place, so you can sleep at night knowing that your family is
+safe from a ClassCastException.
+</p>
+
+<p>
+So Java offers <span class="underline">generics</span>, which allow you to declare general classes that
+produce specialized objects. For example, you can create an SList for Strings
+only, and another SList for Integers only, even though you only wrote one SList
+class. To specify the class, SList takes a <span class="underline">type_parameter</span>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">SListNode</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt; {                         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">T is the formal parameter.</span>
+  <span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #7590db;">item</span>;
+  <span style="color: #ce537a; font-weight: bold;">SListNode</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt; <span style="color: #7590db;">next</span>;
+
+  <span style="color: #bc6ec5; font-weight: bold;">SListNode</span>(<span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #7590db;">i</span>, <span style="color: #ce537a; font-weight: bold;">SListNode</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt; <span style="color: #7590db;">n</span>) {
+    item = i;
+    next = n;
+  }
+}
+
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">SList</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt; {
+  <span style="color: #ce537a; font-weight: bold;">SListNode</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt; <span style="color: #7590db;">head</span>;
+
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">insertFront</span>(<span style="color: #ce537a; font-weight: bold;">T</span> <span style="color: #7590db;">item</span>) {
+    head = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SListNode</span>&lt;<span style="color: #ce537a; font-weight: bold;">T</span>&gt;(item, head);
+  }
+}
+</pre>
+</div>
+
+<p>
+You can now create and use an SList of Strings as follows.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">SList</span>&lt;<span style="color: #ce537a; font-weight: bold;">String</span>&gt; <span style="color: #7590db;">l</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SList</span>&lt;<span style="color: #ce537a; font-weight: bold;">String</span>&gt;();     <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">String is the actual parameter.</span>
+l.insertFront(<span style="color: #2d9574;">"Hello"</span>);
+</pre>
+</div>
+
+<p>
+Likewise, you can create an SList of Integers by using "SList&lt;Integer&gt;" in the
+declaration and constructor.
+</p>
+
+<p>
+What are the advantages of generics? First, the compiler will ensure at
+compile-time that nothing but Strings can ever enter your SList&lt;String&gt;. Second,
+you don't have to cast the Objects coming out of your SList back to Strings, so
+there is no chance of an unexpected ClassCastException at run time. If some bug
+in your program is trying to put Integer objects into your SList, it's much
+easier to diagnose the compiler refusing to put an Integer into an SList&lt;String&gt;
+than it is to diagnose a ClassCastException occurring when you remove an Integer
+from a regular SList and try to cast it to String.
+</p>
+
+<p>
+Generics are a complicated subject.  Consider this to be a taste of them;
+hardly a thorough treatment.  A good tutorial is available at
+<a href="https://www.seas.upenn.edu/~cis1xx/resources/generics-tutorial.pdf">https://www.seas.upenn.edu/~cis1xx/resources/generics-tutorial.pdf</a> .
+</p>
+
+<p>
+Although Java generics are superficially similar to C++ templates, there's a
+crucial difference between them.  In the example above, Java compiles bytecode
+for only a single SList class.  This SList bytecode can be used by all
+different object types.  It is the compiler, not the bytecode itself, that
+enforces the fact that a particular SList object can only store objects of a
+particular class.  Conversely, C++ recompiles the SList methods for every type
+that you instantiate SLists on.  The C++ disadvantage is that one class might
+turn into a lot of machine code.  The C++ advantages are that you can use
+primitive types, and you get code optimized for each type.  Java generics don't
+work with primitive types.
+</p>
+</div>
+</div>
+
+<div id="orgfd9dcc0" class="outline-2">
+<h2 id="orgfd9dcc0">FIELD SHADOWING</h2>
+<div class="outline-text-2" id="text-orgfd9dcc0">
+<p>
+Just as methods can be overridden in subclasses, fields can be "shadowed" in
+subclasses.  However, shadowing works quite differently from overriding.
+Whereas the choice of methods is dictated by the <span class="underline">dyanamic_type</span> of an object,
+the choice of fields is dictated by the <span class="underline">static_type</span> of a variable or object.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Super</span> {
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span> = <span style="color: #a45bad;">2</span>;
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">f</span>() {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">2</span>;
+  }
+}
+
+<span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Sub</span> <span style="color: #4f97d7; font-weight: bold;">extends</span> <span style="color: #ce537a; font-weight: bold;">Super</span> {
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span> = <span style="color: #a45bad;">4</span>;                <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">shadows Super.x</span>
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">f</span>() {                 <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">overrides Super.f()</span>
+    <span style="color: #4f97d7; font-weight: bold;">return</span> <span style="color: #a45bad;">4</span>;
+  }
+}
+</pre>
+</div>
+
+<p>
+Any object of class Sub now has <span class="underline">two</span> fields called x, each of which store a
+different integer.  How do we know which field is accessed when we refer to x?
+It depends on the static type of the expression whose x field is accessed.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">Sub</span> <span style="color: #7590db;">sub</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Sub</span>();
+<span style="color: #ce537a; font-weight: bold;">Super</span> <span style="color: #7590db;">supe</span> = sub;       <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">supe and sub reference the same object.</span>
+<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span>;
+
+</pre>
+</div>
+
+<pre class="example">
+       ----------------
+---    | ---      --- |    ---
+|.+---&gt;| |4|      |2| |&lt;---+.|
+---    | ---      --- |    ---
+sub    |Sub.x Super.x |    supe
+       ----------------
+
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-java">i = supe.x;             <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">2</span>
+i = sub.x;              <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+i = ((<span style="color: #ce537a; font-weight: bold;">Super</span>) sub).x;    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">2</span>
+i = ((<span style="color: #ce537a; font-weight: bold;">Sub</span>) supe).x;     <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+</pre>
+</div>
+
+<p>
+The last four statements all use the same object, but yield different results.
+Recall that method overriding does not work the same way.  Since both variables
+reference a Sub, the method Sub.f always overrides Super.f.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">i = supe.f();           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+i = sub.f();            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+i = ((<span style="color: #ce537a; font-weight: bold;">Super</span>) sub).f();  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+i = ((<span style="color: #ce537a; font-weight: bold;">Sub</span>) supe).f();   <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+</pre>
+</div>
+<p>
+What if the variable whose shadowed field you want to access is "this"?
+You can cast "this" too, but a simpler alternative is to replace "this" with
+"super".
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Sub</span> <span style="color: #4f97d7; font-weight: bold;">extends</span> <span style="color: #ce537a; font-weight: bold;">Super</span> {
+  <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span> = <span style="color: #a45bad;">4</span>;                <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">shadows Super.x</span>
+  <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">g</span>() {
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">i</span>;
+
+    i = <span style="color: #4f97d7; font-weight: bold;">this</span>.x;           <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">4</span>
+    i = ((<span style="color: #ce537a; font-weight: bold;">Super</span>) <span style="color: #4f97d7; font-weight: bold;">this</span>).x  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">2</span>
+    i = <span style="color: #4f97d7; font-weight: bold;">super</span>.x;          <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">2</span>
+  }
+}
+</pre>
+</div>
+
+<p>
+Whereas method overriding is a powerful benefit of object orientation, field
+shadowing is largely a nuisance. Whenever possible, avoid having fields in
+subclasses whose names are the same as fields in their superclasses.
+</p>
+
+<p>
+Static methods can be shadowed too; they follow the same shadowing rules as
+fields.  This might seem confusing:  why do ordinary, non-static methods use
+one system (overriding) while static methods use an entirely different system
+(shadowing)?  The reason is because overriding requires dynamic method lookup.
+Dynamic method lookup looks up the dynamic type of an object.  A static method
+is not called on an object, so there's nothing whose dynamic type we can look
+up.  Therefore, static methods <span class="underline">can't</span> use dynamic method lookup or overriding.
+So they use shadowing instead.
+</p>
+
+<p>
+Static method shadowing, like field shadowing, is largely a nuisance.
+</p>
+</div>
+</div>
+
+<div id="org0dbf24e" class="outline-2">
+<h2 id="org0dbf24e">"final" METHODS AND CLASSES</h2>
+<div class="outline-text-2" id="text-org0dbf24e">
+<p>
+A method can be declared "final" to prevent subclasses from overriding it.  Any
+attempt to override it will cause a compile-time error.
+</p>
+
+<p>
+A class can be declared "final" to prevent it from being extended.  Any attempt
+to declare a subclass will cause a compile-time error.
+</p>
+
+<p>
+The only reason to declare a method or class "final" is to improve the speed of
+a program.  The compiler can speed up method calls that cannot be overridden.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:17 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十八课: Randomized Analysis</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十八课: Randomized Analysis</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org36b3183">lec 38 Randomized analysis</a>
+<ul>
+<li><a href="#orgd0e8a0d">Principle of randomized analysis</a></li>
+<li><a href="#orgcf614b6">what is a randomized algorithms</a></li>
+<li><a href="#orgdf06fb3">Expectation</a>
+<ul>
+<li><a href="#org349af98">Use x() simulate, running one kind of api()</a></li>
+<li><a href="#org6948cea">Use x() x() simulate, running two kinds of api()</a></li>
+<li><a href="#org5c3fe82">when get each api()'s EXPECTATION, we get total program's EXPECTATION</a></li>
+</ul>
+</li>
+<li><a href="#org2e0c6a6">use Randomized analysis in HashTables</a>
+<ul>
+<li><a href="#org7a8c00b">assuming using chaining and no duplicate keys</a></li>
+<li><a href="#org7e7c918">analyze find(), n 个弹珠（keys）放在 N 个袋子（buckets）中</a></li>
+<li><a href="#org3763e38">Load factor occurs</a></li>
+<li><a href="#orgcacceea">Summarized</a></li>
+</ul>
+</li>
+<li><a href="#orgf29e668">use Randomized analysis in Quicksort</a>
+<ul>
+<li><a href="#org86c349a">Summarized</a></li>
+</ul>
+</li>
+<li><a href="#org4ec53bb">use Randomized analysis in Quickselect</a></li>
+<li><a href="#org8b70e45">Amortized Time vs. Expected Time</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="org36b3183" class="outline-2">
+<h2 id="org36b3183">lec 38 Randomized analysis</h2>
+<div class="outline-text-2" id="text-org36b3183">
+<ul class="org-ul">
+<li>Randomized analysis， 要求的是广度;</li>
+<li>Amortized analysis， 要求的是深度;</li>
+</ul>
+
+<p>
+<span class="underline"><b>广度的意思是说</b></span> , 我希望样本的分布更 <b>均匀</b> ，像 quicksort(pivot)，
+hashtable(hashcode), 有依赖 <b>随机</b> 的属性. 这个属性会影响算法结果, <span class="underline"><b>深度的意思是说</b></span> ，我的结果依赖于我之前执行的次数，执行的越多越好，有点像 <b>循环进化</b> 的意思，比如 disjoint set(path compression), splaytree
+</p>
+</div>
+
+
+<div id="orgd0e8a0d" class="outline-3">
+<h3 id="orgd0e8a0d">Principle of randomized analysis</h3>
+<div class="outline-text-3" id="text-orgd0e8a0d">
+<p>
+randomized analysis is also proving the average running time of an algorithm.
+</p>
+
+<p>
+quickSort 最差复杂度是 O(n^2),但是如果你运行 quickSort again and agian and again&#x2026;
+it will get the average running time O(nlogn),which is the best result in
+comparison-based(2-way desicion) algorithms.
+</p>
+
+<p>
+需要注意的是，这里的原理跟以 hashtable,splayTree,disjointSet 为代表的演进派数据结构（amortized analysis）不同这里不是因为一直优化一直 balance the tree 而获得的时间复杂度的减少，而是通过一直投硬币一直投硬币&#x2026;来获得一个稳定的概率分布。
+</p>
+</div>
+</div>
+<div id="orgcf614b6" class="outline-3">
+<h3 id="orgcf614b6">what is a randomized algorithms</h3>
+<div class="outline-text-3" id="text-orgcf614b6">
+<p>
+<span class="underline">Randomized_algorithms</span> are algorithms that make decisions based on rolls of the
+dice. The random numbers actually help to keep the running time low. Examples
+are quicksort, quickselect, and hash tables with random hash codes.
+</p>
+
+<p>
+Randomized analysis, like amortized analysis, is a mathematically rigorous way
+of saying, "The average running time of this operation is fast, even though the
+worst-case running time is slow." Unlike amortized analysis, the "average" is
+taken over an infinite number of runs of the program. A randomized algorithm
+will sometimes run more slowly than the average, but the probability that it
+will run <span class="underline">asymptotically</span> slower is extremely low.
+</p>
+
+<p>
+Randomized analysis requires a little bit of probability theory.
+</p>
+</div>
+</div>
+
+<div id="orgdf06fb3" class="outline-3">
+<h3 id="orgdf06fb3">Expectation</h3>
+<div class="outline-text-3" id="text-orgdf06fb3">
+<p>
+Expectation 实际就是一种 average，一种概率分布下的平均。
+</p>
+</div>
+
+<div id="org349af98" class="outline-4">
+<h4 id="org349af98">Use x() simulate, running one kind of api()</h4>
+<div class="outline-text-4" id="text-org349af98">
+<p>
+Suppose a method x() flips a coin. If the coin comes up heads, x() takes one
+second to execute. If it comes up tails, x() takes three seconds.
+</p>
+
+<p>
+Let X be the exact running time of one call to x(). With probability 0.5, X is
+1, and with probability 0.5, X is 3. For obvious reasons, X is called a
+<span class="underline">random_variable</span>.
+</p>
+
+<p>
+The <span class="underline">expected</span> value of X is the average value X assumes in an infinite sequence
+of coin flips,
+</p>
+
+<pre class="example">
+E[X] = 0.5 * 1 + 0.5 * 3 = 2 seconds expected time.
+</pre>
+</div>
+</div>
+
+<div id="org6948cea" class="outline-4">
+<h4 id="org6948cea">Use x() x() simulate, running two kinds of api()</h4>
+<div class="outline-text-4" id="text-org6948cea">
+<p>
+Suppose we run the code sequence
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">x();     <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">takes time X</span>
+x();     <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">takes time Y</span>
+</pre>
+</div>
+
+<p>
+and let Y be the running time of the <span class="underline">second</span> call. The total running time is T
+= X + Y. (Y and T are also random variables.) What is the expected total running
+time E[T]?
+</p>
+
+<p>
+The main idea from probability we need is called <span class="underline">linearity_of_expectation</span>,
+which says that expected running times sum linearly.
+</p>
+
+<pre class="example">
+E[x()] = E[X + Y]
+E[X + Y] = E[X] + E[Y]
+         = 2 + 2
+         = 4 seconds expected time.
+</pre>
+
+<p>
+The interesting thing is that linearity of expectation holds true whether or not
+X and Y are <span class="underline">independent</span>. Independence means that the first coin flip has no
+effect on the outcome of the second. If X and Y are independent, the code will
+take four seconds on average. But what if they're not? Suppose the second coin
+flip always matches the first&#x2013;we always get two heads, or two tails. Then the
+code still takes four seconds on average. If the second coin flip is always the
+opposite of the first&#x2013;we always get one head and one tail&#x2013; the code still
+takes four seconds on average.
+</p>
+</div>
+</div>
+
+<div id="org5c3fe82" class="outline-4">
+<h4 id="org5c3fe82">when get each api()'s EXPECTATION, we get total program's EXPECTATION</h4>
+<div class="outline-text-4" id="text-org5c3fe82">
+<p>
+<b>So if we determine the expected running time of each individual operation, we</b>
+<b>can determine the expected running time of a whole program by adding up the</b>
+<b>expected costs of all the operations.</b>
+</p>
+</div>
+</div>
+</div>
+<div id="org2e0c6a6" class="outline-3">
+<h3 id="org2e0c6a6">use Randomized analysis in HashTables</h3>
+<div class="outline-text-3" id="text-org2e0c6a6">
+<pre class="example">
+    用在 hashtable，处理的核心估计问题是：
+      处理 collision，当一个 bucket 中存有多个 item 时
+      hashtable 的 api()的 average running time.
+    用到的基本模型是：
+      n 个弹珠（key）放进 N 个袋子（bucket）中，平均起来看（Expectation）
+      会有多少个弹珠出现在袋子 b 中
+</pre>
+
+<blockquote>
+<p>
+when i say a randomly chosen bucket, I do not mean that every time we hash a
+key we roll a dice,no no no Nooooooooo! <span class="underline">you ONLY roll the dice once per key.</span>
+</p>
+
+<p>
+Because for a hash table to work, <span class="underline">the same key has to hash to the same bucket</span>
+<span class="underline">every time</span>.
+</p>
+
+<p>
+So, yes, every key has a randomly chosen bucket, but <span class="underline">one that bucket has
+chosen</span> <span class="underline">it stays that way forever.</span>
+</p>
+</blockquote>
+
+<p>
+The implementations of hash tables we have studied don't use random numbers,
+but we can model the effects of collisions on running time by pretending we
+have a random hash code.
+</p>
+
+<p>
+A <span class="underline">random_hash_code</span> maps each possible key to a number that's chosen randomly.
+This does <span class="underline">not</span> mean we roll dice every time we hash a key.  A hash table can
+only work if a key maps to the same bucket every time.  Each key hashes to a
+randomly chosen bucket in the table, but a key's random hash code never
+changes.
+</p>
+
+<p>
+Unfortunately, it's hard to choose a hash code randomly from all possible hash
+codes, because you need to remember a random number for each key, and that
+would seem to require another hash table.  However, random hash codes are
+a good <span class="underline">model</span> for how a good hash code will perform.  The model isn't perfect,
+and it doesn't apply to bad hash codes, but for a hash code that proves
+effective in experiments, it's a good rough guess.  Moreover, there is a sneaky
+number-theoretical trick called <span class="underline">universal_hashing</span> that generates random hash
+codes.  These random hash codes are chosen from a relatively small set of
+possibilities, yet they perform just as well as if they were chosen from the
+set of all possible hash codes.  (If you're interested, you can read about it
+in the textbook "Algorithms" by Cormen, Leiserson, Rivest, and Stein.)
+</p>
+</div>
+<div id="org7a8c00b" class="outline-4">
+<h4 id="org7a8c00b">assuming using chaining and no duplicate keys</h4>
+<div class="outline-text-4" id="text-org7a8c00b">
+<p>
+Assume our hash table uses chaining and does not allow duplicate keys. If an
+entry is inserted whose key matches an existing entry, the old entry is
+replaced.
+</p>
+</div>
+</div>
+<div id="org7e7c918" class="outline-4">
+<h4 id="org7e7c918">analyze find(), n 个弹珠（keys）放在 N 个袋子（buckets）中</h4>
+<div class="outline-text-4" id="text-org7e7c918">
+<p>
+Suppose we perform the operation find(k), and the key k hashes to a bucket b.
+Bucket b contains at most one entry with key k, so the cost of the search is one
+dollar, plus an additional dollar for every entry stored in bucket b whose key
+is not k. (Recall from last lecture that a <span class="underline">dollar</span> is a unit of time chosen
+large enough to make this statement true.)
+</p>
+
+<p>
+Suppose there are n keys in the table besides k.  Let V1, V2, &#x2026;, Vn be random
+variables such that for each key ki, the variable
+</p>
+
+<pre class="example">
+     / 1,  if key ki hashes to bucket b
+Vi = |
+     \ 0,  else
+</pre>
+
+<p>
+Then the cost of <span class="underline">find(k)</span> is
+</p>
+
+<pre class="example">
+T = 1 + V1 + V2 + ... + Vn.
+</pre>
+
+<p>
+The expected cost of find(k) is (by linearity of expectation)
+</p>
+
+<pre class="example">
+E[T] = 1 + E[V1] + E[V2] + ... + E[Vn].
+</pre>
+
+<p>
+What is E[Vi]?  Since there are N buckets, and the hash code is random, each
+key has a 1/N probability of hashing to bucket b.
+</p>
+
+<pre class="example">
+E[Vi] = 1/N
+
+E[T] = 1 + n/N,
+</pre>
+
+<p>
+到这里，看到一些概率论里的影子了，其实这里就是 n 个 key，往 N 个桶里随即分配的问题。只不过加了一些限制，比如 n 不能超过 N 太多（collision 太多），比如 N 不能超 n 太多（内存空间浪费太多）。对于每一个 key 来说，从 N 个桶中选一个，都是 1/N 的概率。
+</p>
+</div>
+</div>
+
+<div id="org3763e38" class="outline-4">
+<h4 id="org3763e38">Load factor occurs</h4>
+<div class="outline-text-4" id="text-org3763e38">
+<pre class="example">
+E[find()] = 1 + n/N
+          = 1 + LoadFactor
+</pre>
+
+<p>
+which is one plus the load factor! If we keep the load factor n/N below some
+constant c as n grows, find operations cost expected O(1) time.
+</p>
+
+<p>
+The same analysis applies to insert and remove operations.  All three hash
+table operations take O(1) expected amortized time.  (The word "amortized"
+accounts for table resizing, as discussed last lecture.)
+</p>
+
+<p>
+Observe that the running times of hash table operations are <span class="underline">not</span> independent.
+If key k1 and key k2 both hash to the same bucket, it increases the running time
+of both find(k1) and find(k2). Linearity of expectation is important because it
+implies that we can add the expected costs of individual operations, and obtain
+the expected total cost of all the operations an algorithm performs.
+</p>
+</div>
+</div>
+<div id="orgcacceea" class="outline-4">
+<h4 id="orgcacceea">Summarized</h4>
+<div class="outline-text-4" id="text-orgcacceea">
+<ul class="org-ul">
+<li>Hash table ops take O(1) expected  time,if not resized.</li>
+<li>Hahs talbe ops take O(1) amortized time,if resized.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="orgf29e668" class="outline-3">
+<h3 id="orgf29e668">use Randomized analysis in Quicksort</h3>
+<div class="outline-text-3" id="text-orgf29e668">
+<p>
+[TODO]
+</p>
+<pre class="example">
+    用在 hashtable，处理的核心估计问题是：
+      处理 collision，当一个 bucket 中存有多个 item 时
+      hashtable 的 api()的 average running time.
+    用到的基本模型是：
+      n 个弹珠（key）放进 N 个袋子（bucket）中，平均起来看（Expectation）
+      会有多少个弹珠出现在袋子 b 中
+</pre>
+
+<pre class="example">
+                   MergeSort                       QuickSort
+         / +--------------------------+      +----------------------------+
+        |  |                          |      |                            |
+        |  +-------/----------\-------+      +----/--------------\--------+
+        |  +-----------+  +-----------+      +-------+  +-----------------+
+O(logn) &lt;  |           |  |           |      |       |  |                 |
+        |  +-/------\--+  +--/-----\--+      +-/---\-+  +-----/--------\--+
+        |  +----+ +----+  +----+ +----+      +--+ +--+  +----------+ +----+
+        |  |    | |    |  |    | |    |      |  | |  |  |          | |    |
+         \ +----+ +----+  +----+ +----+      +--+ +--+  +---/----\-+ +----+
+                                                        +------+ +-+
+            \------------------------/                  |      | | |    (ref:level deeper, sort less, cost less)
+                        v                               +-/--\-+ +-+
+                       O(n)                             +-+ +--+
+                                                        | | |  |
+                                                        +-+ +--+
+
+</pre>
+
+<ul class="org-ul">
+<li>mergeSort 和 quickSort 看起来一样，其实大相径庭，简直就是相反的：</li>
+<li>mergeSort 重合不重分，合完了排序才算完; 时间主要用在合上; 每一层都需要合并 n 个数值，合并每层都耗时相似 O(n)</li>
+<li>quickSort 重分不重合，分完了排序就完了; 时间主要用在分上; <a href="#coderef-level deeper, sort less, cost less" class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-level deeper, sort less, cost less');" onmouseout="CodeHighlightOff(this, 'coderef-level deeper, sort less, cost less');">越往深层走，这层需要排序(分割)的数列越少，这层的耗时越少</a></li>
+</ul>
+
+<p>
+Recall that mergesort sorts n items in O(n log n) time because the recursion
+tree has <code>1 + ceiling(log_2 n)</code> levels, and each level involves O(n) time spent
+merging lists.
+</p>
+
+<p>
+Quicksort also spends linear time at each level (partitioning the lists), but it
+is trickier to analyze because the recursion tree is not perfectly balanced, and
+<span class="underline">some keys survive to deeper levels than others.</span>
+</p>
+
+<p>
+To analyze quicksort, let's analyze the EXPECTED depth the input key k will
+reach in the tree. (In effect, we're measuring a <span class="underline">vertical slice</span> of the
+recursion tree instead of a horizontal slice.) Assume no two keys are equal,
+since that is the slowest case.
+</p>
+
+
+<p>
+这里的意思是说，我没法向分析 mergeSort 那样按水平切片去分析，取而代之我使用竖直切片去分析 quickSort我去看每一个元素的会存活(未排序定)的深度(时间复杂度随深度降低)的 Expected 值，然后把他们加起来求整体 Expected 值。
+</p>
+
+<p>
+Quicksort chooses a random pivot. The pivot is equally likely to be the smallest
+key, the second smallest, the third smallest, &#x2026;, or the largest. For each
+case, the probability is 1/n. Since we want a roughly balanced partition, let's
+say that the least floor(n/4) keys(排定数列中位置最前的 1/4) and the greatest
+floor(n/4) keys(排定数列中位置最靠后的 1/4) are "bad" pivots, and the other keys
+are "good" pivots. Since there are at most n/2 bad pivots, the probability of
+choosing a bad pivot is &lt;= 0.5.
+</p>
+
+
+<p>
+这个意思是说 pivot 的选择，<a id="org76e4602"></a>，如果选择的 pivot 很好，正好处在排序完成后的中间位置，那么 key k 有可能处在 1/4-3/4其中一个 partition 中，这两个
+partition 的问题空间都比原来的要小不少，good;但是如果选择差的 pivot，而且他正好处在排序完成后的末尾 or 开头位置，那么 key k 有可能处在 0 - 1中的 1 位置，也就是说，整个问题空间完全没改变。这样他更容易 survivor in deep level.耗时也就更多。
+</p>
+
+<p>
+If we choose a good pivot, we'll have a 1/4-3/4 split or better, and our chosen
+key k will go into a subset containing at most three quarters of the keys, which
+is sorted recursively. If we choose a bad pivot, k might go into a subset with
+nearly all the other keys.
+</p>
+
+<p>
+Let D(n) be a random variable equal to the <span class="underline">deepest depth</span> at which key k
+appears when we sort n keys. D(n) varies from run to run, but we can reason
+about its expected value. Since we choose a bad key no more than half the time,
+</p>
+
+<p>
+由于 D(n) 是 deepest depth, <a href="#org76e4602">No description for this link</a> 每一种都选最差的：
+</p>
+
+<ul class="org-ul">
+<li>1/4 - 3/4 选 key k 在 3/4 中;</li>
+<li><p>
+0  -  1  选 key k 在 1 中;
+</p>
+
+<pre class="example">
+E[D(n)] &lt;= 1 + 0.5 E[D(n)] + 0.5 E[D(3n / 4)].
+</pre></li>
+</ul>
+
+<p>
+Multiplying by two and subtracting E[D(n)] from both sides gives
+</p>
+
+<pre class="example">
+E[D(n)] &lt;= 2 + E[D(3n / 4)].
+</pre>
+
+<p>
+This inequality is called a <span class="underline">recurrence</span>, and you'll learn how to solve them in
+CS 170. (No, recurrences won't be on the CS 61B final exam.) The base cases for
+this recurrence are D(0) = 0 and D(1) = 0. It's easy to check by substitution
+that a solution is
+</p>
+
+<pre class="example">
+E[D(n)] &lt;= 2 log    n.
+                4/3
+</pre>
+</div>
+
+<div id="org86c349a" class="outline-4">
+<h4 id="org86c349a">Summarized</h4>
+<div class="outline-text-4" id="text-org86c349a">
+<p>
+So any arbitrary key k appears in expected O(log n) levels of the recursion
+tree, and causes O(log n) partitioning work. By linearity of expectation, we can
+sum the expected O(log n) work for each of the n keys, and we find that
+quicksort runs in expected O(n log n) time.
+</p>
+</div>
+</div>
+</div>
+
+<div id="org4ec53bb" class="outline-3">
+<h3 id="org4ec53bb">use Randomized analysis in Quickselect</h3>
+<div class="outline-text-3" id="text-org4ec53bb">
+<p>
+For quickselect, we can analyze the expected running time more directly.
+Suppose we run quickselect on n keys.  Let P(n) be a random variable equal to
+the total number of keys partitioned, summed over all the partitioning steps.
+Then the running time is in Theta(P(n)).
+</p>
+
+<p>
+Quickselect is like quicksort, but when we choose a good pivot, at least one
+quarter of the keys are discarded.  We choose a good pivot at least half the
+time, so
+</p>
+
+<pre class="example">
+E[P(n)] &lt;= n + 0.5 E[P(n)] + 0.5 E[P(3n / 4)],
+</pre>
+
+<p>
+which is solved by <code>E[P(n)] &lt;= 8n</code>. Therefore, the expected running time of
+quickselect on n keys is in O(n).
+</p>
+</div>
+</div>
+
+<div id="org8b70e45" class="outline-3">
+<h3 id="org8b70e45">Amortized Time vs. Expected Time</h3>
+<div class="outline-text-3" id="text-org8b70e45">
+<p>
+There's a subtle but important difference between amortized running time and
+expected running time.
+</p>
+
+<p>
+Quicksort with random pivots takes O(n log n) expected running time, but its
+worst-case running time is in Theta(n^2).  This means that there is a small
+possibility that quicksort will cost Omega(n^2) dollars, but the probability
+of that happening approaches zero as n approaches infinity.
+</p>
+
+<p>
+A splay tree operation takes O(log n) amortized time, but the worst-case
+running time for a splay tree operation is in Theta(n).  Splay trees are not
+randomized, and the "probability" of an Omega(n)-time splay tree operation is
+not a meaningful concept.  If you take an empty splay tree, insert the items
+1&#x2026;n in order, then run find(1), the find operation <span class="underline">will</span> cost n dollars.
+But a sequence of n splay tree operations, starting from an empty tree, <span class="underline">never</span>
+costs more than O(n log n) actual running time.  Ever.
+</p>
+
+<p>
+Hash tables are an interesting case, because they use both amortization and
+randomization.  Resizing takes Theta(n) time.  With a random hash code, there
+is a tiny probability that every item will hash to the same bucket, so the
+worst-case running time of an operation is Theta(n)&#x2013;even without resizing.
+</p>
+
+<p>
+To account for resizing, we use amortized analysis.  To account for collisions,
+we use randomized analysis.  So when we say that hash table operations run in
+O(1) time, we mean they run in O(1) <span class="underline">expected</span>, <span class="underline">amortized</span> time.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Splay trees</td>
+<td class="org-left">O(log n) amortized time / operation</td>
+<td class="org-left">\({*    }\)</td>
+</tr>
+
+<tr>
+<td class="org-left">Disjoint sets (tree-based)</td>
+<td class="org-left">O(alpha(f + u, u)) amortized time / find op</td>
+<td class="org-left">\({**   }\)</td>
+</tr>
+
+<tr>
+<td class="org-left">Quicksort</td>
+<td class="org-left">O(n log n) expected time</td>
+<td class="org-left">\({***  }\)</td>
+</tr>
+
+<tr>
+<td class="org-left">Quickselect</td>
+<td class="org-left">Theta(n) expected time</td>
+<td class="org-left">\({**** }\)</td>
+</tr>
+
+<tr>
+<td class="org-left">Hash tables</td>
+<td class="org-left">Theta(1) expected amortized time / op</td>
+<td class="org-left">\({*****}\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+If you take CS 170, you will learn an amortized analysis of disjoint sets
+there.  Unfortunately, the analyses of both disjoint sets and splay trees are
+complicated.  Goodrich &amp; Tamassia give the amortized analysis of splay trees,
+but you're not required to read or understand it for this class.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">\(*\)</th>
+<th scope="col" class="org-left">Worst-case time is in Theta(n), worst-case amortized time is in</th>
+</tr>
+
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">Theta(log n), best-case time is in Theta(1).</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">\(**\)</td>
+<td class="org-left">For find operations, worst-case time is in Theta(log u), worst-case</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">amortized time is in Theta(alpha(f + u, u)), best-case time is in</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Theta(1).  All union operations take Theta(1) time.</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">\(***\)</td>
+<td class="org-left">Worst-case time is in Theta(n^2)&#x2013;if we get worst-case input AND</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">worst-case random numbers.  "Worst-case expected" time is in</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Theta(n log n)&#x2013;meaning when the <span class="underline">input</span> is worst-case, but we take the</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">average over all possible sequences of random numbers.  Recall that</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">quicksort can be implemented so that keys equal to the pivot go into a</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">separate list, in which case the best-case time is in Theta(n), because</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">the best-case input is one where all the keys are equal.  If quicksort</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">is implemented so that keys equal to the pivot are divided between lists</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">I1 and I2, as is the norm for array-based quicksort, then the best-case</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">time is in Theta(n log n).</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">\(****\)</td>
+<td class="org-left">Worst-case time is in Theta(n^2)&#x2013;if we get worst-case input AND worst-</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">case random numbers.  Worst-case expected time, best-case time, and</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">best-case expected time are in Theta(n).</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">\(*****\)</td>
+<td class="org-left">Worst-case time is in Theta(n), expected worst-case time is in Theta(n)</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">(worst case is when table is resized), amortized worst-case time is in</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Theta(n) (worst case is when every item is in one bucket), worst-case</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">expected amortized time is in Theta(1), best-case time is in Theta(1).</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Confused yet?</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

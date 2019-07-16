@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:01 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第四十课: JAVA垃圾回收,扩展现有数据结构</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第四十课: JAVA垃圾回收,扩展现有数据结构</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgbb1eda0">lec 40 Generational Garbage Collection</a></li>
+<li><a href="#orgef101a8">AUGMENTING DATA STRUCTURES</a>
+<ul>
+<li><a href="#orgad39d51">2-3-4 Trees with Fast Neighbors</a></li>
+<li><a href="#org99b05f7">Splay Trees with Node Information</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="orgbb1eda0" class="outline-2">
+<h2 id="orgbb1eda0">lec 40 Generational Garbage Collection</h2>
+<div class="outline-text-2" id="text-orgbb1eda0">
+<p>
+Studies of memory allocation have shown that most objects allocated by most
+programs have short lifetimes, while a few go on to survive through many garbage
+collections. This observation has inspired <code>generation</code> al garbage collectors,
+which separate old from new objects.
+</p>
+
+<p>
+A <code>generation</code> al collector has two or more <code>generation</code> s, which are like the
+separate spaces used by copying collectors, except that the <code>generation</code> s can
+be of different sizes, and can change size during a program's lifetime.
+</p>
+
+<p>
+Sun's 1.3 JVM divides objects into an old <code>generation</code> and a young <code>generation</code>
+. Because old objects tend to last longer, the old <code>generation</code> doesn't need to
+be garbage collected nearly as often. Hence, the old <code>generation</code> uses a
+compacting mark-and-sweep collector, because speed is not critical, but memory
+efficiency might be. Because old objects are long-lived, and because mark and
+sweep only uses one memory space, the old <code>generation</code> tends to remain compact.
+</p>
+
+<p>
+The young <code>generation</code> is itself divided into three areas. The largest area is
+called "Eden", and it is the space where all objects are born, and most die.
+Eden is large enough that most objects in it will become garbage long before it
+gets full. When Eden fills up, it is garbage collected and the surviving objects
+are copied into one of two <span class="underline">survivor_spaces</span>. The survivor spaces are just the
+two spaces of a copying garbage collector.
+</p>
+
+<p>
+If an unexpectedly large number of objects survive Eden, the survivor spaces can
+expand if necessary to make room for additional objects.
+</p>
+
+<p>
+Objects move back and forth between the two survivor spaces until they age
+enough to be <span class="underline">tenured</span> - moved to the old <code>generation</code> . Young objects benefit
+from the speed of the copying collector while they're still wild and prone to
+die young.
+</p>
+
+<p>
+Thus, the Sun JVM takes advantage of the best features of both the
+mark-and-sweep and copying garbage collection methods.
+</p>
+
+<p>
+There are two types of garbage collection:  minor collections, which happen
+frequently but only affect the young  <code>generation</code>  - thereby saving lots of time -
+and major collections, which happen much less often but cover all the objects
+in memory.
+</p>
+
+<p>
+This introduces a problem.  Suppose a young object is live only because an old
+object references it.  How does the minor collection find this out, if it
+doesn't search the old  <code>generation</code> ?
+</p>
+
+<p>
+References from old objects to young objects tend to be rare, because old
+objects are set in their ways and don't change much. Since references from old
+objects to young are so rare, the JVM kePure Execution Here you will learn how
+to choose the right activities to focus on, and then how to execute themeps a
+special table of them, which it updates whenever such a reference is created.
+The table of references is added to the roots of the young <code>generation</code> 's
+copying collector.
+</p>
+
+<pre class="example">
+-------------------------------------------------------------------------
+|                                                                       |
+| old generation                                                        |
+|                                                                       |
+|                                                                       |
+-------------------------------------------------------------------------
+|                                                                       |
+| young generation                                                      |
+|                                                                       |
+|  -------------------------------------------------------------------  |
+|  | survivor space                                                  |  |
+|  |                                                                 |  |
+|  -------------------------------------------------------------------  |
+|  | survivor space                                                  |  |
+|  |                                                                 |  |
+|  -------------------------------------------------------------------  |
+|                                 _____                   ____          |
+|      /----\               /----/     \/\/\         /---/    \____     |
+|    _/      \     -\      /                \___--__/              \    |
+|   /         \___/  \__--/                                         |   |
+|  |                                                               /    |
+|  |                             Eden                              \    |
+|   \                                                               |   |
+|    \                                    _                ^       /    |
+|     -\   /\_    _/--\     /\     /\    / \--\    /--\   / \__   /     |
+|       --/   \__/     \___/  \/\_/  \__/      \/\/    --/     \_/      |
+-------------------------------------------------------------------------
+
+</pre>
+
+<p>
+
+</p>
+</div>
+</div>
+<div id="orgef101a8" class="outline-2">
+<h2 id="orgef101a8">AUGMENTING DATA STRUCTURES</h2>
+<div class="outline-text-2" id="text-orgef101a8">
+<p>
+Once you know how to design one of the data structures taught in this class,
+it's sometimes easy to augment it to have "extra" abilities.
+</p>
+
+<p>
+You've already augmented data structures in Project 3.  For example, the set E
+of edges is stored as both a hash table and an adjacency list.  The hash table
+allows you to test set membership in O(1) time, unlike the adjacency list.  The
+adjacency list tells you the edges adjoining a vertex in O(degree) time, unlike
+the hash table.
+</p>
+</div>
+
+<div id="orgad39d51" class="outline-3">
+<h3 id="orgad39d51">2-3-4 Trees with Fast Neighbors</h3>
+<div class="outline-text-3" id="text-orgad39d51">
+<p>
+Suppose you have a 2-3-4 tree with no duplicate keys.  Given a key k, you want
+to be able to determine whether k is in the tree, and what the next smaller and
+larger keys are, in O(1) time.  You are allowed to change the insert() and
+remove() operations, but they still must take O(log n) time.  Can you do it?
+</p>
+
+<p>
+It's easy if you combine the 2-3-4 tree with a hash table.  The hash table maps
+each key to a record that stores the next smaller and next larger keys in the
+tree.
+</p>
+
+<pre class="example">
+      ----------------      ---------------
+      |              |      | ----- ----- |
+      |  Hash table  |      | | 4 | | 9 | |
+5 ----+\/\/\/\/\/\/\/+-----&gt;| ----- ----- |
+      ----------------      | prev   next |
+                            ---------------
+</pre>
+
+<p>
+The trick is that when you insert a key into the tree, you can determine by
+tree search in <code>O(log n)</code> time what the next smaller and larger keys are.  Then,
+you update all three keys' records in the hash table in <code>O(1)</code> time.
+</p>
+
+<p>
+When you remove a key from the tree, you can learn its two neighboring keys
+from the hash table, then update the neighbor records for those two keys so
+they list each other instead of the removed key.  You also remove the key's
+record from the hash table.  The hash table updates take <code>O(1)</code> time, and it
+takes <code>O(log n)</code> time to remove the key from the 2-3-4 tree itself.
+
+</p>
+</div>
+</div>
+<div id="org99b05f7" class="outline-3">
+<h3 id="org99b05f7">Splay Trees with Node Information</h3>
+<div class="outline-text-3" id="text-org99b05f7">
+<p>
+Sometimes it's useful for a binary search tree to record extra information in
+each node, like the size and height of each subtree at each node.
+</p>
+
+<p>
+In splay trees, this is easy to maintain.  Splaying is just a sequence of tree
+rotations.  Each rotation changes the sizes of only two subtrees, and we can
+easily compute their new sizes after the rotation.  Let size(Y) be the number
+of nodes in the subtree rooted at node Y.  After a right rotation (for
+instance) you can recompute the information as follows:
+</p>
+
+<pre class="example">
+size(Y) = 1 + size(B) + size(C)                  Y                       X
+size(X) = 1 + size(A) + size(Y)                 / \                     / \
+                                               X   ^                   ^   Y
+height(Y) = 1 + max{height(B), height(C)}     / \ /C\                 /A\ / \
+height(X) = 1 + max{height(A), height(Y)}    ^  ^      ------------&gt;      ^  ^
+(Note:  to make this work, we must say      /A\/B\      rotate right     /B\/C\
+that the height of an empty tree is -1.)
+</pre>
+
+<p>
+Be forwarned that a rotation does not just change the heights of X and Y&#x2013;it
+also can change the heights of all their ancestors.  But X gets splayed all the
+way to the root, so all the ancestors' heights get fixed on the way up.
+</p>
+
+<p>
+Likewise, inserting or removing an item changes the subtree sizes of all the
+ancestors of the affected item, and possibly their heights as well.  But a
+newly inserted item gets splayed to the top; and a removed node's parent is
+splayed to the top.  So again, all the sizes and heights will get fixed during
+the rotations.  Let's watch the size fields as we insert a new node X into a
+splay tree.  (The following numbers are sizes, <span class="underline">not</span> keys.)
+</p>
+
+<pre class="example">
+1. 先看
+   1. 首先记录自己是父亲的左 or 右孩子，eg l
+   2. 再看父亲是祖父的左 or 右孩子,    eg r
+2. 看完，按照 l r 找对应操作： 对应 zag zig, 对应 右转 左传
+3. 开始转
+   1. 先从以自己的父亲为跟节点的子树开始转，按照 zag zig 顺序，这里是 zag 右转;
+   2. 再按照自己的祖父为根节点的子树开始转，按照 zag zig 顺序，这里是 zig 左转;
+4. 自己来到新的位置,有了新的父亲和祖父，从 1 开始重复
+</pre>
+
+<p>
+Note that the very first rotation is at the grandparent of node X (zig-zig).
+</p>
+
+<pre class="example">
+    10              10              10                   10             [11]
+   /  \            /  \            /  \                 /  \            / \
+  8    1          8    1          8    1              [9]   1          6   4
+ / \             / \             / \                  / \             /\   /\
+1   6           1   6           1   6                6   2           1  4 2  1
+   / \             / \             / \              / \   \            /   \
+  4   1 =zig=&gt;    5   1 =zig=&gt;   [5]  1 =zig-zag=&gt; 1  4    1 =zig=&gt;   3     1
+ / \             / \             /                   /               / \
+1   2           3  [1]          4                   3               1   1
+   / \         / \             /                   / \
+  1  [X]      1   1           3                   1   1
+                             / \
+                            1   1
+</pre>
+
+<pre class="example">
+How can we use this information?  We can answer the query "How       3  find(4)
+many keys are there between x and y?" in O(log n) amortized         / \
+time if the splay tree has no duplicate keys and we label every    2   5
+subtree with its size.  Our strategy is to set c = n, then        /     \
+deduct from c the number of keys outside the range [x, y].       1       8
+                                                                        / \
+  find(x);  // After the splaying, the keys in the root's left         6   9
+  // subtree are all less than x, so subtract their number from c.
+  c = c - size(root's left subtree);                                 6  find(7)
+  if (root key &lt; x)  // Only possible if x is not in the tree--     / \
+    c--;             // otherwise x was splayed to the root.       3   8
+                                                                  / \   \
+  find(y);  // After the splaying, the keys in the root's        2   5   9
+            // right subtree all exceed y.                      /
+  c = c - size(root's right subtree);                          1
+  if (root key &gt; y) c--;
+                                                             Keys in [4, 7] =
+Now, c is the number of keys in [x, y].                      7 - 2 - 1 - 2 = 2.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

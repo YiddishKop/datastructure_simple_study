@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:25 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十七课: Amortized Analysis</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十七课: Amortized Analysis</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orge244177">1. AMORTIZED ANALYSIS in hash table api</a>
+<ul>
+<li><a href="#org930e176">1.1. The Averaging Method</a>
+<ul>
+<li><a href="#orgec4af6b">1.1.1. Disadvantage of average method</a></li>
+</ul>
+</li>
+<li><a href="#orgd1fb9f2">1.2. The Accounting Method</a></li>
+<li><a href="#org0ee03e5">1.3. Accounting of Hash Tables</a>
+<ul>
+<li><a href="#org41bcc41">1.3.1. Identify when amortize and actual difference</a></li>
+<li><a href="#orgd322de1">1.3.2. By trial and error, we give a guess about cost of api</a></li>
+<li><a href="#orgede4da5">1.3.3. Varify whether our guess is right or wrong</a></li>
+<li><a href="#org0d172af">1.3.4. how to analyse the dollars in bank by insert()</a></li>
+<li><a href="#org64c9b07">1.3.5. advantage by using formula n and N</a></li>
+<li><a href="#org20d7f04">1.3.6. the same with delete()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org09b6206">2. Why Does Amortized Analysis Work?</a></li>
+</ul>
+</div>
+</div>
+<ul class="org-ul">
+<li>Randomized analysis， 要求的是广度;</li>
+<li>Amortized  analysis， 要求的是深度;</li>
+</ul>
+
+<p>
+广度的意思是说，我希望样本的分布更均匀，像 quicksort(pivot)，hashtable(hashcode)，有依赖随机的属性。这个属性会影响算法结果。深度的意思是说，我的结果依赖于我之前执行的次数，执行的越多越好，有点像循环进化的意思，比如 disjoint set(path
+compression), splaytree
+</p>
+<div id="orge244177" class="outline-2">
+<h2 id="orge244177"><span class="section-number-2">1</span> AMORTIZED ANALYSIS in hash table api</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+首先必须明确，Amortized analysis 给我们的是一个算法的 upper-bound(big O) running time.
+</p>
+
+<p>
+We've seen several data structures for which I claimed that the average time
+for certain operations is always better than the worst-case time:  hash tables,
+tree-based disjoint sets, and splay trees.
+</p>
+
+<p>
+The mathematics that proves these claims is called <span class="underline">amortized_analysis</span>.
+Amortized analysis is a way of proving that even if an operation is
+occasionally expensive, its cost is made up for by earlier, cheaper operations.
+</p>
+
+<p>
+there are two different ways in which an alogrithm can be better than its worst case time:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Amortized analysis</th>
+<th scope="col" class="org-left">Randomized  analysis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">occasional operation that's very slow</td>
+<td class="org-left">uses randomization to make itself faster</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">hash table, disjoint sets, splay tree</td>
+<td class="org-left">hash table, quickSort, quickSelect</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">one is occasional operation that's very slow</td>
+<td class="org-left">uses randomization to make itself faster</td>
+</tr>
+
+<tr>
+<td class="org-left">but most of the operations are much faster when</td>
+<td class="org-left">depend on the probilistic distribution</td>
+</tr>
+
+<tr>
+<td class="org-left">you do a bunch of operations</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="org930e176" class="outline-3">
+<h3 id="org930e176"><span class="section-number-3">1.1</span> The Averaging Method</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Most hash table operations take O(1) time, but sometimes an operation forces a
+hash table to resize itself, at great expense.
+</p>
+
+<pre class="example">
+What is the average time to insert an item into a hash table with resizing?
+
+</pre>
+
+<p>
+Assume that the chains never grow longer than O(1), so any operation that
+doesn't resize the table takes O(1) time&#x2013;more precisely, suppose it takes at
+most one second.
+</p>
+
+<p>
+Let n be the number of items in the hash table, and N the number of buckets.
+Suppose it takes one second for the insert operation to insert the new item,
+increment n, and then check if n = N. If so, it doubles the size of the table
+from N to 2N, taking 2N additional seconds. This resizing scheme ensures that
+the load factor n/N is always less than one.
+</p>
+
+<p>
+虽然我们是想考察‘由于插入引起 hashtable 扩容数组’所引起的时间消耗，但我们不是直接分析这步操作，我们要分析 average running time, 所以我们从一个‘空’的数据结构开始，这也是所有 Amortized
+analysis 的前提，假设一切从头开始从‘空’开始一步步生成 hashtable。
+</p>
+
+<p>
+Suppose every newly constructed hash table is empty and has just one bucket&#x2013;
+that is, initially n = 0 and N = 1.  After i insert operations, n = i.  The
+number of buckets N must be a power of two, and we never allow it to be less
+than or equal to n; so N is the smallest power of two &gt; n, which is &lt;= 2n.
+这里好像是假设，数组扩容一个单位耗费 1 妙，往数组中写入一个值也耗费 1 妙。
+</p>
+
+<p>
+The total time in seconds for <span class="underline">all</span> the table resizing operations is
+</p>
+
+<pre class="example">
+2 + 4 + 8 + ... + N/4 + N/2 + N = 2N - 2.
+</pre>
+
+<p>
+So the cost of i insert operations is at most <code>i + 2N - 2</code> seconds. Because <code>N
+&lt;= 2n = 2i</code>, the i insert operations take <code>&lt;= 5i - 2</code> seconds. Therefore, the
+<span class="underline">average</span> running time of an insertion operation is
+</p>
+
+<pre class="example">
+(5i - 2)/i = 5 - 2/i
+    O(i)/i = O(1)
+</pre>
+
+<p>
+seconds, which is in O(1) time.
+</p>
+
+<pre class="example">
+We say that the _amortized_running_time_ of insertion is in O(1), even though the worst-case running time is in Theta(n).
+
+</pre>
+
+<p>
+For almost any application, the amortized running time is more important than
+the worst-case running time, because the amortized running time determines the
+total running time of the application.  The main exceptions are some
+applications that require fast interaction (like video games), for which one
+really slow operation might cause a noticeable glitch in response time.
+</p>
+</div>
+<div id="orgec4af6b" class="outline-4">
+<h4 id="orgec4af6b"><span class="section-number-4">1.1.1</span> Disadvantage of average method</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+虽然 average method 很方便的衡量了 insert()操作的平均时间，但 average method 没法处理和估计 delete() 的时间，因为你通过 insert()增加元素，通过 delete()减少元素，两者可以有无数种组合，没法把他们都加起来然后平均。
+</p>
+</div>
+</div>
+</div>
+<div id="orgd1fb9f2" class="outline-3">
+<h3 id="orgd1fb9f2"><span class="section-number-3">1.2</span> The Accounting Method</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Consider hash tables that resize in both directions:  not only do they expand
+as the number of items increases, but they also shrink as the number of items
+decreases.  You can't analyze them with the averaging method, because you don't
+know what sequence of insert and remove operations an application might
+perform.
+</p>
+
+<p>
+Let's try a more sophisticated method.  In the <span class="underline">accounting_method</span>, we "charge"
+each operation a certain amount of time.  Usually we overcharge.  When we
+charge more time than the operation actually takes, we can save the excess time
+in a bank to spend on later operations.
+</p>
+
+<p>
+Before we start, let's stop using seconds as our unit of running time.  We
+don't actually know how many seconds any computation takes, because it varies
+from computer to computer.  However, everything a computer does can be broken
+down into a sequence of constant-time computations.  Let a <span class="underline">dollar</span> be a unit
+of time that's long enough to execute the slowest constant-time computation
+that comes up in the algorithm we're analyzing.  A dollar is a real unit of
+time, but it's different for different computers.
+</p>
+
+<p>
+Each hash table operation has
+</p>
+<ul class="org-ul">
+<li>an <span class="underline">amortized_cost</span>, which is the number of dollars that we "charge" to do
+that operation, and</li>
+<li><p>
+an <span class="underline">actual_cost</span>, which is the actual number of constant-time computations
+the operation performs.
+</p>
+
+<pre class="example">
+if amortized cost &gt; actual cost,
+   比如 amortize 估计每几步操作就会产生 resize hashtable，
+   但实际上，代码中并不考虑快满了就 resize hashtable 的情况。
+   extra dollars saved in an imaginary bank to be spend in later operations
+
+if actual cost &gt; amortized cost,
+   比如 amortize 估计没几步操作就会产生 resize hashtable,
+   但实际上，代码中每进行一次操作，都会 resize hashtable。
+   that means you have to withdraw money from the bank to pay for you overcharge
+</pre></li>
+</ul>
+
+
+<p>
+The amortized cost is usually a fixed function of n (e.g. $5 for insertion into
+a hash table, or $2 log n for insertion into a splay tree), but the actual cost
+may vary wildly from operation to operation.  For example, insertion into a
+hash table takes a long, long time when the table is resized.
+</p>
+
+<p>
+When an operation's amortized cost exceeds its actual cost, the extra dollars
+are saved in the bank to be spent on later operations.  When an operation's
+actual cost exceeds its amortized cost, dollars are withdrawn from the bank to
+pay for an unusually expensive operation.
+</p>
+
+<p>
+If the bank balance goes into surplus, it means that the actual total running
+time is even faster than the total amortized costs imply.
+</p>
+
+<p>
+THE BANK BALANCE MUST NEVER FALL BELOW ZERO.  If it does, you are spending more
+total dollars than your budget claims, and you have failed to prove anything
+about the amortized running time of the algorithm.
+</p>
+
+<p>
+Think of amortized costs as an allowance.  If your dad gives you $500 a month
+allowance, and you only spend $100 of it each month, you can save up the
+difference and eventually buy a car.  The car may cost $30,000, but if you
+saved that money and don't go into debt, your <span class="underline">average</span> spending obviously
+wasn't more than $500 a month.
+
+</p>
+</div>
+</div>
+<div id="org0ee03e5" class="outline-3">
+<h3 id="org0ee03e5"><span class="section-number-3">1.3</span> Accounting of Hash Tables</h3>
+<div class="outline-text-3" id="text-1-3">
+</div>
+<div id="org41bcc41" class="outline-4">
+<h4 id="org41bcc41"><span class="section-number-4">1.3.1</span> Identify when amortize and actual difference</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+Suppose every operation (insert, find, remove) takes one dollar of actual
+running time unless the hash table is resized.  We resize the table in two
+circumstances.
+</p>
+<ul class="org-ul">
+<li>An insert operation doubles the table size if n = N AFTER the new item is
+inserted and n is incremented, taking 2N additional dollars of time for
+resizing to 2N buckets. Thus, the load factor is always less than one.</li>
+<li>The remove operation halves the table size if n = N/4 AFTER the item is
+deleted and n is decremented, taking N additional dollars of time for
+resizing to N/2 buckets.  Thus, the load factor is always greater than 0.25
+(except when n = 0, i.e. the table is empty).</li>
+</ul>
+
+<p>
+Either way, a hash table that has <span class="underline">just</span> been resized has n = N/2.
+A newly constructed hash table has n = 0 items and N = 1 buckets.
+</p>
+</div>
+</div>
+<div id="orgd322de1" class="outline-4">
+<h4 id="orgd322de1"><span class="section-number-4">1.3.2</span> By trial and error, we give a guess about cost of api</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+By trial and error, I came up with the following amortized costs.
+</p>
+
+<pre class="example">
+insert:  5 dollars
+remove:  5 dollars
+find:    1 dollar
+为什么 find cost 很少，因为他永远不会 resize hashtable
+</pre>
+</div>
+</div>
+<div id="orgede4da5" class="outline-4">
+<h4 id="orgede4da5"><span class="section-number-4">1.3.3</span> Varify whether our guess is right or wrong</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+<b>value of n and N when start accouting</b>
+</p>
+
+<pre class="example">
+    下面的事情就是来验证，我们对 api()消耗所做出的猜测是否正确
+    假设 n 和 N 是当 hashtable 为空或者刚刚 resize 后的值
+             这里的假设就和 average method 不一样，average method 是假设一切从零开始，hashtable
+             一开始也是空的，慢慢插入;
+             accounting method 假设是 empty or just resized，空或者刚刚被 resize 过。
+
+    这样假设之后，n 在每一次开始时（empty or just resized）
+    都处在[N/2 - 1, N/2 + 1]之间, 注意这里的 N 是经过 resize 之后的 hashtable 大小。
+             比如，一开始 N = 8, n = 8
+             insert(), ==&gt; N = 8*2 = 16, n = 8 + 1 = 9
+                       ==&gt; n = 16/2 + 1 = _N/2 + 1_;
+             比如，一开始 N = 8, n = 2
+             delete(), ==&gt; N = 8/2 =4,   n = 2 - 1 = 1
+                       ==&gt; n = 4/2 -1   = _N/2 - 1_;
+</pre>
+
+<p>
+<b>our target</b>
+</p>
+
+<p>
+最重要的是通过这个公式，我们不用知道之前操作的时间消耗(<a href="#orgec4af6b">combination of
+series of operations</a>)，我们可以直接通过现在的 n 和 N 估算出目前银行里存有多少 dollars。只要我们可以估算出，in a long term, 银行里的前不会小于 0（实际时间消耗 &lt; 估算时间消耗）,即可。
+</p>
+</div>
+</div>
+
+<div id="org0d172af" class="outline-4">
+<h4 id="org0d172af"><span class="section-number-4">1.3.4</span> how to analyse the dollars in bank by insert()</h4>
+<div class="outline-text-4" id="text-1-3-4">
+<p>
+We charge an amortized $5 for an insert or remove operation.  Every insert or
+remove operation costs one actual dollar (not counting resizing) and puts the
+remaining $4 in the bank to pay for resizing.  For every step n takes away from
+N/2, we accumulate another $4.
+</p>
+
+<p>
+So, when encount a 'resize', there must be at least 4*|n - N/2| dollars
+saved (or 4n dollars for a never-resized one-bucket hash table).
+</p>
+
+<p>
+An insert operation only resizes the table if the number of items n reaches
+N. According to the formula 4|n - N/2|, there are at least 2N dollars in
+the bank.
+</p>
+
+<p>
+Resizing the hash table from N to 2N buckets costs 2N dollars, so we can
+afford it.
+</p>
+
+<p>
+After we resize, the bank balance might be zero again, but it isn't negative.
+</p>
+
+<p>
+比如，一开始 N = 9, n = 16
+</p>
+<pre class="example">
+|------------------------------+-------------------+-----+----|----\
+| insert(), ==&gt; n = 10, N = 16 | actual_cost = 1$  |     |    |    |
+|                              | amortized   = 5$  |   4 |  4 |    |
+|------------------------------+-------------------+-----+----|    |
+| insert(), ==&gt; n = 11, N = 16 | actual_cost = 1$  |     |    |    |
+|                              | amortized   = 5$  |   4 |  8 |    |
+|------------------------------+-------------------+-----+----|    |
+| insert(), ==&gt; n = 12, N = 16 | actual_cost = 1$  |     |    |    |
+|                              | amortized   = 5$  |   4 | 12 |    |&gt; &lt;&lt;store dollars&gt;&gt;   |
+|------------------------------+-------------------+-----+----|    |                      |
+| insert(), ==&gt; n = 13, N = 16 | actual_cost = 1$  |     |    |    |                      |
+|                              | amortized   = 5$  |   4 | 16 |    |                      |
+|------------------------------+-------------------+-----+----|    |                      |
+| insert(), ==&gt; n = 14, N = 16 | actual_cost = 1$  |     |    |    |                      |
+|                              | amortized   = 5$  |   4 | 20 |    |                      |&gt; 一轮一轮的看,整体 dollars 总是&gt;0
+|------------------------------+-------------------+-----+----|    |                      |
+| insert(), ==&gt; n = 15, N = 16 | actual_cost = 1$  |     |    |    |                      |
+|                              | amortized   = 5$  |   4 | 24 |    |                      |
+|------------------------------+-------------------+-----+----|    |                      |
+| insert(), ==&gt; n = 16, N = 16 | actual_cost = 1$  |     |    |    |                      |
+|                              | amortized   = 5$  |   4 | 28 |----/                      |
+|------------------------------+-------------------+-----+----|                           |
+| insert(), ==&gt; n = 17, N = 32 | actual_cost = 32$ | -27 |  1 |----&gt; &lt;&lt;withdraw dollars&gt;&gt; |
+|                              | amortized   = 5$  |     |    |
+</pre>
+
+
+<pre class="example">
+4|n - N/2| 这里的 n 是指在 N/2+1 ~ N 之间游走时，会一直[[store dollars]]。
+当 n = N+1 的时候开始 [[withdraw dollars]]
+
+
+当 n = N+1, 会导致 N--&gt;2N, 这里重新分配一个 2N 大小的数组，消耗 2N dollars 时间。
+但我总体来看，一轮一轮的看，银行里的 dollars 不会小于 0,所以 amortized 估计总是大于 actual
+所以：
+       insert:  5 dollars
+       remove:  5 dollars
+       find:    1 dollar
+是合理的。
+</pre>
+</div>
+</div>
+<div id="org64c9b07" class="outline-4">
+<h4 id="org64c9b07"><span class="section-number-4">1.3.5</span> advantage by using formula n and N</h4>
+<div class="outline-text-4" id="text-1-3-5">
+<p>
+IMPORTANT:  Note that 4|n - N/2| is a function of the data structure, and does
+NOT depend on the history of hash table operations performed.
+</p>
+
+<p>
+The crucial insight is that at any time, we can look at a hash table and know a
+lower bound for how many dollars are in the bank from the values of n and N.
+</p>
+
+<p>
+In general, the accounting method only works if you can tell how much
+money is in the bank (or, more commonly, a minimum bound on that bank
+balance) just by looking at the current state of the data
+structure&#x2013;without knowing how the data structure reached that state.
+</p>
+
+<p>
+We know that the last time the hash table was resized, the number of items n
+was exactly N/2.  So if n != N/2, there have been subsequent insert/remove
+operations, and these have put money in the bank.
+</p>
+</div>
+</div>
+
+<div id="org20d7f04" class="outline-4">
+<h4 id="org20d7f04"><span class="section-number-4">1.3.6</span> the same with delete()</h4>
+<div class="outline-text-4" id="text-1-3-6">
+<p>
+A remove operation only resizes the table if the number of items n drops to
+N/4.  According to the formula 4|n - N/2|, there are at least N dollars in the
+bank.  Resizing the hash table from N to N/2 buckets costs N dollars, so we can
+afford it.
+</p>
+
+<p>
+The bank balance never drops below zero, so my amortized costs above are valid.
+Therefore, the amortized cost of all three operations is in O(1).
+</p>
+
+<p>
+      Observe that if we alternate between inserting and deleting the same item over
+      and over, the hash table is never resized, so we save up a lot of money in the
+      bank.  This isn't a problem; it just means the algorithm is faster (spends
+      fewer dollars) than my amortized costs indicate.
+
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="org09b6206" class="outline-2">
+<h2 id="org09b6206"><span class="section-number-2">2</span> Why Does Amortized Analysis Work?</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Why does this metaphor about putting money in the bank tell us anything about
+the actual running time of an algorithm?
+</p>
+
+<p>
+Suppose our accountant keeps a ledger with two columns:  the total amortized
+cost of all operations so far, and the total actual cost of all operations so
+far.  Our bank balance is the sum of all the amortized costs in the left
+column, minus the sum of all the actual costs in the right column.  If the bank
+balance never drops below zero, the total actual cost is less than or equal to
+the total amortized cost.
+</p>
+
+<pre class="example">
+Total amortized cost  |  Total actual cost
+------------------------------------------
+         $5           |          $1
+         $1           |          $1
+         $5           |          $3
+          .           |           .
+          .           |           .
+          .           |           .
+         $5           |          $1
+         $5           |      $2,049
+         $1           |          $1
+------------------------------------------
+    $12,327           &gt;=    $10,333
+</pre>
+
+<p>
+Therefore, the total running time of all the actual operations is never longer
+than the total amortized cost of all the operations.
+</p>
+
+<p>
+Amortized analysis (as presented here) only tells us an <span class="underline">upper bound (big-Oh)</span>
+on the actual running time, and not a lower bound (big-Omega) . It might happen
+that we accumulate a big bank balance and never spend it, and the total actual
+running time might be much less than the amortized cost.
+</p>
+
+<p>
+For example, splay tree operations take amortized O(log n) time, where n is the
+number of items in the tree, but if your only operation is to find the same
+item n times in a row, the actual average running time is in O(1).
+</p>
+
+<p>
+If you want to see the amortized analysis of splay trees, Goodrich and Tamassia
+have it. If you take CS 170, you'll see an amortized analysis of disjoint sets.
+I am saddened to report that both analyses are too complicated to provide much
+intuition about their running times. (Especially the inverse Ackermann
+function, which is ridiculously nonintuitive, though cool nonetheless.)
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

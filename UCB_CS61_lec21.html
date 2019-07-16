@@ -1,0 +1,836 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 23:27 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十一课 Dictionaries &amp; HashTable</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十一课 Dictionaries &amp; HashTable</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org4f161cd">1. DICTIONARIES</a></li>
+<li><a href="#orga97ee5a">2. Hash Tables (the most common implementation of dictionaries)</a>
+<ul>
+<li><a href="#orga7ce9a3">2.1. what is a hash table?</a></li>
+<li><a href="#org0718c29">2.2. from Dictionaries to hashtable</a></li>
+<li><a href="#org9298ed2">2.3. hash table: java</a></li>
+</ul>
+</li>
+<li><a href="#org82cc3ec">3. Hash Codes and Compression Functions</a>
+<ul>
+<li><a href="#org21edcef">3.1. hashcode: lec-note</a></li>
+<li><a href="#orgacd9eb9">3.2. Performance of Hash Table:</a></li>
+<li><a href="#org2b54082">3.3. Troublesome 1: Compression fn</a></li>
+<li><a href="#org8eee088">3.4. Troublesome 2: H</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="org4f161cd" class="outline-2">
+<h2 id="org4f161cd"><span class="section-number-2">1</span> DICTIONARIES</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Suppose you have a set of two-letter words and their definitions. You want to be
+able to look up the definition of any word, very quickly. The two-letter word is
+the <span class="underline">key</span> that addresses the definition.
+</p>
+
+<p>
+Since there are 26 English letters, there are 26 * 26 = 676 possible two-letter
+words. To implement a dictionary, we declare an array of 676 references, all
+initially set to null. To insert a Definition into the dictionary, we define a
+function hashCode() that maps each two-letter word (key) to a unique integer
+between 0 and 675. We use this integer as an index into the array, and make the
+corresponding bucket (array position) point to the Definition object.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Word</span> {
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">LETTERS</span> = <span style="color: #a45bad;">26</span>, <span style="color: #7590db;">WORDS</span> = LETTERS * LETTERS;
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">word</span>;
+
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">hashCode</span>() {                  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Map a two-letter Word to 0...675.</span>
+    <span style="color: #4f97d7; font-weight: bold;">return</span> LETTERS * (word.charAt(<span style="color: #a45bad;">0</span>) - <span style="color: #2d9574;">'a'</span>) + (word.charAt(<span style="color: #a45bad;">1</span>) - <span style="color: #2d9574;">'a'</span>);
+  }
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">WordDictionary</span> {
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">Definition</span>[] <span style="color: #7590db;">defTable</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Definition</span>[<span style="color: #a45bad;">Word</span>.WORDS];
+
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">insert</span>(<span style="color: #ce537a; font-weight: bold;">Word</span> <span style="color: #7590db;">w</span>, <span style="color: #ce537a; font-weight: bold;">Definition</span> <span style="color: #7590db;">d</span>) {
+    defTable[w.hashCode()] = d;               <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Insert (w, d) into Dictionary.</span>
+  }
+
+  <span style="color: #ce537a; font-weight: bold;">Definition</span> <span style="color: #bc6ec5; font-weight: bold;">find</span>(<span style="color: #ce537a; font-weight: bold;">Word</span> <span style="color: #7590db;">w</span>) {
+    <span style="color: #4f97d7; font-weight: bold;">return</span> defTable[w.hashCode()];               <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Return the Definition of w.</span>
+  }
+}
+
+</pre>
+</div>
+
+<p>
+What if we want to store every English word, not just the two-letter words?
+The table "defTable" must be long enough to accommodate
+pneumonoultramicroscopicsilicovolcanoconiosis, 45 letters long.  Unfortunately,
+declaring an array of length 26^45 is out of the question.  English has fewer
+than one million words, so we should be able to do better.
+</p>
+</div>
+</div>
+
+<div id="orga97ee5a" class="outline-2">
+<h2 id="orga97ee5a"><span class="section-number-2">2</span> Hash Tables (the most common implementation of dictionaries)</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Suppose n is the number of keys (words) whose definitions we want to store, and
+suppose we use a table of N buckets, where N is perhaps a bit larger than n, but
+much smaller than the number of <span class="underline">possible</span> keys. A hash table maps a huge set of
+possible keys into N buckets by applying a <span class="underline">compression_function</span> to each hash
+code. The obvious compression function is
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">h(<span style="color: #ce537a; font-weight: bold;">hashCode</span>) = hashCode mod N.
+</pre>
+</div>
+
+<p>
+Hash codes are often negative, so remember that mod is not the same as Java's
+remainder operator "%".  If you compute hashCode % N, check if the result is
+negative, and add N if it is.
+</p>
+
+<p>
+With this compression function, no matter how long and variegated the keys are,
+we can map them into a table whose size is not much greater than the actual
+number of entries we want to store.  However, we've created a new problem:
+several keys are hashed to the same bucket in the table if h(hashCode1) =
+h(hashCode2).  This circumstance is called a <span class="underline">collision</span>.
+</p>
+
+<p>
+How do we handle collisions without losing entries?  We use a simple idea
+called <span class="underline">chaining</span>.  Instead of having each bucket in the table reference one
+entry, we have it reference a linked list of entries, called a <span class="underline">chain</span>.  If
+several keys are mapped to the same bucket, their definitions all reside in
+that bucket's linked list.
+</p>
+
+<p>
+Chaining creates a second problem:  how do we know which definition corresponds
+to which word?  The answer is that we must store each key in the table with its
+definition.  The easiest way to do this is to have each listnode store an
+<span class="underline">entry</span> that has references to both a key (the word) and an associated value
+(its definition).
+</p>
+
+<pre class="example">
+         ---   ----------------------------------------------------------
+defTable |.+--&gt;|   .   |   .   |   X   |   .   |   X   |   .   |   .   | ...
+         ---   ----|-------|---------------|---------------|-------|-----
+                   v       v               v               v       v
+                  ---     ---             ---             ---     ---
+                  |.+&gt;pus |.+&gt;evil        |.+&gt;okthxbye    |.+&gt;cool|.+&gt;mud
+                  |.+&gt;goo |.+&gt;C++         |.+&gt;creep       |.+&gt;jrs |.+&gt;wet dirt
+                  |.|     |X|             |X|             |.|     |X|
+                  -+-     ---             ---             -+-     ---
+                   |                                       |
+                   v                                       v
+                  ---                      ^              ---
+                  |.+&gt;sin              &lt; chains &gt;         |.+&gt;twerk
+                  |.+&gt;have fun                            |.+&gt;Miley burping
+                  |X|                                     |X| the wrong way
+                  ---                                     ---
+</pre>
+
+<p>
+Hash tables usually support at least three operations. An Entry object
+references a key and its associated value.
+</p>
+
+<ul class="org-ul">
+<li>public Entry insert(key, value)
+<ul class="org-ul">
+<li>Compute the key's hash code and compress it to determine the entry's bucket.</li>
+<li>Insert the entry (key and value together) into that bucket's list.</li>
+</ul></li>
+<li>public Entry find(key)
+<ul class="org-ul">
+<li>Hash the key to determine its bucket.  Search the list for an entry with the</li>
+<li>given key.  If found, return the entry; otherwise, return null.</li>
+</ul></li>
+<li>public Entry remove(key)
+<ul class="org-ul">
+<li>Hash the key to determine its bucket.  Search the list for an entry with the</li>
+<li>given key.  Remove it from the list if found.  Return the entry or null.</li>
+</ul></li>
+</ul>
+
+<p>
+<b>What if two entries with the same key are inserted?</b> There are two approaches.
+</p>
+
+<ol class="org-ol">
+<li>Following Goodrich and Tamassia, we can insert both, and have find() or
+remove() arbitrarily return/remove one. Goodrich and Tamassia also propose a
+method findAll() that returns all the entries with a given key.</li>
+<li>Replace the old value with the new one, so only one entry with a given key
+exists in the table.</li>
+</ol>
+<p>
+Which approach is best?  It depends on the application.
+</p>
+
+<blockquote>
+<p>
+<b>WARNING</b>: When an object is stored as a key in a hash table, an application
+should never change the object in a way that will change its hash code. If you
+do so, the object will thenceforth be in the wrong bucket.
+</p>
+</blockquote>
+
+<p>
+The <span class="underline">load_factor</span> of a hash table is n/N, where n is the number of keys in the
+table and N is the number of buckets. If the load factor stays below one (or a
+small constant), and the hash code and compression function are "good," and
+there are no duplicate keys, then the linked lists are all short, and each
+operation takes O(1) time. However, if the load factor grows too large (n &gt;&gt; N),
+performance is dominated by linked list operations and degenerates to O(n) time
+(albeit with a much smaller constant factor than if you replaced the hash table
+with one singly-linked list). A proper analysis requires a little probability
+theory, so we'll put it off until near the end of the semester.
+</p>
+</div>
+<div id="orga7ce9a3" class="outline-3">
+<h3 id="orga7ce9a3"><span class="section-number-3">2.1</span> what is a hash table?</h3>
+<div class="outline-text-3" id="text-2-1">
+<ol class="org-ol">
+<li>a hash table is a data structure</li>
+<li>offers fast <b>insertion and searching</b></li>
+<li>they are limited in size because they are <b>based on arrays</b>
+<ol class="org-ol">
+<li>can be resized, but it should be avoided</li>
+</ol></li>
+<li>they are hard to order</li>
+</ol>
+
+<p>
+why hash table important?
+</p>
+<pre class="example">
+i want the INFO with ID ---&gt; compression(hashCode(ID)) ---&gt; *directly* find id in hashtable and get INFO
+</pre>
+</div>
+</div>
+
+<div id="org0718c29" class="outline-3">
+<h3 id="org0718c29"><span class="section-number-3">2.2</span> from Dictionaries to hashtable</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+two-letter words and definitions
+</p>
+
+<ul class="org-ul">
+<li>words is a key that addresses the definition 26 * 26 = 676 words.</li>
+</ul>
+
+<p>
+Insert a definition into dectionary:
+</p>
+<ul class="org-ul">
+<li>function <code>hashCode()</code>: maps each word, eg (key) to integer 0&#x2026;675</li>
+<li>index into array, we call it buckhead, where we're going to store the definition for that word</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Word</span>{
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #4f97d7; font-weight: bold;">final</span> <span style="color: #ce537a; font-weight: bold;">int</span>
+        <span style="color: #7590db;">LETTERS</span> = <span style="color: #a45bad;">26</span>,
+        <span style="color: #7590db;">WORDS</span> = LETTERS * LETTERS;
+    <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">word</span>;
+
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #bc6ec5; font-weight: bold;">hashCode</span>(){
+        <span style="color: #4f97d7; font-weight: bold;">return</span> LETTERS * (word.charAt(<span style="color: #a45bad;">0</span>) - <span style="color: #2d9574;">'a'</span>) +
+            (word.charAt(<span style="color: #a45bad;">1</span>) - <span style="color: #2d9574;">'a'</span>);
+        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">java treat a chararter as a number</span>
+        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">char - 'a'  = 0...25</span>
+        <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">this is how you map a 2 letter word to a unique num</span>
+    }
+}
+
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">WordDictionary</span>{
+    <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">Definition</span>[] <span style="color: #7590db;">defTable</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">Definition</span>[<span style="color: #a45bad;">Word</span>.WORDS];
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">insert</span>(<span style="color: #ce537a; font-weight: bold;">Word</span> <span style="color: #7590db;">w</span>, <span style="color: #ce537a; font-weight: bold;">Definition</span> <span style="color: #7590db;">d</span>){
+        defTable[w.hashCode()] = d;
+    }
+
+    <span style="color: #ce537a; font-weight: bold;">Definition</span> <span style="color: #bc6ec5; font-weight: bold;">find</span>(<span style="color: #ce537a; font-weight: bold;">Word</span> <span style="color: #7590db;">w</span>){
+        <span style="color: #4f97d7; font-weight: bold;">return</span> defTable[w.hashCode()];
+    }
+}
+</pre>
+</div>
+
+<pre class="example">
+Problems with long letter word
+2 letter word ==&gt; 26^2 items array
+3 letter word ==&gt; 26^3
+n letter word ==&gt; 26^n
+</pre>
+
+<blockquote>
+<p>
+this number is too large to store in computer. now hashtable comes
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="org9298ed2" class="outline-3">
+<h3 id="org9298ed2"><span class="section-number-3">2.3</span> hash table: java</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">import</span> <span style="color: #a45bad;">java</span>.<span style="color: #a45bad;">util</span>.<span style="color: #ce537a; font-weight: bold;">Arrays</span>;
+
+<span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">HashFunction</span> {
+
+    <span style="color: #ce537a; font-weight: bold;">String</span>[] <span style="color: #7590db;">theArray</span>;
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">arraySize</span>;
+    <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">itemsIntArray</span> = <span style="color: #a45bad;">0</span>;
+
+    <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">static</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">main</span>(<span style="color: #ce537a; font-weight: bold;">String</span>[] <span style="color: #7590db;">args</span>){
+
+    }
+}
+
+<span style="color: #bc6ec5; font-weight: bold;">HashFunction</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">size</span>){
+    arraySize = size;
+    theArray = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">String</span>[size];
+    Arrays.fill(theArray, <span style="color: #2d9574;">"-1"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="org82cc3ec" class="outline-2">
+<h2 id="org82cc3ec"><span class="section-number-2">3</span> Hash Codes and Compression Functions</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Hash codes and compression functions are a bit of a black art. The ideal hash
+code and compression function would map each key to a uniformly distributed
+random bucket from zero to N - 1. By "random", I don't mean that the function is
+different each time; a given key always hashes to the same bucket. I mean that
+two different keys, however similar, will hash to independently chosen integers,
+so the probability they'll collide is 1/N. This ideal is tricky to obtain.
+</p>
+
+<p>
+In practice, it's easy to mess up and create far more collisions than necessary.
+Let's consider bad compression functions first. Suppose the keys are integers,
+and each integer's hash code is itself, so hashCode(i) = i.
+</p>
+
+<p>
+Suppose we use the compression function h(hashCode) = hashCode mod N, and the
+number N of buckets is 10,000.  Suppose for some reason that our application
+only ever generates keys that are divisible by 4.  A number divisible by 4 mod
+10,000 is still a number divisible by 4, so three quarters of the buckets are
+never used!  Thus the average bucket has about four times as many entries as it
+ought to.
+</p>
+
+<p>
+The same compression function is much better if N is prime.  With N prime, even
+if the hash codes are always divisible by 4, numbers larger than N often hash
+to buckets not divisible by 4, so all the buckets can be used.
+</p>
+
+<p>
+For reasons I won't explain (see Goodrich and Tamassia Section 9.2.4 if you're
+interested),
+</p>
+
+<pre class="example">
+h(hashCode) = ((a * hashCode + b) mod p) mod N
+</pre>
+
+<p>
+is a yet better compression function. Here, a, b, and p are positive integers, p
+is a large prime, and p &gt;&gt; N. Now, the number N of buckets doesn't need to be
+prime.
+</p>
+
+<p>
+I recommend always using a known good compression function like the two above.
+Unfortunately, it's still possible to mess up by inventing a hash code that
+creates lots of conflicts even before the compression function is used. We'll
+discuss hash codes next lecture.
+</p>
+</div>
+<div id="org21edcef" class="outline-3">
+<h3 id="org21edcef"><span class="section-number-3">3.1</span> hashcode: lec-note</h3>
+<div class="outline-text-3" id="text-3-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">notation</th>
+<th scope="col" class="org-left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">n</td>
+<td class="org-left">numbers of keys(words) actually you want to store</td>
+</tr>
+
+<tr>
+<td class="org-left">N</td>
+<td class="org-left">table of N buckets, N a bit longer than n, 20% longer</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+A hash table maps huge set of possible keys into N buckest by applying a
+compression function to each hash code
+</p>
+
+<ul class="org-ul">
+<li>n : i can still map every possible english word to a number from 0 ~ 26^45</li>
+<li>N : but then i will compress it down, so that i'm not using more than a million buckets</li>
+</ul>
+
+<p>
+<code>h(hashCode) = hashCode mod N</code>
+</p>
+<ul class="org-ul">
+<li>h is the name of compression function</li>
+<li>hashCode ofen negative</li>
+<li>because 'mod N' is a random <b>compression</b>, you will have collisions</li>
+</ul>
+
+<p>
+<b>Collision</b>:
+several keys hash to same bucket; <code>if h(hashCode1) = h(hashCode2)</code>
+</p>
+
+<p>
+<b>How to solve Collision &#x2014; Chaining</b>: chaining*, each bucket is <b>no longer
+*store just one word</b>, instead, store <b>a references a linked list of entries</b>,
+*that link is called a <code>chain</code>.
+</p>
+
+<p>
+then, when i seach a definition of a word, how to locate it in this chain? Not
+just install the definitions, i have to store the original words as well. Store
+eahc key in table with definition, as a pair in that table.
+</p>
+
+<pre class="example">
+entry = (key, value)
+</pre>
+
+
+<p>
+<code>1.insert(key,value)</code> , when getting key and value, it combines them together
+   into an entry object and stores that entry in the hash table and for some
+   reason here 'insert' will also return the entry object creates to store your
+   key in your value
+</p>
+
+<p>
+<code>public Entry insert(key, value)</code>
+</p>
+<ul class="org-ul">
+<li>compute the key's hash code</li>
+<li>compress it to determine bucket.</li>
+<li>insert the entry into the bucket's chain</li>
+</ul>
+
+<p>
+<code>public Entry find(key)</code>
+</p>
+<ul class="org-ul">
+<li>hash the key to hash code</li>
+<li>search chain for entry with given key</li>
+<li>if found, return it; else null.</li>
+</ul>
+
+<p>
+<code>public Entry remove(key)</code>
+</p>
+<ul class="org-ul">
+<li>hash key to hash code</li>
+<li>search the chain of bucket</li>
+<li>remove from chain if found</li>
+<li>return entry or null.</li>
+</ul>
+
+
+<p>
+But, still hava some issues:
+</p>
+<blockquote>
+<p>
+what if you try to insert multiple copies of the same key into the dictionary,
+like maybe a word has two different definitions and you want to put each of
+those definitions in as a separate entry.
+</p>
+</blockquote>
+
+<p>
+2 entries in same key. 2 approaches to handle this:
+</p>
+
+<ol class="org-ol">
+<li>G&amp;T(book): insert both, find() arbitrary returns one. also this book give a findALL() function
+to give all items matching a certain key.
+so now your chain has tow different entries in it that have the
+same key or five different entries or 100 diffenent entries.</li>
+<li>Replace old value with new. Only one entry has given key.</li>
+</ol>
+
+<p>
+how to choose, depend on your application.
+</p>
+<blockquote>
+<p>
+<b>A Big Warning</b>: insert sth into hash, eg an refference of object, you should
+NOT change the object, once you do, this will change its hashCode, because you
+change an object in a way that changes its hashcode, will make this object in
+the WRONG bucket and you'll never be able to look it up again.
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="orgacd9eb9" class="outline-3">
+<h3 id="orgacd9eb9"><span class="section-number-3">3.2</span> Performance of Hash Table:</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+performance of hash table is depand on how <b>much</b> stuff you try to pack into how
+<b>big</b> a hash table
+</p>
+
+<p>
+Load factor of a hash table:
+</p>
+<pre class="example">
+n/N = (items you want to store into hashtable)/(number of buckets)
+</pre>
+
+<p>
+If load factor stay low, and if hash code &amp; compress function are 'good', and no
+duplicate keys , THEN the chains are short, &amp; each opreation takes O(1) time.
+And performance of hash table ,also depends on how big the chain is, that you
+have to search. if chain is big , it'll take &gt;O(1)
+</p>
+
+<pre class="example">
+If load factor get BIG(n&gt;&gt;N), O(n) time.
+
+</pre>
+</div>
+</div>
+
+<div id="org2b54082" class="outline-3">
+<h3 id="org2b54082"><span class="section-number-3">3.3</span> Troublesome 1: Compression fn</h3>
+<div class="outline-text-3" id="text-3-3">
+<pre class="example">
+key -------(hashcode func)------&gt; hashcode ----(compression func)------&gt; bucket[0,N-1]
+</pre>
+
+<p>
+<b>Ideal</b>: Map each key to a random bucket(use random function). with each bucket
+being equally likely.
+</p>
+
+<p>
+Bad compression function,eg:
+</p>
+<pre class="example">
+suppose keys are ints.
+hashCode(i) = i.
+Compression function h(hashCode) = hashCode mod N
+N = 10,000 buckets.
+Suppose keys are divisible by 4.
+h() is divisible by 4 too.
+Very Bad news, because 3/4 of our buckets are wasted.
+this means every bucket has a chain of 4 entries ,need handle with 4 collision.
+</pre>
+
+<p>
+Some compression fn better if N is prime, any num mod N, they won't be divisible
+by any particular number.
+</p>
+
+<pre class="example">
+Better: chap9.2.4 of G&amp;T
+h(hashCode) = ((a*hashCode + b) mod p) mod N)
+a,b,p : positive integers
+p: large prime
+p &gt;&gt; N
+
+'mod p' as scrambling the bits really well;
+'mod N' make it fit in your table
+</pre>
+
+<p>
+the advantage of this over below, is now, N(buckets) dosen't need to be prime.
+</p>
+</div>
+</div>
+
+<div id="org8eee088" class="outline-3">
+<h3 id="org8eee088"><span class="section-number-3">3.4</span> Troublesome 2: H</h3>
+</div>
+</div>
+</div>
+</body>
+</html>

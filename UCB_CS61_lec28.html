@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 21:27 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第二十八课 Graph-DFS</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第二十八课 Graph-DFS</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orge22f814">1. GRAPHS</a></li>
+<li><a href="#org226c74a">2. some definition</a></li>
+<li><a href="#org91e6e08">3. adjacent matrix</a></li>
+<li><a href="#org4120a01">4. adjacent list</a></li>
+<li><a href="#org6082cd9">5. path vs length vs distance</a></li>
+<li><a href="#orgcb699ca">6. planar graph</a></li>
+<li><a href="#orgb444cac">7. Toplogical Sorting</a></li>
+<li><a href="#orgfd0a8aa">8. Graph Representations</a></li>
+<li><a href="#orgd059987">9. choose data structure for adjacency list</a></li>
+<li><a href="#org265dd0f">10. A bare skeleton of DFS</a>
+<ul>
+<li><a href="#org3028e60">10.1. 如果不是完全联通的图，比如有三个内部相连外部独立的图，我该怎么输出每个图的遍历结果呢？</a></li>
+<li><a href="#org94e6e3a">10.2. <span class="todo TODO">TODO</span> 如何识别并找出图中的环路？</a></li>
+<li><a href="#org0f1dde9">10.3. Toglogical sortting by DFS</a></li>
+<li><a href="#org5f43c0e">10.4. Strongly connected</a></li>
+</ul>
+</li>
+<li><a href="#org1ef39b6">11. Graph Traversals:DFS</a></li>
+<li><a href="#orgc743b05">12. How to specify 'Cycle path' in graph</a></li>
+<li><a href="#org2b2919f">13. More on the Running Time of DFS</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="orge22f814" class="outline-2">
+<h2 id="orge22f814"><span class="section-number-2">1</span> GRAPHS</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+有很多算法都是对 DFS 的改进形成的，比如查看有无环路, find Strongly connected
+components(directed Graph) DFS can identify planar graph, in time propotional to
+the nodes in linear time.
+</p>
+</div>
+</div>
+
+<div id="org226c74a" class="outline-2">
+<h2 id="org226c74a"><span class="section-number-2">2</span> some definition</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+A graph G is a set V of vertices (sometimes called nodes), and a set E of edges
+(sometimes called arcs) that each connect two vertices together.  To confuse
+you, mathematicians often use the notation G = (V, E).  Here, "(V, E)" is an
+<span class="underline">ordered_pair</span> of sets.  This isn't as deep and meaningful as it sounds;
+some people just love formalism.  The notation is convenient when you want to
+discuss several graphs with the same vertices; e.g. G = (V, E) and T = (V, F).
+</p>
+
+<p>
+Graphs come in two types:  <span class="underline">directed</span> and <span class="underline">undirected</span>.  In a directed graph
+(or <span class="underline">digraph</span> for short), every edge e is directed from some vertex v to some
+vertex w.  We write "e = (v, w)" (also an ordered pair), and draw an arrow
+pointing from v to w.  The vertex v is called the <span class="underline">origin</span> of e, and w is the
+<span class="underline">destination</span> of e.
+</p>
+
+<p>
+digraph   = directed graph
+undigraph = undirected graph
+</p>
+
+<p>
+In an undirected graph, edges have no favored direction, so we draw a curve
+connecting v and w.  We still write e = (v, w), but now it's an unordered pair,
+which means that (v, w) = (w, v).
+</p>
+
+<p>
+One application of a graph is to <span class="underline">model a street map</span>.  For each intersection,
+define a vertex that represents it.  If two intersections are connected by a
+length of street with no intervening intersection, define an edge connecting
+them.  We might use an undirected graph, but if there are one-way streets, a
+directed graph is more appropriate.  We can model a two-way street with two
+edges, one pointing in each direction.  On the other hand, if we want a graph
+that tells us which cities adjoin each other, an undirected graph makes sense.
+</p>
+
+<pre class="example">
+     ---   Bancroft  ---             ---             --------      ------------
+     |1|&lt;------------|2|&lt;------------|3|             |Albany|------|Kensington|
+     ---             ---             ---             --------      ------------
+      |               ^              | ^                     \       /
+ Dana |     Telegraph |     Bowditch | |     ------------     ----------
+      v               |              v |     |Emeryville|-----|Berkeley|
+     ---             ---             ---     ------------     ----------
+     |4|------------&gt;|5|------------&gt;|6|              \      /
+     ---    Durant   ---             ---            ---------     ----------
+                                                    |Oakland|-----|Piedmont|
+Multiple copies of an edge are forbidden,           ---------     ----------
+but a directed graph may contain both (v, w)
+and (w, v).  Both types of graph can have _self-edges_ of the form (v, v),
+which connect a vertex to itself.  (Many applications, like the two illustrated
+above, don't use these.)
+</pre>
+</div>
+</div>
+
+<div id="org91e6e08" class="outline-2">
+<h2 id="org91e6e08"><span class="section-number-2">3</span> adjacent matrix</h2>
+<div class="outline-text-2" id="text-3">
+<pre class="example">
+    A    K   E   B   O   P
+   +---+---+---+---+---+---+
+A  | - | t |   | t |   |   |
+   +---+---+---+---+---+---+
+K  | t | - |   | t |   |   |
+   +---+---+---+---+---+---+
+E  |   |   | - | t | t |   |
+   +---+---+---+---+---+---+
+B  | t | t | t | - | t |   |
+   +---+---+---+---+---+---+
+O  |   |   | t | t | - | t |
+   +---+---+---+---+---+---+
+P  |   |   |   |   | t | - |
+   +---+---+---+---+---+---+
+</pre>
+</div>
+</div>
+
+<div id="org4120a01" class="outline-2">
+<h2 id="org4120a01"><span class="section-number-2">4</span> adjacent list</h2>
+<div class="outline-text-2" id="text-4">
+<pre class="example">
+Directed Graph: every edge occur twice;
+Undirected Graph: every edge occur once;
+     +---+
+  A  | 0 |---&gt;1 ---&gt;3
+     +---+
+  K  | 1 |---&gt;0 ---&gt;3
+     +---+
+  E  | 2 |---&gt;3 ---&gt;4
+     +---+
+  B  | 3 |---&gt;0 ---&gt;1 ---&gt;2 ---&gt;4
+     +---+
+  O  | 4 |---&gt;2 ---&gt;3 ---&gt;5
+     +---+
+  P  | 5 |---&gt;4
+     +---+
+</pre>
+</div>
+</div>
+
+<div id="org6082cd9" class="outline-2">
+<h2 id="org6082cd9"><span class="section-number-2">5</span> path vs length vs distance</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+A <code>_path_</code> is a sequence of vertices such that each adjacent pair of vertices is
+connected by an edge. If the graph is directed, the edges that form the path
+must all be aligned with the direction of the path.
+</p>
+
+<p>
+The <code>length</code> of a path is the number of edges it traverses. Above, &lt;4, 5, 6, 3&gt;
+is a path of length 3. It is perfectly respectable to talk about a path of
+length zero, such as &lt;2&gt;.
+</p>
+
+<p>
+The <code>distance</code> from one vertex to another is the length of the shortest path
+from one to the other.
+</p>
+
+<p>
+A graph is <code>strongly_connected</code> (in digraph)if there is a path from every vertex
+to every other vertex. (This is just called <code>connected</code> in undirected graphs.)
+Both graphs above are strongly connected.
+</p>
+
+<p>
+The <code>degree</code> of a vertex is the number of edges incident on that vertex.
+(Self-edges count just once in 61B.) Hence, Berkeley has degree 4, and Piedmont
+has degree 1.
+</p>
+
+<p>
+A vertex in a directed graph has an <code>indegree</code> (the number of edges directed
+toward it) and an
+</p>
+
+<p>
+<code>Outdegree</code> (the number of edges directed away). Intersection 6 above has
+indegree 2 and outdegree 1.
+</p>
+</div>
+</div>
+
+<div id="orgcb699ca" class="outline-2">
+<h2 id="orgcb699ca"><span class="section-number-2">6</span> planar graph</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+planar graph: have no edges crossing. some algo is running faster in planar
+graph than regular graph. so it's important to identify a planar graph. If a
+graph is not a planar, then it has one of these inside: complete 5 node graph,
+and 3-3 complete graph.
+</p>
+</div>
+</div>
+
+<div id="orgb444cac" class="outline-2">
+<h2 id="orgb444cac"><span class="section-number-2">7</span> Toplogical Sorting</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+教授说，任何一个算法都不能脱离数据结构，
+</p>
+
+<p>
+当你使用一个算法的时候，最好根据具体问题，事先制定好自己所使用的数据结构，然后再在数据结构基础上定义 api.最后实现算法。
+</p>
+
+<p>
+数据结构是存储和操作数据的工具;
+</p>
+
+<p>
+算法是操作工具的步骤;
+</p>
+
+<p>
+需要注意的是算法的本质和核心就是步骤，一般要么是循环，要么是递归，所以 应该让算法做的操作尽可能的少;
+</p>
+
+<p>
+什么意思，就是在数据结构阶段，多做一些预处理，多把一些食物咀嚼碎放在勺子里等待算法去取。
+</p>
+
+<pre class="example">
+   +---+                                +---+
+A  | 0 |---&gt;1 ---&gt;3                  A  | 0 |---&gt;1 ---&gt;3---&gt;4---&gt;5---&gt;2----&gt;0
+   +---+                                +---+
+K  | 1 |---&gt;0 ---&gt;3                  K  | 1 |
+   +---+                                +---+
+E  | 2 |---&gt;3 ---&gt;4                  E  | 2 |
+   +---+                                +---+
+B  | 3 |---&gt;0 ---&gt;1 ---&gt;2 ---&gt;4      B  | 3 |
+   +---+                                +---+
+O  | 4 |---&gt;2 ---&gt;3 ---&gt;5            O  | 4 |
+   +---+                                +---+
+P  | 5 |---&gt;4                        P  | 5 |
+   +---+                                +---+
+
+</pre>
+
+<p>
+注意，为什么 graph 算法复杂度中经常出现 n（节点数量），因为对于有向图如果所有边都连接 A，而其他节点都没有边，那么根据算法检查 A 之后你还需要依次检查其余所有节点，所以最差复杂度会包含 n 个节点,但实际上他们并没有边连接。如果有边连接那就直接算在边里算一次就好了，没有边连接所以需要加上节点数量。
+</p>
+
+<p>
+Toplogical sorting 开始
+</p>
+<pre class="example">
+      A------&gt;B ------&gt;C--------+
+      +---\   ^        |        |
+           \  |        |        |
+        /---\-+        |        |
+       /     v         V        V
+      O------&gt;C-------&gt;E-------&gt;F
+                                   Indegree                                  queue: -&gt;
++---+                                 +---+---+                          _________________
+| A |---&gt;B---&gt;C                       | 0 | A |---&gt;B---&gt;C                      C B +O+ +A+
++---+                                 +---+---+                          -----------------
+| B |---&gt;D                            | 2 | B |---&gt;D
++---+                                 +---+---+
+| C |---&gt;E                            | 2 | C |---&gt;E
++---+                                 +---+---+
+| D |---&gt;E---&gt;F                       | 1 | D |---&gt;E---&gt;F
++---+                                 +---+---+
+| E |---&gt;F                            | 2 | E |---&gt;F
++---+                                 +---+---+
+| F |                                 | 2 | F |
++---+                                 +---+---+
+| O |---&gt;B---&gt;C                       | 0 | O |---&gt;B---&gt;C
++---+                                 +---+---+
+
+</pre>
+
+<p>
+<code>*DAG*</code>: directed a cyclic graph.which means if a grpah has a cycle it's not
+toplogical ordering graph.
+</p>
+
+<p>
+Only make sense when the graph is Directed.
+</p>
+<ol class="org-ol">
+<li><code>O(n+e)</code>: find all nodes that have no arrows going into them &#x2014; <code>in-degree =
+   0</code></li>
+<li>delete them, ouput them. repeat step 1. until graph is empty.</li>
+</ol>
+
+<p>
+这个算法的复杂度基本是： <code>O(n*(n+e))</code>
+</p>
+
+<p>
+<b>Improvement-1:</b>
+</p>
+
+<p>
+在数据结构阶段多做一些，多咀嚼一些数据给算法。增加一列存放每个 node 的
+in-degree. 并不直接操作后面的 adjacent list。算法仅仅操作 indegree 这一列：遍历
+indegree=0 的 node，凡出现者，in-degree &#x2013;;但是，你没法区分新出现的 0,和早就已经是 0 的节点。毕竟你不想重复遍历之前已经为 0 的那些节点了。
+</p>
+
+<p>
+<b>Improvement-2:</b>
+</p>
+
+<p>
+我们需要能保证某种顺序的结构&#x2014;queue.把每次检索到的 inDegree=0 的节点 enqueue();
+dequeue()一个，遍历连接 nodes，凡所出现，indegree&#x2013;, 如果某个 indegree&#x2013;之后为
+0,直接 enqueue. 当 queue is empty, algorithms done!
+</p>
+
+<p>
+算法复杂度仅仅是：你 enqueue() 了 n 个节点，每个节点的连接检测一次 e，so, O(n+e)
+or approximate O(e)
+</p>
+</div>
+</div>
+
+<div id="orgfd0a8aa" class="outline-2">
+<h2 id="orgfd0a8aa"><span class="section-number-2">8</span> Graph Representations</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+There are two popular ways to represent a graph.  The first is an <span class="underline">adjacency</span>
+<span class="underline">matrix</span>, a |V|-by-|V| array of boolean values (where |V| is the number of
+vertices in the graph).  Each row and column represents a vertex of the graph.
+Set the value at row i, column j to true if (i, j) is an edge of the graph.  If
+the graph is undirected (below right), the adjacency matrix is <span class="underline">symmetric</span>:
+row i, column j has the same value as row j, column i.
+</p>
+
+<pre class="example">
+  1 2 3 4 5 6                           Alb Ken Eme Ber Oak Pie
+1 - - - T - -                    Albany  -   T   -   T   -   -
+2 T - - - - -                Kensington  T   -   -   T   -   -
+3 - T - - - T                Emeryville  -   -   -   T   T   -
+4 - - - - T -                  Berkeley  T   T   T   -   T   -
+5 - T - - - T                   Oakland  -   -   T   T   -   T
+6 - - T - - -                  Piedmont  -   -   -   -   T   -
+
+这个有向图，                             由于这个图是对称矩阵，
+row --&gt; cloumn                         所以也可以只存储：对角线+上半 或 对角线+下半
+
+</pre>
+
+<p>
+It should be clear that the maximum possible number of edges is |V|^2 for a
+directed graph, and slightly more than(上图中因为包含对角线所以是 slightly more
+than ) half that for an undirected graph.
+</p>
+
+<p>
+In many applications, however, the number of edges is much less than
+Theta(|V|^2). For instance, our maps above are <span class="underline">planar_graphs</span> (graphs that can
+be drawn without edges crossing), and all planar graphs have O(|V|) edges. A
+graph is called <span class="underline">sparse</span> if it has far fewer edges than the maximum possible
+number. ("Sparse" has no precise definition, but it usually implies that the
+number of edges is asymptotically smaller than |V|^2.)
+</p>
+
+<p>
+For a sparse graph, an adjacency matrix representation is very wasteful.
+A more memory-efficient data structure for sparse graphs is the <span class="underline">adjacency</span>
+<span class="underline">list</span>.  An adjacency list is actually a collection of lists.  Each vertex v
+maintains a list of the edges directed out from v.  The standard list
+representations all work&#x2013;arrays (below left), linked lists (below right), even
+search trees (because you can traverse one in linear time).
+</p>
+
+<pre class="example">
+  ---   -----                       ---   ------   ------
+1 |.+-&gt; | 4 |                Albany |.+-&gt; |Ken.+-&gt; |Ber*|
+  ---   =====                       ===   ======   ======
+2 |.+-&gt; | 1 |            Kensington |.+-&gt; |Alb.+-&gt; |Ber*|
+  ---   =====----                   ===   ======   ======
+3 |.+-&gt; | 2 | 6 |        Emeryville |.+-&gt; |Ber.+-&gt; |Oak*|
+  ---   =====----                   ===   ======   ======   ------   ------
+4 |.+-&gt; | 5 |              Berkeley |.+-&gt; |Alb.+-&gt; |Ken.+-&gt; |Eme.+-&gt; |Oak*|
+  ---   =====----                   ===   ======   ======   ======   ------
+5 |.+-&gt; | 2 | 6 |           Oakland |.+-&gt; |Eme.+-&gt; |Ber.+-&gt; |Pie*|
+  ---   =====----                   ===   ======   ------   ------
+6 |.+-&gt; | 3 |              Piedmont |.+-&gt; |Oak*|
+  ---   -----                       ---   ------
+</pre>
+
+<p>
+The total memory used by all the lists is Theta(|V| + |E|).
+</p>
+</div>
+</div>
+
+<div id="orgd059987" class="outline-2">
+<h2 id="orgd059987"><span class="section-number-2">9</span> choose data structure for adjacency list</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+If your vertices have consecutive integer names, you can declare an array of
+lists, and find any vertex's list in O(1) time.
+index-&gt; key(num); value-&gt; list of vertices
+</p>
+
+<p>
+If your vertices have names like "Albany," you can use a hash table to map names
+to lists. Each entry in the hash table uses a vertex name as a key, and a List
+object as the associated value. You can find the list for any label in O(1) average time.
+key-&gt; vertex name; value-&gt; list of vertices
+</p>
+
+<p>
+An adjacency list is more space- and time-efficient than an adjacency matrix
+for a <span class="underline">sparse graph</span>, but less efficient for a <span class="underline">complete_graph</span>.  A complete
+graph is a graph having every possible edge; that is, for every vertex u and
+every vertex v, (u, v) is an edge of the graph.
+</p>
+
+<p>
+同理如果是满载矩阵，而且 verex 都是字符串，该怎么办呢？
+</p>
+
+<p>
+先用 hash table 对字符串做映射：string -&gt; ints. 然后 再用数字作为矩阵的行列来存储在二维数组中。
+</p>
+</div>
+</div>
+
+
+<div id="org265dd0f" class="outline-2">
+<h2 id="org265dd0f"><span class="section-number-2">10</span> A bare skeleton of DFS</h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+<pre class="src src-java" id="org1e8018a"><span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">DFS &#26576;&#20010;&#29420;&#31435;&#30340;&#22270;&#20266;&#20195;&#30721;</span>
+<span style="color: #a45bad;">1</span>. DFS(randomly <span style="color: #ce537a; font-weight: bold;">choose</span> <span style="color: #7590db;">i</span>)
+<span style="color: #a45bad;">2</span>. mark(i);
+@. &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;
+<span style="color: #a45bad;">4</span>. <span style="color: #4f97d7; font-weight: bold;">for</span> all j adjacent to i, <span style="color: #4f97d7; font-weight: bold;">if</span> j is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;
+<span style="color: #a45bad;">5</span>.      DFS(j);
+@.      &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+@. &lt;Input some code here <span style="color: #a45bad;">4</span>&gt;
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23545;&#20110;&#21253;&#21547;&#22810;&#20010;&#38750;&#32852;&#36890;&#30340;&#29420;&#31435;&#23376;&#22270;&#30340;&#22270;</span>
+<span style="color: #a45bad;">1</span>. For i = <span style="color: #a45bad;">1</span> to n, <span style="color: #4f97d7; font-weight: bold;">if</span> i is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;
+<span style="color: #a45bad;">2</span>.      DFS(i)
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;
+@. &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+
+</pre>
+</div>
+<p>
+通过在 skeleton 中不同位置添加不同代码来实现不同的功能：大图中包含独立小图，图中环路，toplogical sorting,strongly connected
+</p>
+</div>
+
+<div id="org3028e60" class="outline-3">
+<h3 id="org3028e60"><span class="section-number-3">10.1</span> 如果不是完全联通的图，比如有三个内部相连外部独立的图，我该怎么输出每个图的遍历结果呢？</h3>
+<div class="outline-text-3" id="text-10-1">
+<ol class="org-ol">
+<li>设置外循环，去遍历每一个节点执行 dfs(i)，而不是只 dfs()一个节点</li>
+<li>对每一个内部递归去 stack 某个点，并在本次循环执行完毕之后 empty and output
+the stack,最好设置 count 变量保存这个独立的图的是第几个。</li>
+</ol>
+<div class="org-src-container">
+<pre class="src src-java" id="orge61753c"><span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">DFS &#26576;&#20010;&#29420;&#31435;&#30340;&#22270;&#20266;&#20195;&#30721;</span>
+<span style="color: #a45bad;">1</span>. DFS(randomly <span style="color: #ce537a; font-weight: bold;">choose</span> <span style="color: #7590db;">i</span>)
+<span style="color: #a45bad;">2</span>. mark(i);
+@. &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;: add i to statck
+<span style="color: #a45bad;">4</span>. <span style="color: #4f97d7; font-weight: bold;">for</span> all j adjacent to i, <span style="color: #4f97d7; font-weight: bold;">if</span> j is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;
+<span style="color: #a45bad;">5</span>.      DFS(j);
+@.      &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+@. &lt;Input some code here <span style="color: #a45bad;">4</span>&gt;
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23545;&#20110;&#21253;&#21547;&#22810;&#20010;&#38750;&#32852;&#36890;&#30340;&#29420;&#31435;&#23376;&#22270;&#30340;&#22270;</span>
+<span style="color: #a45bad;">1</span>. For i = <span style="color: #a45bad;">1</span> to n, <span style="color: #4f97d7; font-weight: bold;">if</span> i is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;
+<span style="color: #a45bad;">2</span>.      DFS(i)
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;: print and empty elements in stack
+@. &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="org94e6e3a" class="outline-3">
+<h3 id="org94e6e3a"><span class="section-number-3">10.2</span> <span class="todo TODO">TODO</span> 如何识别并找出图中的环路？</h3>
+<div class="outline-text-3" id="text-10-2">
+<p>
+要识别环路就要区分几种边： <code>forward edge, backward edge, cross edge, tree edge</code>.
+tree edge: 就是真正 visited 的路径; backward edge:TODO
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">DFS &#26576;&#20010;&#29420;&#31435;&#30340;&#22270;&#20266;&#20195;&#30721;</span>
+<span style="color: #a45bad;">1</span>. DFS(randomly <span style="color: #ce537a; font-weight: bold;">choose</span> <span style="color: #7590db;">i</span>)
+<span style="color: #a45bad;">2</span>. mark(i);
+@. &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;
+<span style="color: #a45bad;">4</span>. <span style="color: #4f97d7; font-weight: bold;">for</span> all j adjacent to i, <span style="color: #4f97d7; font-weight: bold;">if</span> j is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;: parent(j) = i
+<span style="color: #a45bad;">5</span>.      DFS(j);
+@.      &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+@. &lt;Input some code here <span style="color: #a45bad;">4</span>&gt;
+<span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">&#23545;&#20110;&#21253;&#21547;&#22810;&#20010;&#38750;&#32852;&#36890;&#30340;&#29420;&#31435;&#23376;&#22270;&#30340;&#22270;</span>
+<span style="color: #a45bad;">1</span>. For i = <span style="color: #a45bad;">1</span> to n, <span style="color: #4f97d7; font-weight: bold;">if</span> i is unmarked:
+@.      &lt;Input some code here <span style="color: #a45bad;">1</span>&gt;
+<span style="color: #a45bad;">2</span>.      DFS(i)
+@.      &lt;Input some code here <span style="color: #a45bad;">2</span>&gt;
+@. &lt;Input some code here <span style="color: #a45bad;">3</span>&gt;
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="org0f1dde9" class="outline-3">
+<h3 id="org0f1dde9"><span class="section-number-3">10.3</span> Toglogical sortting by DFS</h3>
+<div class="outline-text-3" id="text-10-3">
+<p>
+这是一种比之前使用的方法更好的解决 toplogical sortting 更好的方法。可以通过记录每一个你遍历过的节点，然后反向输出即可得到这个 toplogical sortting
+</p>
+</div>
+</div>
+
+<div id="org5f43c0e" class="outline-3">
+<h3 id="org5f43c0e"><span class="section-number-3">10.4</span> Strongly connected</h3>
+<div class="outline-text-3" id="text-10-4">
+<p>
+Strongly connected graph 是指图中任何一点都可以到达其他点的有向图。有很多算法都是建构在 stongly connected graph 的基础之上，所以识别这个属性非常重要
+</p>
+
+<pre class="example">
+................         ..............
+.   *-------&gt;*-.---------.&gt;*&lt;-------* .
+.    ^      / \.         .  \      ^  .
+.     \    /   .+--\     .   \    /   .
+.      \  /    .    \    .    \  /    .
+.       \v     .     v   .     v/     .
+.        *     .      *--.----&gt;*      .
+................      |  ..............
+         |            |         |
+         |            |         |
+         |            |         |
+         |            |         |
+         |            |         |
+         |            |         |
+         |            |         |
+ +---------------------------------------+
+ |   3 strongly     connected components |
+ +---------------------------------------+
+
+</pre>
+<p>
+every directed graph can be split up into an equivalence class of strongly
+connected components. These 3 are considered equivalence class of strongly
+connected.
+</p>
+
+<p>
+这对于你求有很多独立有向小图的大图的 minimum spanning tree 也很有作用，你首先就需要得到这么多小图这里‘独立’就是指是否 strongly connected，‘连接而不独立’ 就是指 connected but not strongly connected. 相当于连接性整体上升了一个档次。
+</p>
+
+<pre class="example" id="algo for identifing strongly connected graph">
+1. DFS search and calculat finishing times of each node
+   1. one for finishing times useful, algo for topological sort
+   2. finishing times of a DFS give us in reverse the topological sort
+2. reverse the edges in graph
+3. call DFS on the nodes in the reverse graph, in reverse order of the finishing times
+
+</pre>
+
+<pre class="example">
+Original graph:
+          a-------&gt;b------&gt;c&lt;------d
+           ^      / \       \      ^
+            \    /   \       \    /
+             \  /     \       \  /
+              \v       v       v/
+               e        f-----&gt;g
+
+DFS and caculate finishing times:
+                   6       3       1
+        7 a-------&gt;b------&gt;c&lt;------d
+           ^      / \       \      ^
+            \    /   \       \    /
+             \  /     \       \  /
+              \v       v       v/
+               e        f-----&gt;g
+               4        5      2
+
+Reverse edges:
+          a&lt;-------b&lt;------c------&lt;d
+           \      ^ ^       ^      /
+            \    /   \       \    /
+             \  /     \       \  /
+              v/       \       \v
+               e        f&lt;-----g
+
+</pre>
+
+<p>
+Call DFS on nodes in reverse graph, in reverse order of finishing times
+</p>
+<pre class="example">
+         (1)                         (2)
+a&lt;-------b&lt;------c------&lt;d   a&lt;-------b&lt;------c------&lt;d
+.\      ^ ^       ^      /   .\      ^.^       ^      /
+ .\    /   \       \    /     .\    /.  \       \    /
+  .\  /     \       \  /       .\  /.    \       \  /
+   .v/       \       \v         .v/.      \       \v
+     e        f&lt;-----g            e        f&lt;-----g
+
+        (3)                          (4)                         (5)
+                                               .......                     .......
+a&lt;-------b&lt;------c------&lt;d   a&lt;-------b&lt;------c------&lt;d  a&lt;-------b&lt;------c------&lt;d
+.\      ^.^       ^      /   .\      ^.^       ^      /  .\      ^.^       ^      /.
+ .\    /.  \       \    /     .\    /.  \       \    /    .\    /.  \       \    /.
+  .\  /.    \       \  /       .\  /.    \       \  /      .\  /.    \       \  /.
+   .v/.      \       \v         .v/.      \       \v        .v/.      \       \v.
+     e        f&lt;-----g            e        f&lt;-----g           e        f&lt;-----g
+             ...                          ...                         ...
+
+</pre>
+
+<p>
+in (5) every <span class="underline">connected tree</span> represents a <span class="underline">strongly connected component</span> in the
+original grapha
+</p>
+</div>
+</div>
+</div>
+
+<div id="org1ef39b6" class="outline-2">
+<h2 id="org1ef39b6"><span class="section-number-2">11</span> Graph Traversals:DFS</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+We'll look at two types of graph traversals, which can be used on either
+directed or undirected graphs to visit each vertex once.
+</p>
+
+<p>
+Depth-first search (DFS) starts at an arbitrary vertex and searches a graph as
+"deeply" as possible as early as possible. For example, if your graph is an
+undirected tree, DFS performs a preorder (or if you prefer, postorder) tree
+traversal.
+</p>
+
+<p>
+Breadth-first search (BFS) starts by visiting an arbitrary vertex, then visits
+all vertices whose distance from the starting vertex is one, then all vertices
+whose distance from the starting vertex is two, and so on.  If your graph is an
+undirected tree, BFS performs a level-order tree traversal.
+有点像 level-order traversal
+</p>
+
+<p>
+In a graph, unlike a tree, there may be several ways to get from one vertex to
+another.
+</p>
+
+<p>
+<b>如何处理多路径造成的 vertex 多次被访问的问题？</b>
+</p>
+
+<p>
+Therefore, each vertex has a boolean field called "visited" that tells us if we
+have visited the vertex before, so we don't visit it twice. When we say we are
+"marking a vertex visited", we are setting its "visited" field to true.
+</p>
+
+<p>
+Assume that we are traversing a strongly connected graph, thus there is a path
+from the starting vertex to every other vertex.
+</p>
+
+<p>
+When <span class="underline">DFS</span> visits a vertex u, it checks every vertex v that can be <span class="underline">reached</span> by
+some edge (u, v).  If v has not yet been visited, DFS visits it <span class="underline">recursively</span>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java" id="org490908d"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">Graph</span> {
+  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Before calling dfs(), set every "visited" flag to false; takes O(|V|) time</span>
+  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">dfs</span>(<span style="color: #ce537a; font-weight: bold;">Vertex</span> <span style="color: #7590db;">u</span>) {
+    u.visit();                                <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Do some unspecified thing to u</span>
+    u.visited = <span style="color: #a45bad;">true</span>;                              <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Mark the vertex u visited</span>
+<span id="coderef-for-loop" class="coderef-off">    <span style="color: #4f97d7; font-weight: bold;">for</span> (each vertex v <span style="color: #ce537a; font-weight: bold;">such</span> <span style="color: #bc6ec5; font-weight: bold;">that</span> (<span style="color: #ce537a; font-weight: bold;">u</span>, <span style="color: #ce537a; font-weight: bold;">v</span>) is an edge in E) { (for-loop)</span>
+      <span style="color: #4f97d7; font-weight: bold;">if</span> (<span style="color: #a45bad;">!</span>v.visited) {
+        dfs(v);
+      }
+    }
+  }
+}
+</pre>
+</div>
+<p>
+这里需要注意，‘遍历’ 和 ‘访问’ 是分开的，意思是说，当你‘遍历’的时候未必‘访问’，而只有被标记为‘访问过（visited）’的节点，才不会被再次‘访问’，而最终结果是输出所有‘访问过的节点及其路径’。‘遍历’ 就像一个游标一样只具有‘指’的作用;而‘访问’才是真正的处理这个节点。
+</p>
+
+<p>
+In this DFS pseudocode, a "visit()" method is defined that performs some action
+on a specified vertex.
+</p>
+
+<p>
+For instance, if we want to count the total population of the city graph above,
+"visit()" might add the population of the visited city to the grand total. The
+order in which cities are visited depends partly on their order in the adjacency
+lists.
+</p>
+
+<p>
+The sequence of figures below shows the behavior of DFS on our street map,
+starting at vertex 1.
+</p>
+<ul class="org-ul">
+<li>A "<code>V</code>" is currently visited;</li>
+<li>an "<code>x</code>" is marked visited;</li>
+<li><p>
+a "<code>*</code>" is a vertex which we try to visit but discover has already been visited.
+</p>
+
+<pre class="example">
+V&lt;-2&lt;-3   x&lt;-2&lt;-3   x&lt;-2&lt;-3   x&lt;-V&lt;-3   *&lt;-V&lt;-3    x&lt;-x&lt;-3   x&lt;-x&lt;-V   x&lt;-*&lt;-V    x&lt;-x&lt;-V
+|  ^  ^   |  ^  ^   |  ^  ^   |  ^  ^   |  ^  ^    |  ^  ^   |  ^  ^   |  ^  ^    |  ^  ^
+v  |  v   v  |  v   v  |  v   v  |  v   v  |  v    v  |  v   v  |  v   v  |  v    v  |  v
+4-&gt;5-&gt;6   V-&gt;5-&gt;6   x-&gt;V-&gt;6   x-&gt;x-&gt;6   x-&gt;x-&gt;6    x-&gt;x-&gt;V   x-&gt;x-&gt;x   x-&gt;x-&gt;x    x-&gt;x-&gt;*
+| --  |   | --  |   | --  |   | --  |   | --   |   | --  |   | --  |   |      |   |   |
+|     |   |     |   |     |   |     |   |      |   |     |   |     |   | u=2* |   |   |
+|     |   |     |   |     |   |     |   | u=1* |   |     |   | u=3 |   | u=3* |   |   |
+|     |   |     |   |     |   | u=2 |   | u=2* |   | u=6 |   | u=6 |   | u=6* |   |   |
+|     |   |     |   | u=5 |   | u=5 |   | u=5  |   | u=5 |   | u=5 |   | u=5  |   |   |
+|     |   | u=4 |   | u=4 |   | u=4 |   | u=4  |   | u=4 |   | u=4 |   | u=4  |   |   |
+| u=1 |   | u=1 |   | u=1 |   | u=1 |   | u=1  |   | u=1 |   | u=1 |   | u=1  |   |   |
+
+</pre></li>
+</ul>
+<p>
+DFS runs in:
+</p>
+
+<p>
+O(|V| + |E|) (为什么还要加上 edge？因为每个 vertex 的每个 edge 都要检测-&gt;<a href="#coderef-for-loop" class="coderef" onmouseover="CodeHighlightOn(this, 'coderef-for-loop');" onmouseout="CodeHighlightOff(this, 'coderef-for-loop');">for-loop</a>) time if you use an adjacency list;
+</p>
+
+<p>
+O(|V|^2) time if you use an adjacency matrix. Hence, an adjacency list is
+asymptotically faster if the graph is sparse.
+</p>
+
+<p>
+<b>What's an application of DFS?</b>
+</p>
+
+<p>
+Suppose you want to determine <span class="underline">whether there is a path</span> from a vertex u to
+another vertex v. Just do DFS from u, and see if v gets visited. (If not, you
+can't there from here.)
+</p>
+</div>
+</div>
+
+<div id="orgc743b05" class="outline-2">
+<h2 id="orgc743b05"><span class="section-number-2">12</span> How to specify 'Cycle path' in graph</h2>
+<div class="outline-text-2" id="text-12">
+<ol class="org-ol">
+<li>通过设置 visited 可以 check 是否含有 cycle path，但是没法将这个 cycle path
+完整的打印出来</li>
+</ol>
+</div>
+</div>
+<div id="org2b2919f" class="outline-2">
+<h2 id="org2b2919f"><span class="section-number-2">13</span> More on the Running Time of DFS</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+Why does DFS on an adjacency list run in <code>O(|V| + |E|)</code> time?
+</p>
+
+<p>
+The <code>O(|V|)</code> component comes up solely because we have to initialize all the
+"visited" flags to false (or at least construct an array of flags) before we
+start.
+</p>
+
+<p>
+The <code>O(|E|)</code> component is trickier. Take a look at the "for" loop of the <code>dfs()</code>
+pseudocode above. How many times does it iterate? If the vertex u has outdegree
+<code>d(u)</code>, then the loop iterates <code>d(u)</code> times. Different vertices have different
+degrees. Let the total degree D be the sum of the outdegrees of all the vertices
+in V.
+</p>
+
+<pre class="example">
+D =  sum  d(v).
+   v in V
+</pre>
+
+<p>
+A call to <code>dfs(u)</code> takes <code>O(d(u))</code> time, NOT counting the time for the recursive
+calls it makes to <code>dfs()</code>. A depth-first search never calls <code>dfs()</code> more than
+once on the same vertex, so the total running time of all the calls to <code>dfs()</code>
+is in <code>O(D)</code>. How large is D?
+</p>
+
+<ul class="org-ul">
+<li>If G is a directed graph, then <code>D = |E|</code>, the number of edges.</li>
+<li>If G is an undirected graph with no self-edges, then <code>D = 2|E|</code>, because each
+edge offers a path out of two vertices.</li>
+<li>If G is an undirected graph with one or more self-edges, then <code>D &lt; 2|E|</code>.</li>
+</ul>
+
+<p>
+In all three cases, the running time of depth-first search is in <code>O(|E|)</code>, NOT
+counting the time required to initialize the "visited" flags.
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

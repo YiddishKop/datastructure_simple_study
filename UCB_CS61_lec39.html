@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-09 四 19:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第三十九课 JAVA 垃圾回收机制初探</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第三十九课 JAVA 垃圾回收机制初探</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd661e43">lec 39 Garbage collection</a>
+<ul>
+<li><a href="#org7e18dd1">Roots and Reachability</a></li>
+<li><a href="#orgdfba83a">Memory Addresses</a></li>
+<li><a href="#org58ef185">Mark and Sweep Garbage Collection</a></li>
+<li><a href="#orgef345d8">Compaction</a></li>
+<li><a href="#org4cd0196">References</a></li>
+<li><a href="#org208e292">Copying Garbage Collection</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="orgd661e43" class="outline-2">
+<h2 id="orgd661e43">lec 39 Garbage collection</h2>
+<div class="outline-text-2" id="text-orgd661e43">
+<p>
+Objects take up space in memory. If your program creates lots of objects, throws
+them away, and creates more, you might eventually run out of memory. To reduce
+the chance that this will happen, Java has garbage collection.
+</p>
+
+<p>
+While the Java Virtual Machine (JVM) runs your program, it also spends little
+bits of time searching for objects that you're no longer using, so it can
+reclaim their memory for use by other objects.
+</p>
+
+<p>
+You don't have to know anything about garbage collection to be an effective Java
+programmer. But garbage collection is interesting because the JVM uses a lot of
+hidden data structures to manage memory. These data structures are hidden from
+your Java program&#x2013;after all, the JVM, just like any other encapsulated module,
+should hide the details of how it is implemented. Here's a peak at what's going
+on under the hood.
+</p>
+</div>
+
+<div id="org7e18dd1" class="outline-3">
+<h3 id="org7e18dd1">Roots and Reachability</h3>
+<div class="outline-text-3" id="text-org7e18dd1">
+<p>
+Garbage collection's prime directive is to never sweep up an object your program
+might possibly use or inspect again. These objects are said to be <span class="underline">live</span>. The
+opposite of "live" is <span class="underline">garbage</span>&#x2013;objects that your program cannot reference
+again. Java's design makes it possible for the JVM to determine whether an
+object can ever be used again by your program or not.
+</p>
+
+<p>
+Garbage collection begins at the roots. A <span class="underline">root</span> is any object reference your
+program can access directly, without going through another object. There are two
+kinds (that we know about). First, every local variable (including parameters)
+in every stack frame on the program stack is a root if it is a reference.
+(Primitive types like ints are not roots; only references are.) Second, every
+class variable (aka "static" field) that is a reference is a root.
+</p>
+
+<p>
+An object is live, and should not be garbage collected, if
+</p>
+<ul class="org-ul">
+<li>it is referenced by a root (obviously), or</li>
+<li>it is referenced by a field in another live object.</li>
+</ul>
+
+<p>
+Note that this definition is recursive. Another way to say it is that an object
+is live if it is <span class="underline">reachable</span> from the roots. If you run depth-first search
+starting at all the roots, you will visit all the live objects and none of the
+garbage. And that's exactly what garbage collectors do: run depth-first search
+from the roots.
+</p>
+
+<p>
+Each object has a small tag that allows the garbage collector to mark whether
+the object has been visited or not. The tag is invisible to your Java program,
+but it takes a few bits of the object's memory. (This is not the only "hidden"
+memory Java associates with an object&#x2013;for example, every object has a hidden
+label that tells Java what class it's in.)
+</p>
+</div>
+</div>
+<div id="orgdfba83a" class="outline-3">
+<h3 id="orgdfba83a">Memory Addresses</h3>
+<div class="outline-text-3" id="text-orgdfba83a">
+<p>
+In any modern computer, memory is one huge array of bytes with addresses.
+</p>
+
+<pre class="example">
+----------------------------
+|   |   |   |   |   |   |   ...
+----------------------------
+  0   1   2   3   4   5   6
+</pre>
+
+<p>
+However, modern computers prefer to read or write four bytes at a time, and
+they do this much faster if the four bytes start at an address divisible by
+four, so that's how things like ints and floats are stored.
+</p>
+
+<p>
+Every time you declare a local variable, you are naming a memory location.
+(You pick the name, Java picks the address.)  An assignment statement writes
+something into a memory location.
+</p>
+
+<pre class="example">
+              bob
+   -----------------------------                         int bob;
+...  |   |   | 3 |   |   |   |  ...
+   -----------------------------                         bob = 3;
+      208 212 216 220 224 228
+</pre>
+
+<p>
+Computers can store memory addresses in memory.  To reduce the number of
+syllables, memory addresses are called <span class="underline">pointers</span> for short.  Some languages
+like C allow you to declare variables that are pointers.  A pointer field is
+a memory location that points to another memory location.
+</p>
+
+<pre class="example">
+              bob     ptr
+   -----------------------------
+...  |   |   | 3 |   |216|   |  ...
+   --------------------+--------
+      208 212 216 220  |  228
+               ^       |
+               |       |
+               \-------/
+</pre>
+
+<p>
+Java uses pointers too, but it considers them confidential information, and
+won't let you print them or look at the numbers directly.  Java references are
+a little bit like pointers, but as we'll learn soon, they're actually more
+complicated than pointers.
+</p>
+
+<p>
+The important point is that your computer's memory is just one giant array that
+has no structure except the structure you impose on it.  Java saves you a huge
+amount of time and effort by structuring memory for you.  Java does this by
+using hidden pointer-based data structures that you can't access from a Java
+program.
+</p>
+</div>
+</div>
+
+<div id="org58ef185" class="outline-3">
+<h3 id="org58ef185">Mark and Sweep Garbage Collection</h3>
+<div class="outline-text-3" id="text-org58ef185">
+<p>
+A mark-and-sweep garbage collector runs in two separate phases.  The <span class="underline">mark</span>
+phase does a DFS from every root, and marks all the live objects.  The <span class="underline">sweep</span>
+phase does a pass over all the objects in memory.  Each object that was not
+marked as being live is garbage, and its memory is reclaimed.
+</p>
+
+<p>
+How does the sweep phase do a pass over all the objects in memory?  The JVM has
+an elaborate internal data structure for managing the heap.  This hidden data
+structure keeps track of free memory and allocated memory so that new objects
+can be allocated without overwriting live ones.  Time prevents my describing
+Java's heap data structure here, but it allows the garbage collector to do
+a pass over every object, even the ones that are not live.  It's roughly like
+an invisible linked list that links <span class="underline">everything</span>.
+</p>
+
+<p>
+Similarly, the stack frames on the stack are data structures that make it
+possible for the garbage collector to determine which data on the stack are
+references, and which are not.
+</p>
+
+<p>
+When a mark-and-sweep collector runs, your program stops running for an instant
+while the garbage collector does a mark pass and a sweep pass.  The garbage
+collector is typically started when the JVM tries to create a new object but
+doesn't have enough memory for it.
+</p>
+</div>
+</div>
+
+<div id="orgef345d8" class="outline-3">
+<h3 id="orgef345d8">Compaction</h3>
+<div class="outline-text-3" id="text-orgef345d8">
+<p>
+Typical programs allocate and forget a good many objects.  One problem that
+arises is <span class="underline">fragmentation</span>, the tendency of the free memory to get broken up
+into lots of small pieces.  Fragmentation can render Java unable to allocate a
+large object despite having lots of free memory available.
+</p>
+
+<p>
+(Fragmentation also means that the memory caches and virtual memory don't
+perform as well.  If you don't know why, wait until CS 61C or CS 152.)
+</p>
+
+<p>
+To solve this problem, a compacting garbage collector actually picks up the
+objects and moves them to different locations in memory, thereby removing the
+space between the objects.  This is easily done during the sweep phase.
+</p>
+
+<pre class="example">
+-------------------------------------    -------------------------------------
+|object  object    object   object  | =&gt; |objectobjectobjectobject           |
+-------------------------------------    -------------------------------------
+</pre>
+</div>
+</div>
+<div id="org4cd0196" class="outline-3">
+<h3 id="org4cd0196">References</h3>
+<div class="outline-text-3" id="text-org4cd0196">
+<p>
+There's a problem here:  if we pick up an object and move it, what about all
+the references to that object?  Aren't those references wrong now?
+</p>
+
+<p>
+Interestingly, in the Oracle JVM, a reference isn't a pointer.  A reference is
+a handle.  A <span class="underline">handle</span> is a pointer to a pointer.
+</p>
+
+<p>
+When an object moves, Java corrects the second pointer so it points to the
+object's new address.  That way, even if there are a million references to the
+object, they're all corrected in one fell swoop.  The "second pointers" are
+kept in a special table, since they don't take as much memory as objects.
+</p>
+
+<pre class="example">
+reference reference reference              reference reference reference
+     |        |        |                        |        |        |
+     |        v        |                        |        v        |
+     \-----&gt;====&lt;------/                        \-----&gt;====&lt;------/
+        /---+- |                   ==&gt;                 | -+----\
+        |   ====                                       ====    |
+        v                                                      v
+       object                                                object
+    "Over here"                                       "No, wait, over here"
+</pre>
+
+<p>
+The special table of "second pointers" does not suffer from fragmentation
+because all pointers have exactly the same size. Objects suffer from
+fragmentation because when a small object is garbage collected, the space it
+leaves behind might not be large enough to accommodate a larger object. But a
+garbage-collected object's "second pointer" can simply be reused by any newly
+constructed object that comes along, because all "second pointers" have the same
+size.
+</p>
+</div>
+</div>
+
+<div id="org208e292" class="outline-3">
+<h3 id="org208e292">Copying Garbage Collection</h3>
+<div class="outline-text-3" id="text-org208e292">
+<p>
+Copying garbage collection is an alternative to mark and sweep. It does
+compaction, but it is faster than mark and sweep with compaction because there
+is only one phase, rather than a mark phase and a sweep phase.
+</p>
+
+<p>
+Memory is divided into two distinct spaces, called the old space and the new
+space. A copying garbage collector finds the live objects by DFS as usual, but
+when it encounters an object in the old space, it <span class="underline">immediately</span> moves it to the
+new space. The object is moved to the first available memory location in the new
+space, so compaction is part of the deal. After all the objects are moved to the
+new space, the garbage objects that remain in the old space are simply
+forgotten. There is no need for a sweep phase.
+</p>
+
+<p>
+Next time the garbage collector runs, the new space is relabeled the "old space"
+and the old space is relabeled the "new space". Long-lived objects may be copied
+back and forth between the two spaces many times.
+</p>
+
+<p>
+While your program is running (between garbage collections), all your objects
+are in one space, while the other space sits empty.
+</p>
+
+<p>
+The advantage of copying garbage collection is that it's fast. The disadvantage
+is that you effectively cut in half the amount of heap memory available to your
+program.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

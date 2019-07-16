@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-08-10 五 00:06 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>第十课 JAVA 继承</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="yiddishkop" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="/home/yiddi/git_repos/YIDDI_org_export_theme/theme/org-nav-theme_cache.css" >
+<script src="https://hypothes.is/embed.js" async></script>
+<script type="application/json" class="js-hypothesis-config">
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">第十课 JAVA 继承</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd4c5b5e">1. INHERITANCE</a>
+<ul>
+<li><a href="#org3760278">1.1. Inheritance and Constructors</a></li>
+</ul>
+</li>
+<li><a href="#orgd3e3a48">2. Invoking Overridden Methods</a></li>
+<li><a href="#org3cb702f">3. The "protected" Keyword</a></li>
+<li><a href="#org5ca3f81">4. Class Hierarchies</a>
+<ul>
+<li><a href="#org8a4c0ee">4.1. Dynamic Method Lookup</a></li>
+<li><a href="#orgf747d77">4.2. Subtleties of Inheritance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="orgd4c5b5e" class="outline-2">
+<h2 id="orgd4c5b5e"><span class="section-number-2">1</span> INHERITANCE</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+In Lab 3, you modified several methods in the SList class so that a "tail"
+reference could keep track of the end of the list, thereby speeding up the
+<code>insertEnd()</code> method.
+</p>
+
+<p>
+We could have accomplished the same result without modifying SList&#x2013;by creating
+a new class that inherits all the properties of SList, and then changing only
+the methods that need to change.  Let's create a new class called TailList that
+inherits the fields and methods of the original SList class.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">TailList</span> <span style="color: #4f97d7; font-weight: bold;">extends</span> <span style="color: #ce537a; font-weight: bold;">SList</span> {
+  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">The "head" and "size" fields are inherited from SList.</span>
+  <span style="color: #4f97d7; font-weight: bold;">private</span> <span style="color: #ce537a; font-weight: bold;">SListNode</span> <span style="color: #7590db;">tail</span>;
+</pre>
+</div>
+
+<p>
+This code declares a TailList class that behaves just like the SList class, but
+has an additional field "tail" not present in the SList class.  TailList is
+said to be a <span class="underline">subclass</span> of SList, and SList is the <span class="underline">superclass</span> of TailList.
+A TailList has three fields:  head, size, and tail.
+</p>
+
+<p>
+A subclass can modify or augment a superclass in at least three ways:
+</p>
+<ol class="org-ol">
+<li>It can declare new fields.</li>
+<li>It can declare new methods.</li>
+<li>It can override old methods with new implementations.</li>
+</ol>
+
+<p>
+We've already seen an example of the first.  Let's try out the third.  The
+advantage of TailList is that it can perform the insertEnd() method much more
+quickly than a tail-less SList can.  So, let's write a new insertEnd() for
+TailList, which will <span class="underline">override</span> SList's old, slow insertEnd() method.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">insertEnd</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">obj</span>) {
+  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Your solution to Lab 3 goes here.</span>
+}
+</pre>
+</div>
+
+<p>
+The isEmpty(), length(), nth(), and toString() methods of SList do not need any
+changes on account of the tail reference.  These methods are inherited from
+SList, and there's no need to rewrite them.
+</p>
+</div>
+
+<div id="org3760278" class="outline-3">
+<h3 id="org3760278"><span class="section-number-3">1.1</span> Inheritance and Constructors</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+What happens when we construct a TailList?  Java executes a TailList
+constructor, as you would expect, but <span class="underline">first</span> it executes the code in the
+<code>SList()</code> constructor.  The TailList constructor should initialize fields unique
+to TailList.  It can also modify the work done by <code>SList()</code> if appropriate.
+</p>
+
+<pre class="example">
+public TailList() {
+  // SList() constructor called automatically; sets size = 0, head = null
+  tail = null;
+}
+</pre>
+<p>
+The zero-parameter <code>SList()</code> constructor is always called by default, regardless
+of the parameters passed to the TailList constructor.  To change this default
+behavior, the TailList constructor can explicitly call any constructor for its
+superclass by using the "super" keyword.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #bc6ec5; font-weight: bold;">TailList</span>(<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span>) {
+  <span style="color: #4f97d7; font-weight: bold;">super</span>(x);
+  tail = <span style="color: #a45bad;">null</span>;
+}
+</pre>
+</div>
+
+<p>
+The call to <code>*super()*</code> must be the first statement in the constructor.  If a
+constructor has no explicit call to "super", and its (nearest) superclass has
+no zero-parameter constructor, a compile-time error occurs.  There is no way to
+tell Java not to call a superclass constructor.  You have only the power to
+choose which of the superclass constructors is called.
+</p>
+</div>
+</div>
+</div>
+
+<div id="orgd3e3a48" class="outline-2">
+<h2 id="orgd3e3a48"><span class="section-number-2">2</span> Invoking Overridden Methods</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Sometimes you want to override a method, yet still be able to call the method
+implemented in the superclass.  The following example shows how to do this.
+Below, we want to reuse the code in SList.insertFront, but we also need to
+adjust the tail reference.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java">  <span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #ce537a; font-weight: bold;">void</span> <span style="color: #bc6ec5; font-weight: bold;">insertFront</span>(<span style="color: #ce537a; font-weight: bold;">Object</span> <span style="color: #7590db;">obj</span>) {
+    <span style="color: #4f97d7; font-weight: bold;">super</span>.insertFront(obj);             <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Insert at the front of the list.</span>
+    <span style="color: #4f97d7; font-weight: bold;">if</span> (size == <span style="color: #a45bad;">1</span>) {                    <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">If necessary,</span>
+      tail = head;                      <span style="color: #2aa1ae; background-color: #292e34;">//   </span><span style="color: #2aa1ae; background-color: #292e34;">adjust the tail reference.</span>
+    }
+  }
+}
+</pre>
+</div>
+
+<p>
+Unlike superclass constructor invocations, ordinary superclass method
+invocations need not be the first statement in a method.
+</p>
+</div>
+</div>
+
+<div id="org3cb702f" class="outline-2">
+<h2 id="org3cb702f"><span class="section-number-2">3</span> The "protected" Keyword</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+I lied when I said that we don't need to modify SList.  One change is
+necessary.  The "head" and "size" fields in SList must be declared "protected",
+not "private".
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">public</span> <span style="color: #4f97d7; font-weight: bold;">class</span> <span style="color: #ce537a; font-weight: bold;">SList</span> {
+  <span style="color: #4f97d7; font-weight: bold;">protected</span> <span style="color: #ce537a; font-weight: bold;">SListNode</span> <span style="color: #7590db;">head</span>;
+  <span style="color: #4f97d7; font-weight: bold;">protected</span> <span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">size</span>;
+
+  [Method definitions.]
+}
+</pre>
+</div>
+
+<p>
+"<code>protected</code>" is a level of protection somewhere between "public" and "private".
+A "protected" field is visible to the declaring class and all its subclasses,
+but not to other classes.  "private" fields aren't even visible to the
+subclasses.
+</p>
+
+<p>
+If "head" and "size" are declared private, the method TailList.insertFront
+can't access them and won't compile.  If they're declared protected,
+insertFront can access them because TailList is a subclass of SList.
+</p>
+
+<p>
+When you write an ADT, if you think somebody might someday want to write a
+subclass of it, declare its vulnerable fields "protected", unless you have a
+reason for not wanting subclasses to see them.  Helper methods often should be
+declared "protected" as well.
+
+</p>
+</div>
+</div>
+<div id="org5ca3f81" class="outline-2">
+<h2 id="org5ca3f81"><span class="section-number-2">4</span> Class Hierarchies</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Subclasses can have subclasses.  Subclassing is transitive:  if Proletariat is
+a subclass of Worker, and Student is a subclass of Proletariat, then Student is
+a subclass of Worker.  Furthermore, <span class="underline">every</span> class is a subclass of the Object
+class (including Java's built-in classes like String and BufferedReader.)
+Object is at the top of every class hierarchy.
+</p>
+
+<pre class="example">
+      Object
+      /    \
+  String  Worker
+         /      \
+Proletariat  Bourgeoisie        Superclasses appear above their subclasses.
+   /     \       |
+Student  TA   Professor
+</pre>
+
+<p>
+That's why the "item" field in each listnode is of type Object:  it can
+reference any object of any class.  (It can't reference a primitive type,
+though.)
+</p>
+</div>
+
+<div id="org8a4c0ee" class="outline-3">
+<h3 id="org8a4c0ee"><span class="section-number-3">4.1</span> Dynamic Method Lookup</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Here's where inheritance gets interesting.  Any TailList can masquerade as an
+SList.  An object of class TailList can be assigned to a variable of type
+SList&#x2013;but the reverse is not true.  Every TailList is an SList, but not every
+SList is a TailList.  It merits repeating:
+</p>
+
+<pre class="example">
+&gt;&gt;&gt;!!!*** Every TailList *IS* an SList. ***!!!&lt;&lt;&lt;    For example:
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">SList</span> <span style="color: #7590db;">s</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">TailList</span>();         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+<span style="color: #ce537a; font-weight: bold;">TailList</span> <span style="color: #7590db;">t</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SList</span>();         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">COMPILE-TIME ERROR.</span>
+</pre>
+</div>
+
+<p>
+Memorize the following two definitions.
+</p>
+<ul class="org-ul">
+<li><span class="underline">Static_type</span>:  The type of a variable.</li>
+<li><span class="underline">Dynamic_type</span>:  The class of the object the variable references.</li>
+</ul>
+
+<p>
+In the code above, the static type of s is SList, and the dynamic type of s is
+TailList.  Henceforth, I will often just say "type" for static type and "class"
+for dynamic type.
+</p>
+
+<p>
+When we invoke an overridden method, Java calls the method for the object's
+<span class="underline">dynamic</span> type, regardless of the variable's static type.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">SList</span> <span style="color: #7590db;">s</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">TailList</span>();
+s.insertEnd(obj);                 <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Calls TailList.insertEnd()</span>
+s = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SList</span>();
+s.insertEnd(obj);                 <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Calls SList.insertEnd()</span>
+</pre>
+</div>
+
+<p>
+This is called <span class="underline">dynamic_method_lookup</span>, because Java automatically looks up the
+right method for a given object at run-time.  Why is it interesting?
+</p>
+<pre class="example">
+-------------------------------------------------------------------------------
+| WHY DYNAMIC METHOD LOOKUP MATTERS             (Worth reading and rereading) |
+|                                                                             |
+| Suppose you have a method (in any class) that sorts an SList using only     |
+| SList method calls (but doesn't construct any SLists).  Your method now     |
+| sorts TailLists too, with no changes.                                       |
+|                                                                             |
+| Suppose you've written a class--let's call it RunLengthEncoding--that uses  |
+| SLists extensively.  By changing the constructors so that they create       |
+| TailLists instead of SLists, your class immediately realizes the            |
+| performance improvement that TailLists provide--without changing anything   |
+| else in the RunLengthEncoding class.                                        |
+-------------------------------------------------------------------------------
+
+</pre>
+</div>
+</div>
+
+<div id="orgf747d77" class="outline-3">
+<h3 id="orgf747d77"><span class="section-number-3">4.2</span> Subtleties of Inheritance</h3>
+<div class="outline-text-3" id="text-4-2">
+<ol class="org-ol">
+<li><p>
+Suppose we write a new method in the TailList class called eatTail(). We
+can't call eatTail on an SList. We can't even call eatTail on a variable of
+type SList that references a TailList.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">TailList</span> <span style="color: #7590db;">t</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">TailList</span>();
+t.eatTail();                      <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+<span style="color: #ce537a; font-weight: bold;">SList</span> <span style="color: #7590db;">s</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">TailList</span>();         <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy--every TailList is an SList.</span>
+s.eatTail();                      <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">COMPILE-TIME ERROR.</span>
+</pre>
+</div>
+
+<p>
+<b>Why?</b>  Because not every object of class SList has an "eatTail()" method, so
+Java can't use dynamic method lookup on the variable s.
+</p>
+
+<p>
+But if we define eatTail() in SList instead, the statements above compile and
+run without errors, even if no eatTail() method is defined in class TailList.
+(TailList inherits eatTail() from SList.)
+</p></li>
+
+<li><p>
+I pointed out earlier that you can't assign an SList object to a TailList
+variable. The rules are more complicated when you assign one variable to
+another.
+</p>
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">SList</span> <span style="color: #7590db;">s</span>;
+<span style="color: #ce537a; font-weight: bold;">TailList</span> <span style="color: #7590db;">t</span> = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">TailList</span>();
+s = t;                            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+t = s;                            <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">COMPILE-TIME ERROR.</span>
+t = (<span style="color: #ce537a; font-weight: bold;">TailList</span>) s;                 <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+s = <span style="color: #4f97d7; font-weight: bold;">new</span> <span style="color: #ce537a; font-weight: bold;">SList</span>();
+t = (<span style="color: #ce537a; font-weight: bold;">TailList</span>) s;                 <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">RUN-TIME ERROR:  ClassCastException.</span>
+</pre>
+</div>
+
+<p>
+Why does the compiler reject "t = s", but accept "t = (TailList) s"?  It
+refuses "t = s" because not every SList is a TailList, and it wants you to
+confirm that you're not making a thoughtless mistake.  The cast in the latter
+statement is your way of reassuring the compiler that you've designed the
+program to make sure that the SList s will always be a TailList.
+</p>
+
+<p>
+If you're wrong, Java will find out when you run the program, and will crash
+with a "ClassCastException" error message.  The error occurs only at run-time
+because Java cannot tell in advance what class of object s will reference.
+</p>
+
+<p>
+Recall that SLists store items of type Object.  When they're recovered, they
+usually have to be cast back to a more specific type before they can be used.
+Suppose we have a list of Integers.  Recall that nth() returns type Object.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">x</span> = t.nth(<span style="color: #a45bad;">1</span>).intValue();                <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">COMPILE-TIME ERROR.</span>
+<span style="color: #ce537a; font-weight: bold;">int</span> <span style="color: #7590db;">y</span> = ( (<span style="color: #ce537a; font-weight: bold;">Integer</span>) t.nth(<span style="color: #a45bad;">1</span>) ).intValue();  <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+</pre>
+</div>
+
+<p>
+Some methods are defined on every Object, though.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #ce537a; font-weight: bold;">String</span> <span style="color: #7590db;">z</span> = t.nth(<span style="color: #a45bad;">1</span>).toString();             <span style="color: #2aa1ae; background-color: #292e34;">// </span><span style="color: #2aa1ae; background-color: #292e34;">Groovy.</span>
+</pre>
+</div></li>
+
+<li><p>
+Java has an "instanceof" operator that tells you whether an object is of a
+specific class. WARNING: The "o" in "instanceof" is not capitalized.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #4f97d7; font-weight: bold;">if</span> (s <span style="color: #4f97d7; font-weight: bold;">instanceof</span> TailList) {
+  t = (<span style="color: #ce537a; font-weight: bold;">TailList</span>) s;
+}
+</pre>
+</div>
+
+<p>
+This instanceof operation will return false if s is null or doesn't reference
+a TailList. It returns true if s references a TailList object&#x2013;even if it's a
+subclass of TailList.
+</p></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
